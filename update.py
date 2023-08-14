@@ -36,12 +36,12 @@ def upload(text, kbId):  # Upload the text to the website.
 
 
 if __name__ == "__main__":
-    repos = os.listdir("./modules")
+    repos = os.listdir("/home/runner/work/CNCF-Graduated/CNCF-Graduated/modules")
     for repo in repos:
-        f = open(f'./kbId/{repo}/secret.yaml', 'r', encoding='utf-8')
+        f = open(f'/home/runner/work/CNCF-Graduated/CNCF-Graduated/kbId/{repo}/secret.yaml', 'r', encoding='utf-8')
         secrets = yaml.load(f.read(), Loader=yaml.FullLoader)
         kbId = secrets["kbId"]
-        for root, dirs, files in os.walk(f"./modules/{repo}"):
+        for root, dirs, files in os.walk(f"/home/runner/work/CNCF-Graduated/CNCF-Graduated/modules/{repo}"):
             for file in files:
                 if getsuffix(file) == "md":  # We only care about .md files
                     cwd = root + '/' + file
