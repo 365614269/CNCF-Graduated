@@ -1,1 +1,0 @@
-Tài liệu trong thư mục này được lấy từ nguồn khác. Vui lòng không trực tiếp sửa chúng, ngoại trừ việc thay thế chúng với phiên bản khác.

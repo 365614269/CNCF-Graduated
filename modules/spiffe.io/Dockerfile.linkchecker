@@ -1,9 +1,0 @@
-FROM python:3.8-alpine
-
-ENV HOME /tmp
-
-RUN pip install linkchecker
-
-ADD linkcheckerrc .
-
-ENTRYPOINT [ "linkchecker" ]

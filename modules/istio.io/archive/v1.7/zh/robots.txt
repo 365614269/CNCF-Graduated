@@ -1,3 +1,0 @@
-User-agent: *
-Disallow:
-Sitemap: /v1.7/sitemap.xml

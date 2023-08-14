@@ -1,7 +1,0 @@
-.vscode
-node_modules
-.*.swp
-.DS_Store
-tmp
-.idea
-bin

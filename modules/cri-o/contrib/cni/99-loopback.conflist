@@ -1,9 +1,0 @@
-{
-    "cniVersion": "1.0.0",
-    "name": "loopback",
-    "plugins": [
-        {
-            "type": "loopback"
-        }
-    ]
-}

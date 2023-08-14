@@ -1,2 +1,0 @@
-{{ $path := . }}
-{{ with resources.Get (printf "inline_images/%s" ($path)) }}{{ .Content | safeHTML }}{{ end }}

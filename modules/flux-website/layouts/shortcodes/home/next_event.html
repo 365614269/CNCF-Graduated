@@ -1,8 +1,0 @@
-{{ $_hugo_config := `{ "version": 1 }` }}
-{{ $blockID := printf "td-cover-block-%d" .Ordinal }}
-
-<p class="next-event">
-{{ range first 1 $.Site.Data.calendar }}
-📆 Next event: <a href="{{ .where }}">{{ .date }} {{ .time }} UTC: {{ .label }}</a>
-{{ end }}
-</p>

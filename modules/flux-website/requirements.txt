@@ -1,8 +1,0 @@
-icalendar
-pathlib
-pygithub
-python-dateutil>=2.8.1
-pytz
-pyYaml
-recurring-ical-events
-urllib3
