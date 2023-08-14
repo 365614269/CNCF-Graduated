@@ -1,0 +1,13 @@
+name: netlify
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+jobs:
+  publish:
+    if: github.repository == 'fluxcd/website'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy 'main' on Netlify
+        run: |
+          curl -X POST -d {} '${{ secrets.NETLIFY_BUILD_HOOK }}'

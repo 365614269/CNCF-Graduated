@@ -1,0 +1,72 @@
+name: install
+
+on:
+  pull_request:
+    paths:
+      - Makefile
+      - run.linkerd.io/public/install*
+
+jobs:
+  lint:
+    name: Lint install script
+    runs-on: ubuntu-latest
+    container:
+      image: buoyantio/website-builder:v1.3.3
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Lint install script
+      run: |
+        make shellcheck
+
+  build:
+    name: Build install script
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build scripts
+      run: |
+        make build-run.linkerd.io
+
+    - uses: actions/upload-artifact@v3.1.2
+      with:
+        name: run.linkerd.io
+        path: tmp/run.linkerd.io/public
+
+  install:
+    name: Test install for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    needs: [build]
+
+    steps:
+    - uses: actions/download-artifact@v3.0.2
+      with:
+        name: run.linkerd.io
+
+    - name: Test install script execution
+      shell: bash
+      run: |
+        for script in $(find run.linkerd.io/install*); do
+          [ $(uname -s) = "Darwin" ] && statcmd="stat -f %m" || statcmd="stat -c %Y"
+          sh ${script}
+          set -x
+          client=$(~/.linkerd2/bin/linkerd version --client --short)
+          expected=$(cat ${script} | grep VERSION= | sed 's/.*:-\(.*\)\}.*/\1/')
+          [ "$client" = "$expected" ]
+          orig_mtime=$(${statcmd} ~/.linkerd2/bin/linkerd-${expected})
+          # re-run should not re-download
+          sh ${script}
+          new_mtime=$(${statcmd} ~/.linkerd2/bin/linkerd-${expected})
+          [ "${orig_mtime}" = "${new_mtime}" ]
+          # breaking the sha hash forces a redownload
+          echo "x" >> ~/.linkerd2/bin/linkerd-${expected}
+          sh ${script}
+          new_mtime=$(${statcmd} ~/.linkerd2/bin/linkerd-${expected})
+          [ "${orig_mtime}" != "${new_mtime}" ]
+        done

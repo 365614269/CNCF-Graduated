@@ -1,0 +1,139 @@
+title = "Harbor"
+baseURL = "https://goharbor.io"
+disableKinds = ["taxonomy", "taxonomyTerm"]
+ignoreFiles = ["README.md"]
+
+[params]
+tagline = "Manage and serve container images in a secure environment"
+description = "Our mission is to be the trusted cloud native repository for Kubernetes"
+intro = "Want to know more about what Harbor is and how it works? Watch this intro video to see how Harbor is helping organizations deliver a consistent image management solution across a variety of cloud native compute platforms like [Kubernetes](https://kubernetes.io) and [Docker](https://docker.com)."
+font_awesome_version = "5.12.0"
+favicon = "favicon.png"
+cncf_status = "Graduated"
+repo = "goharbor/harbor"
+twitter = "project_harbor"
+slack = "https://cloud-native.slack.com/messages/harbor"
+github = "https://github.com/goharbor/harbor"
+user_group = "https://lists.cncf.io/g/harbor-users"
+dev_group = "https://lists.cncf.io/g/harbor-dev"
+logo_repo = "https://github.com/cncf/artwork/tree/master/projects/harbor"
+youtube_video_id = "4zZiBcvZmgQ"
+alpine_js_version = "2.1.2"
+
+[[params.versions]]
+harborversion = "2.8.0"
+helmversion = "1.12"
+branchname = "release-2.8.0"
+
+[[params.versions]]
+harborversion = "2.7.0"
+helmversion = "1.11"
+branchname = "release-2.7.0"
+
+[[params.versions]]
+harborversion = "2.6.0"
+helmversion = "1.10"
+branchname = "release-2.6.0"
+
+[[params.versions]]
+harborversion = "2.5.0"
+helmversion = "1.9"
+branchname = "release-2.5.0"
+
+[[params.versions]]
+harborversion = "2.4.0"
+helmversion = "1.8"
+branchname = "release-2.4.0"
+
+[[params.versions]]
+harborversion = "2.3.0"
+helmversion = "1.7"
+branchname = "release-2.3.0"
+
+[[params.versions]]
+harborversion = "2.2.0"
+helmversion = "1.6"
+branchname = "release-2.2.0"
+
+[[params.versions]]
+harborversion = "2.1.0"
+helmversion = "1.5"
+branchname = "release-2.1.0"
+
+[[params.versions]]
+harborversion = "2.0.0"
+helmversion = "1.4"
+branchname = "release-2.0.0"
+
+[[params.versions]]
+harborversion = "1.10"
+helmversion = "1.3"
+branchname = "release-1.10"
+
+[params.info]
+what_is = "Harbor is an open source registry that secures artifacts with policies and role-based access control, ensures images are scanned and free from vulnerabilities, and signs images as trusted. Harbor, a CNCF Graduated project, delivers compliance, performance, and interoperability to help you consistently and securely manage artifacts across cloud native compute platforms like Kubernetes and Docker."
+
+getting_started = """
+Harbor can be installed on any Kubernetes environment or on a system with Docker support. Information on how to get started:
+
+* [Harbor Installation and Configuration](/docs/latest/install-config)
+* [Harbor Administration](/docs/latest/administration)
+"""
+
+[params.features]
+security = [
+    { title = "Security and vulnerability analysis", icon = "fas fa-lock" },
+    { title = "Content signing and validation", icon = "fas fa-file-signature" },
+]
+management = [
+    { title = "Multi-tenant", icon = "fas fa-boxes" },
+    { title = "Extensible API and web UI", icon = "fas fa-globe" },
+    { title = "Replication across many registries, including Harbor", icon = "far fa-images" },
+    { title = "Identity integration and role-based access control", icon = "fas fa-users" },
+]
+
+[markup.highlight]
+style = "pygments"
+guessSyntax = true
+
+[markup.goldmark.renderer]
+unsafe = true
+
+[params.logos]
+footer = "harbor-horizontal-color.svg"
+navbar = "harbor-horizontal-color.png"
+
+[[params.fonts]]
+name = "PT Sans"
+sizes = [300, 400, 600, 700]
+type = "sans_serif"
+
+[[menu.main]]
+name = "Home"
+url = "/"
+weight = 1
+
+[[menu.main]]
+name = "Getting Started"
+url = "/docs/latest/install-config"
+weight = 2
+
+[[menu.main]]
+name = "Community"
+url = "/community"
+weight = 3
+
+[[menu.main]]
+name = "Blog"
+url = "/blog"
+weight = 4
+
+[outputs]
+home = [ "HTML", "REDIRECTS" ]
+
+[mediaTypes."text/netlify"]
+delimiter = ""
+
+[outputFormats.REDIRECTS]
+mediaType = "text/netlify"
+baseName = "_redirects"

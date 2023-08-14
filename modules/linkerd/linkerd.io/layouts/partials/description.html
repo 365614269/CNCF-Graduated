@@ -1,0 +1,7 @@
+{{- if isset .Params "description" -}}
+{{ .Params.description }}
+{{- else if isset .Params "summary" -}}
+{{ .Params.summary }}
+{{- else -}}
+{{ .Summary}}
+{{- end -}}

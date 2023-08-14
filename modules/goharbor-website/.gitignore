@@ -1,0 +1,48 @@
+# Application #
+############
+.htaccess
+
+# npm assets
+node_modules/
+
+public*/
+resources/
+
+# Content from goharbor/harbor repo
+content/docs/
+generated/
+
+# Link checker artifacts
+bin/
+tmp/
+
+# Packages #
+############
+*.7z
+*.dmg
+*.gz
+*.bz2
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.tgz
+
+# GULP #
+########
+sync.js
+
+# OS generated files #
+######################ß
+.DS_Store*
+ehthumbs.db
+#Icon?
+Thumbs.db
+._*
+
+# Editor generated files #
+######################
+*.un~
+.idea/
+.hugo_build.lock

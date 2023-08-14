@@ -1,0 +1,61 @@
+{{ $toc := partial "toc.html" (dict "page" .) }}
+{{ $needTOC := .Scratch.Get "needTOC" }}
+{{ $skipPageNav := .Scratch.Get "skipPageNav" }}
+
+            {{ if .Scratch.Get "seeAlso" }}
+                {{ $related := .Site.RegularPages.Related . }}
+                {{ $excludes := where $related "Params.exclude_from_see_also" true }}
+                {{ $seeAlso := $related | complement $excludes | first 6 }}
+                {{ with $seeAlso }}
+                    <nav id="see-also">
+                        <h2>{{ i18n "see_also" }}</h2>
+
+                        <div class="see-also">
+                            {{ range . }}
+                                <div class="entry">
+                                    <p class="link"><a data-skipendnotes="true" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></p>
+                                    <p class="desc">{{ .Description }}</p>
+                                </div>
+                            {{ end }}
+                        </div>
+                    </nav>
+                {{ end }}
+            {{ end }}
+        </article>
+
+        {{ partial "posts_navigation.html" . }}
+
+        {{ if not .Params.skip_feedback }}
+            {{ if .Scratch.Get "getFeedback" }}
+                <div id="feedback">
+                    <div id="feedback-initial">
+                        {{ i18n "feedback_title" }}<br>
+                        <button class="btn feedback" onclick="sendFeedback('{{.Site.Language}}', 1)">{{ i18n "feedback_yes" }}</button>
+                        <button class="btn feedback" onclick="sendFeedback('{{.Site.Language}}', 0)">{{ i18n "feedback_no" }}</button>
+                    </div>
+                    <div id="feedback-comment">
+                        {{ i18n "feedback_ask_for_comment" }}<br><br>
+                        <input id="feedback-textbox" type="text" placeholder='{{ i18n "feedback_comment_placeholder"}}' data-lang='{{.Site.Language}}'/>
+                    </div>
+                    <div id="feedback-thankyou">
+                        {{ i18n "feedback_thankyou" }}
+                    </div>
+                </div>
+            {{ end }}
+        {{ end }}
+
+        <div id="endnotes-container" aria-hidden="true">
+            <h2>{{ i18n "links" }}</h2>
+            <ol id="endnotes"></ol>
+        </div>
+    </div>
+    {{ if and $needTOC (not .Params.force_inline_toc) }}
+        <div class="toc-container">
+            <nav class="toc" aria-label="Table of Contents">
+                <div id="toc">
+                    {{ $toc | safeHTML }}
+                </div>
+            </nav>
+        </div>
+    {{ end }}
+</main>

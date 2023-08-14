@@ -1,0 +1,13 @@
+/capnpc-go/capnpc-go
+/internal/cmd/mktemplates/mktemplates
+TAGS
+*~
+*.swp
+*.out
+
+# Bazel
+/bazel-bin
+/bazel-capnproto2
+/bazel-genfiles
+/bazel-out
+/bazel-testlogs

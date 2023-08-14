@@ -1,0 +1,75 @@
+<div class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" aria-label="Close modal" onclick="closeModal()">
+                    {{ partial "icon.html" "menu-close" }}
+                </button>
+            </div>
+
+            <div class="modal-body modal-company">
+                {{ partial "company_logo" (dict "link" "#" "alt" "modal-logo" "logo" "/") }}
+
+                <div id="modal-company-details"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const modalBody = document.getElementsByClassName("modal-company")[0];
+    let body = document.body;
+    let companyDetails = document.getElementById("modal-company-details");
+    let companyLogoPanel = modalBody.getElementsByClassName("company-logo")[0];
+
+    function showModal() {
+        body.classList.add("modal-open");
+    }
+
+    function closeModal() {
+        body.classList.remove("modal-open");
+    }
+
+    function insertCompanyModalDetails(company) {
+        clearModal();
+        insertParagraphs(company);
+        insertLogo(company);
+    }
+
+    function clearModal() {
+        companyDetails.innerHTML = "";
+        companyLogoPanel.innerHTML = "";
+    }
+
+    function insertParagraphs(company) {
+        if(company.details) {
+            company.details.forEach(paragraph => {
+                let para = document.createElement("p");
+                const node = document.createTextNode(paragraph);
+                para.appendChild(node);
+                companyDetails.appendChild(para);
+            });
+        }
+        if (company.url && company.name) {
+            let link = document.createElement("a");
+            link.href = company.url;
+            link.text = company.name;
+            companyDetails.append(link)
+        }
+    }
+
+    function insertLogo(company) {
+        let img = document.createElement("img");
+
+        if(company.url) {
+            companyLogoPanel.href = company.url;
+            companyLogoPanel.target = "_blank";
+        }
+
+        if(company.logo && company.name) {
+            img.src = `${location.origin}/latest${company.logo}`;
+            img.alt = `${company.name} logo`;
+            companyLogoPanel.append(img);
+        }
+    }
+</script>

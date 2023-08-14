@@ -1,0 +1,125 @@
+dependencies:
+  - name: go
+    version: 1.20
+    refPaths:
+    - path: .github/workflows/verify.yml
+      match: GO_VERSION
+    - path: .github/workflows/integration.yml
+      match: GO_VERSION
+    - path: .github/workflows/test.yml
+      match: GO_VERSION
+    - path: contrib/test/integration/vars.yml
+      match: golang_version
+    - path: contrib/test/ci/vars.yml
+      match: golang_version
+
+  - name: golangci-lint
+    version: v1.53.2
+    refPaths:
+    - path: .github/workflows/verify.yml
+      match: GOLANGCI_LINT_VERSION
+    - path: Makefile
+      match: GOLANGCI_LINT_VERSION
+
+  - name: shellcheck
+    version: v0.9.0
+    refPaths:
+    - path: Makefile
+      match: SHELLCHECK_VERSION
+
+  - name: cni-plugins
+    version: v1.3.0
+    refPaths:
+    - path: scripts/versions
+      match: cni-plugins
+    - path: contrib/test/integration/build/plugins.yml
+      match: version
+    - path: contrib/test/ci/build/plugins.yml
+      match: version
+
+  - name: conmon
+    version: v2.1.6
+    refPaths:
+    - path: scripts/versions
+      match: conmon
+
+  - name: cri-tools
+    version: v1.27.0
+    refPaths:
+    - path: scripts/versions
+      match: cri-tools
+    # Uncomment and pin once we have cri-tools v1.28.0
+    # - path: contrib/test/integration/vars.yml
+    #   match: cri_tools_git_version
+    # - path: contrib/test/ci/vars.yml
+    #   match: cri_tools_git_version
+
+  - name: runc
+    version: v1.1.9
+    refPaths:
+    - path: scripts/versions
+      match: runc
+
+  - name: crun
+    version: 1.8.5
+    refPaths:
+    - path: scripts/versions
+      match: crun
+
+  - name: bats
+    version: v1.10.0
+    refPaths:
+    - path: scripts/versions
+      match: bats
+    - path: contrib/test/integration/build/bats.yml
+      match: version
+    - path: contrib/test/ci/build/bats.yml
+      match: version
+
+  - name: zeitgeist
+    version: 0.4.1
+    refPaths:
+      - path: Makefile
+        match: ZEITGEIST_VERSION
+
+  - name: nix
+    version: 2.15.1
+    refPaths:
+      - path: .github/workflows/test.yml
+        match: NIX_VERSION
+
+  - name: bom
+    version: 0.5.1
+    refPaths:
+      - path: Makefile
+        match: BOM_VERSION
+
+  - name: release-notes
+    version: 0.15.1
+    refPaths:
+      - path: Makefile
+        match: RELEASE_NOTES_VERSION
+
+  - name: shfmt
+    version: 3.6.0
+    refPaths:
+      - path: Makefile
+        match: SHFMT_VERSION
+
+  - name: mockgen
+    version: 1.6.0
+    refPaths:
+      - path: Makefile
+        match: MOCKGEN_VERSION
+
+  - name: go-mod-outdated
+    version: 0.9.0
+    refPaths:
+      - path: Makefile
+        match: GO_MOD_OUTDATED_VERSION
+
+  - name: gosec
+    version: 2.15.0
+    refPaths:
+      - path: Makefile
+        match: GOSEC_VERSION

@@ -1,0 +1,111 @@
+---
+- name: create crio dir
+  file:
+    path: "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o"
+    state: directory
+
+## extract source
+- name: check if cri-o.tar.gz exists
+  stat:
+    path: "/home/deadbeef/cri-o.tar.gz"
+  register: source_tar
+
+- name: extract cri-o
+  unarchive:
+    src: "/home/deadbeef/cri-o.tar.gz"
+    dest: "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o"
+  when: source_tar.stat.exists
+
+- name: check if vargrant source exists
+  stat:
+    path: /vagrant
+  register: vagrant_dir
+
+- name: copy vagrant source
+  synchronize:
+    dest: "/home/deadbeef/src/github.com/cri-o/cri-o"
+    src: /vagrant/
+  when: (vagrant_dir.stat.isdir is defined) and (vagrant_dir.stat.isdir)
+
+## Check for python executable
+- name: see if the python executable or symlink is available
+  stat:
+    path: /usr/bin/python
+  register: python_exists
+
+- name: symlink python3 to python
+  file:
+    src: /usr/bin/python3
+    dest: /usr/bin/python
+    state: link
+  when: not python_exists.stat.exists
+
+- name: Set cri-o repo to be a safe directory to be accessed by root
+  command:
+    cmd: git config --global --add safe.directory "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o"
+
+- name: build cri-o
+  make:
+    chdir: "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o"
+
+- name: link pinns
+  file:
+    src: "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o/bin/pinns"
+    dest: "/bin/pinns"
+    state: link
+
+- name: set RestartPolicy in systemd unit appropriate for tests
+  lineinfile:
+    path: "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o/contrib/systemd/crio.service"
+    regexp: '^Restart='
+    line: 'Restart=no'
+
+- name: install cri-o
+  make:
+    target: install
+    chdir: "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o"
+
+- name: use crun
+  copy:
+    dest: /etc/crio/crio.conf.d/01-crun.conf
+    content: |
+      [crio.runtime]
+      default_runtime = "crun"
+      [crio.runtime.runtimes.crun]
+      runtime_root = "/run/crun"
+  when: "build_crun | default(False) | bool"
+
+- name: use conmon-rs
+  copy:
+    dest: /etc/crio/crio.conf.d/99-conmonrs.conf
+    content: |
+      [crio.runtime.runtimes.runc]
+      runtime_type = "pod"
+
+      [crio.runtime.runtimes.crun]
+      runtime_type = "pod"
+      runtime_root = "/run/crun"
+  when: "use_conmonrs | default(False) | bool"
+
+- name: use evented-pleg
+  copy:
+    dest: /etc/crio/crio.conf.d/99-evented-pleg.conf
+    content: |
+      [crio.runtime]
+      enable_pod_events = true
+  when: "evented_pleg_fg | default(False) | bool"
+
+- name: install configs
+  copy:
+    src: "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o/{{ item.src }}"
+    dest: "{{ item.dest }}"
+    remote_src: yes
+  with_items:
+    - src: contrib/cni/10-crio-bridge.conflist
+      dest: /etc/cni/net.d/10-crio-bridge.conflist
+    - src: contrib/cni/99-loopback.conflist
+      dest: /etc/cni/net.d/99-loopback.conflist
+    - src: test/redhat_sigstore.yaml
+      dest: /etc/containers/registries.d/registry.access.redhat.com.yaml
+    - src: test/default.yaml
+      dest: /etc/containers/registries.d/default.yaml

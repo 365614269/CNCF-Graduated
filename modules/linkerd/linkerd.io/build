@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+
+BASE_DIR=$(pwd -P)
+rm -rf "$BASE_DIR"/public
+
+hugo

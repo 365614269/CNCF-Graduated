@@ -1,0 +1,27 @@
+{{ define "main" }}
+<div class="wrapper has-background-bright-blue has-text-white has-text-centered">
+  <div class="container notification has-background-bright-blue platform-top-hero is-fullheight hero">
+    <div class="hero-body">
+      <div class="container columns is-vcentered is-mobile">
+        <div class="column">
+          <h1>
+            Aw, snap!<br />
+            Something’s not quite right.
+          </h1>
+
+          <div class="container center buttons">
+            <div class="column">
+              <a href="/" class="button is-large is-primary">Go Home</a>
+
+              <button id="goToPrevPage" class="button is-large">Previous Page</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ $js := resources.Get "js/not-found.js" | resources.Minify | resources.Fingerprint }}
+<script src="{{ $js.Permalink }}"></script>
+{{ end }}

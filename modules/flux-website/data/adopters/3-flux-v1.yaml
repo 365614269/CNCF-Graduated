@@ -1,0 +1,221 @@
+# Flux Legacy and Helm Operator have been archived
+# https://fluxcd.io/blog/2022/10/september-2022-update/#flux-legacy-v1-retirement-plan
+#
+# We strongly recommend you familiarise yourself with the newest Flux and
+# migrate as soon as possible: https://fluxcd.io/flux/migration/
+#
+
+adopters:
+  project: Flux (legacy)
+  description: >
+    All of these organisations have been using Flux and Helm Operator.
+  companies:
+    - name: ABA English
+      url: https://www.abaenglish.com
+    - name: Alea
+      url: https://www.alea.com
+      logo: logos/alea.png
+    - name: Apester
+      url: https://apester.com
+    - name: APPUiO
+      url: https://appuio.ch
+    - name: ArangoDB Oasis
+      url: https://arangodb.com/managed-service
+    - name: Avisi
+      url: https://avisi.nl
+    - name: B3i
+      url: https://b3i.tech/
+    - name: Babylon Health
+      url: https://www.babylonhealth.com/
+    - name: Belvo
+      url: https://belvo.com/
+    - name: bimspot
+      url: https://bimspot.io
+      logo: logos/bimspot.png
+    - name: Bink
+      url: https://bink.com
+      logo: logos/bink.png
+    - name: BlaBlaCar
+      url: https://www.blablacar.com/
+    - name: blackmirror media
+      url: https://blackmirror.media
+      logo: logos/blackmirror-media.png
+    - name: Canva
+      url: https://www.canva.com/
+      logo: logos/canva.png
+    - name: Carrot
+      url: https://carrot.com
+    - name: Chattigo
+      url: https://chattigo.com
+    - name: Cloudlets
+      url: https://cloudlets.io
+    - name: Cloudogu GmbH
+      logo: logos/cloudogu.svg
+      url: https://cloudogu.com
+    - name: CLVR Cloud Ltd
+      url: https://clvr.cloud
+    - name: College of William & Mary
+      url: https://www.wm.edu
+    - name: Consorcio Chile
+      url: https://www.consorcio.cl
+    - name: Control Plane
+      url: https://control-plane.io
+    - name: CrowdRiff
+      url: https://crowdriff.com
+    - name: Cybrary
+      url: https://www.cybrary.it
+      logo: logos/cybrary.svg
+    - name: DoneOps
+      url: https://www.doneops.com/
+      logo: logos/doneops.svg
+    - name: Duedil
+      url: https://www.duedil.com/
+    - name: Enliven Systems
+      url: https://enliven.systems
+      logo: logos/enliven-systems.png
+    - name: FELFEL
+      url: https://felfel.ch/
+    - name: FireHydrant
+      url: https://firehydrant.io
+    - name: Frame.io
+      url: https://frame.io
+    - name: gastromatic
+      url: https://www.gastromatic.de/
+    - name: Gini
+      url: https://gini.net
+    - name: GlobalX
+      url: https://globalx.com.au
+    - name: Greenpass
+      url: https://www.greenpass.com.br/
+    - name: HMCTS
+      url: https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service
+      logo: logos/hmcts.png
+    - name: IBM Cloudant
+      url: https://www.ibm.com/cloud/cloudant
+    - name: Improwised Technologies
+      url: https://www.improwised.com/
+    - name: Infabode
+      url: https://infabode.com
+    - name: iQmetrix
+      url: https://www.iqmetrix.com
+    - name: karriere tutor GmbH
+      url: https://www.karrieretutor.de
+    - name: Limejump
+      url: https://limejump.com
+    - name: loveholidays
+      url: https://www.loveholidays.com/
+    - name: Luma Health
+      url: https://lumahealth.io/
+    - name: LUNAR
+      url: https://www.lunarway.com/
+    - name: Media&shy;Markt&shy;Saturn
+      url: https://www.mediamarktsaturn.com
+      logo: logos/mms-technology.svg
+    - name: Mettle
+      url: https://mettle.co.uk
+      logo: logos/mettle.png
+    - name: Mintel
+      url: https://www.mintel.com
+    - name: Multicaja S.A
+      url: https://www.multicaja.cl
+    - name: MyFitnessPal
+      url: https://www.myfitnesspal.com
+    - name: NetHunt
+      url: https://nethunt.com
+      logo: logos/nethunt.png
+    - name: Okteto Cloud
+      url: https://okteto.com/
+    - name: Omise
+      url: https://www.omise.co
+    - name: Payout
+      url: https://payout.one
+    - name: Plex Systems
+      url: https://www.plex.com/
+    - name: Qordoba
+      url: https://qordoba.com
+    - name: Rakuten
+      url: https://rakuten.com
+    - name: RentPath
+      url: https://rentpath.com
+    - name: Replicated
+      url: https://replicated.com
+    - name: Resulta
+      url: https://resulta.com
+    - name: Sage AI Labs
+      url: https://www.sage.com
+      logo: logos/sageailabs.png
+    - name: Sngular
+      url: https://www.sngular.com
+      logo: logos/sngular.png
+    - name: Starbucks
+      url: https://www.starbucks.com/
+    - name: Stencila
+      url: https://stenci.la/
+    - name: SupplyStack
+      url: https://www.supplystack.com/
+    - name: Swoop
+      url: https://www.swoopfunding.com
+    - name: Talend
+      url: https://www.talend.com
+    - name: Troii
+      url: https://troii.com/
+    - name: UK Hydro&shy;graphic Office
+      url: https://www.gov.uk/government/organisations/uk-hydrographic-office
+    - name: Under Armour
+      url: https://www.underarmour.com
+    - name: VSHN
+      url: https://vshn.ch
+    - name: Verifa Oy
+      url: https://verifa.io/
+    - name: Walmart Chile
+      url: https://www.walmartchile.cl
+    - name: Weaveworks
+      url: https://weave.works
+      logo: logos/weaveworks.png
+    - name: Wildlife Studios
+      url: https://wildlifestudios.com
+    - name: Workable
+      url: https://www.workable.com
+    - name: Workarea
+      url: https://www.workarea.com
+    - name: Working Group Two
+      url: https://wgtwo.com
+    - name: Yad2
+      url: https://yad2.co.il
+      logo: logos/yad2.png
+    - name: Yusofleet
+      url: https://yusofleet.com
+    - name: Zaaksysteem
+      url: https://zaaksysteem.nl
+    - name: Zwift
+      url: https://zwift.com
+    - name: TietoEVRY
+      url: https://www.tietoevry.com/
+      logo: logos/tietoevry.png
+    - name: particule.
+      url: https://particule.io
+      logo: logos/particule.svg
+    - name: VNClagoon
+      url: https://vnclagoon.com
+      logo: logos/vnclagoon.png
+    - name: 99 Group
+      url: https://www.99.co
+      logo: logos/99group.png
+    - name: Trendhim
+      url: https://www.trendhim.com
+      logo: logos/trendhim.svg
+    - name: Axel Springer SE
+      url: https://axelspringer.de
+      logo: logos/axel-springer.png
+    - name: Divistant
+      url: https://divistant.com/
+      logo: logos/divistant.png
+    - name: Housing Anywhere
+      url: https://housinganywhere.com
+      logo: logos/housing_anywhere.png
+    - name: Riley
+      url: https://riley.ai/
+      logo: logos/riley.png
+    - name: MilliporeSigma
+      url: https://www.sigmaaldrich.com/
+      logo: logos/milliporesigma.png

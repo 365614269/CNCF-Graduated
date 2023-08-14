@@ -1,0 +1,10 @@
+{{ $items := index .Site.Data.companies (.Get "items") }}
+
+{{ with $items }}
+    <div class="panels panels--grid">
+        {{ range sort $items "name" }}
+            {{- $text := partial "interactive_panel" . -}}
+            {{- $text | markdownify -}}
+        {{ end }}
+    </div>
+{{ end }}

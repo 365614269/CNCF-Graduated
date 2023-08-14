@@ -1,0 +1,32 @@
+/docs/components/helm/controller                /flux/components/helm                               301!
+/docs/components/image/controller               /flux/components/image                              301!
+/docs/components/kustomize/controller           /flux/components/kustomize                          301!
+/docs/components/notification/controller        /flux/components/notification                       301!
+/docs/components/source/controller              /flux/components/source                             301!
+/docs/guides/installation                       /flux/installation                                  301!
+/docs/contributing/flux2                        /flux/contributing/flux                             301!
+/docs/contributing/docs/hugo-shortcodes         /flux/contributing/docs/writing-docs                301!
+/docs/roadmap                                   /roadmap                                            301!
+/integrations                                   /ecosystem                                          301!
+/docs/contributing/docs/some-background         https://github.com/fluxcd/website#readme            301!
+
+/flagger/how-it-works                           /flagger/usage/how-it-works                         301!
+/flagger/usage/progressive-delivery             /flagger/tutorials/istio-progressive-delivery       301!
+/flagger/usage/ab-testing                       /flagger/tutorials/istio-ab-testing                 301!
+/flagger/usage/blue-green                       /flagger/tutorials/kubernetes-blue-green            301!
+/flagger/usage/appmesh-progressive-delivery     /flagger/tutorials/appmesh-progressive-delivery     301!
+/flagger/usage/linkerd-progressive-delivery     /flagger/tutorials/linkerd-progressive-delivery     301!
+/flagger/usage/contour-progressive-delivery     /flagger/tutorials/contour-progressive-delivery     301!
+/flagger/usage/gloo-progressive-delivery        /flagger/tutorials/gloo-progressive-delivery        301!
+/flagger/usage/nginx-progressive-delivery       /flagger/tutorials/nginx-progressive-delivery       301!
+/flagger/usage/skipper-progressive-delivery     /flagger/tutorials/skipper-progressive-delivery     301!
+/flagger/usage/crossover-progressive-delivery   /flagger/tutorials/crossover-progressive-delivery   301!
+/flagger/usage/traefik-progressive-delivery     /flagger/tutorials/traefik-progressive-delivery     301!
+/flagger/usage/osm-progressive-delivery         /flagger/tutorials/osm-progressive-delivery         301!
+/flagger/usage/kuma-progressive-delivery        /flagger/tutorials/kuma-progressive-delivery        301!
+/flagger/usage/gatewayapi-progressive-delivery  /flagger/tutorials/gatewayapi-progressive-delivery  301!
+
+/docs/contributing/*                            /contributing/:splat                                301!
+/docs/*                                         /flux/:splat                                        301!
+
+/legacy/*                                       /flux/migration                                     301!

@@ -1,0 +1,85 @@
+---
+
+- name: Make testing output verbose so it can be converted to xunit
+  lineinfile:
+    dest: "{{ ansible_env.GOPATH }}/src/k8s.io/kubernetes/hack/make-rules/test.sh"
+    line: ' go test -v "${goflags[@]:+${goflags[@]}}" \  # Added by ansible from test.yml'
+    regexp: ' go test \"\$'
+    state: present
+
+- name: Setup /etc/subuid
+  lineinfile:
+    dest: "/etc/subuid"
+    line: "containers:100000:65536"
+    regexp: ' go test \"\$'
+    state: present
+
+- name: Setup /etc/subgid
+  lineinfile:
+    dest: "/etc/subgid"
+    line: "containers:100000:65536"
+    insertafter: EOF
+    state: present
+
+- name: set user.max_user_namespaces
+  sysctl:
+    name: user.max_user_namespaces
+    state: present
+    value: 255945
+    sysctl_set: yes
+    ignoreerrors: yes
+
+- name: ensure directory exists for e2e reports
+  file:
+    path: "{{ artifacts }}"
+    state: directory
+
+- name: set crun runtime if enabled
+  set_fact:
+    int_test_env: "{{ int_test_env | combine(crun_test_env) }}"
+  when: "build_crun | bool"
+
+- name: kata configuration
+  block:
+    - name: configure integration test suite for kata
+      set_fact:
+        int_test_env: '{{ int_test_env | combine(kata_int_test_env) }}'
+        userns_int_test_skip: True
+
+    - name: skip tests not working in kata
+      lineinfile:
+        dest: "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o/test/{{ item.0 }}"
+        insertafter: "{{ item.1 }}"
+        line: "skip \"{{ item.1  | regex_replace('\"', \"'\") }} not working in kata\""
+        state: present
+      loop: "{{ ['cgroups.bats'] | product(kata_skip_cgroups_tests) \
+        + ['command.bats'] | product(kata_skip_command_tests) \
+        + ['config.bats'] | product(kata_skip_config_tests) \
+        + ['config_migrate.bats'] | product(kata_skip_config_migrate_tests) \
+        + ['crio-wipe.bats'] | product(kata_skip_crio_wipe_tests) \
+        + ['ctr.bats'] | product(kata_skip_ctr_tests) \
+        + ['devices.bats'] | product(kata_skip_devices_tests) \
+        + ['image.bats'] | product(kata_skip_image_tests) \
+        + ['namespaces.bats'] | product(kata_skip_namespaces_tests) \
+        + ['network.bats'] | product(kata_skip_network_tests) \
+        + ['pod.bats'] | product(kata_skip_pod_tests) \
+        | list }}"
+
+    - name: Disable SELinux
+      ansible.posix.selinux:
+        state: disabled
+
+  when: "build_kata | bool"
+
+- block:
+    - name: run integration tests
+      become: yes
+      shell: make localintegration 2>&1 > /tmp/artifacts/testout.txt
+      args:
+        executable: /bin/bash
+        chdir: "{{ ansible_env.GOPATH }}/src/github.com/cri-o/cri-o"
+      vars:
+        ansible_async_dir: '/tmp/artifacts/async'
+      environment: '{{ int_test_env }}'  # from vars.yml and main.yml
+      async: '{{ int_test_timeout | default(90 * 60) }}'  # seconds
+      poll: 30

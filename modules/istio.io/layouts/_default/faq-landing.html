@@ -1,0 +1,28 @@
+{{ define "main" }}
+
+{{ partial "primary_top.html" . }}
+
+{{ .Content }}
+
+<div>
+    {{ range .Data.Pages.ByWeight }}
+        <h2 id="{{.LinkTitle | urlize }}">{{ .LinkTitle }}</h2>
+
+        {{ $questions := .Resources.ByType "page" }}
+        {{ $sorted_questions := sort $questions ".Params.weight" }}
+        {{ range $q := $sorted_questions }}
+            {{ $id := $q.File.BaseFileName | urlize }}
+            {{ partial "faq_block" (dict "question" $q.Title "answer" .Content "id" $id) }}
+        {{ end }}
+    {{ end }}
+</div>
+
+{{ $headers := slice }}
+{{ range .Data.Pages.ByWeight }}
+    {{ $headers = $headers | append (print "<h2 id=\"" (.LinkTitle | urlize ) "\">" .LinkTitle "</h2>") }}
+{{ end }}
+
+{{ $toc := partial "toc.html" (dict "page" . "headers" $headers) | safeHTML }}
+{{ partial "primary_bottom_toc.html" (dict "toc" $toc) }}
+
+{{ end }}

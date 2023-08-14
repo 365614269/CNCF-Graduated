@@ -1,0 +1,121 @@
+{{ $versionFromPath := index (split $.Page.File.Path "/") 1 }}
+{{ $isNextRelease := eq $versionFromPath "next-release" }}
+{{ $version := cond ($isNextRelease) site.Params.latest $versionFromPath }}
+{{ $data    := index site.Data.cli $version }}
+{{ $config  := index (index site.Data.cli $versionFromPath) "config" }}
+
+{{ if $isNextRelease }}
+  <p><b>NOTE: This page is generated for version {{ $version }}.</b></p>
+{{ end }}
+
+<p>The CLI flags for the following binaries are documented below:</p>
+<ul>
+  {{ range $config.tools }}
+  <li>
+    <a href="#{{ . }}">{{ . }}</a>
+  </li>
+  {{ end }}
+</ul>
+
+{{ range $config.tools }}
+  {{ $tool := . }}
+  {{ $cli := index $data $tool }}
+  {{ $storage_types := index (index $config $tool) "storage" }}
+  {{ $sampling_types := index (index $config $tool) "sampling" }}
+  {{ $metrics_storage_types := index (index $config $tool) "metrics-storage" }}
+
+  <h2 id="{{ $tool }}">
+    {{ $tool }}
+  </h2>
+  <p>
+    {{ $cli.description }}
+  </p>
+
+  <!-- TODO if a tool had sampling types but no storage types then this would not correctly print sampling types -->
+  {{ if gt (len $storage_types) 0 }}
+    <p>{{ $tool }} can be used with these storage backends:</p>
+    <ul>
+      {{ range $storage_types }}
+        {{ $storage := . }}
+        {{ $file    := printf "%s-%s" $tool $storage }}
+        <li>
+            <a href="#{{ $file }}">
+                {{ $tool }} with <code>{{ $storage }}</code>
+            </a>
+        </li>
+      {{ end }}
+    </ul>
+
+    {{ if $sampling_types }}
+      <p>{{ $tool }} can be used with these sampling types:</p>
+      <ul>
+        {{ range $sampling_types }}
+          {{ $sampling := . }}
+          {{ $file    := printf "%s-%s" $tool $sampling }}
+          <li>
+              <a href="#{{ $file }}">
+                  {{ $tool }} with <code>{{ $sampling }}</code> sampling
+              </a>
+          </li>
+        {{ end }}
+      </ul>
+    {{ end }}
+
+    {{ if $metrics_storage_types }}
+      <p>(Experimental) {{ $tool }} can be used with these metrics storage types:</p>
+      <ul>
+        {{ range $metrics_storage_types }}
+        {{ $metrics_storage := . }}
+        {{ $file    := printf "%s-%s" $tool $metrics_storage }}
+        <li>
+          <a href="#{{ $file }}">
+            {{ $tool }} with <code>{{ $metrics_storage }}</code> metrics storage
+          </a>
+        </li>
+        {{ end }}
+      </ul>
+    {{ end }}
+
+    {{ range $storage_types }}
+      {{ $storage := . }}
+      {{ $file    := printf "%s-%s" $tool $storage }}
+      {{ $cli     := index $data $file }}
+
+      <!-- TODO right sidebar gets too long, we should use tabs here -->
+      <h3 id="{{ $file }}">
+        {{ $tool }} with <code>{{ $storage }}</code> storage
+      </h3>
+
+      {{ partial "options-table.html" $cli.options }}
+    {{ end }}
+
+    {{ range $sampling_types }}
+      {{ $sampling := . }}
+      {{ $file    := printf "%s-%s" $tool $sampling }}
+      {{ $cli     := index $data $file }}
+
+      <!-- TODO right sidebar gets too long, we should use tabs here -->
+      <h3 id="{{ $file }}">
+        {{ $tool }} with <code>{{ $sampling }}</code> sampling
+      </h3>
+
+      {{ partial "options-table.html" $cli.options }}
+    {{ end }}
+
+    {{ range $metrics_storage_types }}
+      {{ $metrics_storage := . }}
+      {{ $file    := printf "%s-%s" $tool $metrics_storage }}
+      {{ $cli     := index $data $file }}
+
+      <!-- TODO right sidebar gets too long, we should use tabs here -->
+      <h3 id="{{ $file }}">
+        {{ $tool }} with <code>{{ $metrics_storage }}</code> metrics storage
+      </h3>
+
+      {{ partial "options-table.html" $cli.options }}
+    {{ end }}
+
+  {{ else }}
+    {{ partial "options-table.html" $cli.options }}
+  {{ end }}
+{{ end }}

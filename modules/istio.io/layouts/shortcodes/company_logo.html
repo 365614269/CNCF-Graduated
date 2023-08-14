@@ -1,0 +1,5 @@
+{{ $link := .Get "link" }}
+{{ $alt := .Get "alt" }}
+{{ $logo := .Get "logo" }}
+
+{{ partial "company_logo" (dict "link" $link "alt" $alt "logo" $logo) }}

@@ -1,0 +1,10 @@
+first-line-h1:
+  level: 2
+first-heading-h1:
+  level: 2
+line_length:
+  code_blocks: false
+  tables: false
+no-trailing-punctuation:
+  punctuation: ".,;:"
+no-duplicate-header: false

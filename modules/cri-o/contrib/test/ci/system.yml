@@ -1,0 +1,73 @@
+---
+- name: ensure directories exist as needed
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /opt/cni/bin
+    - /etc/cni/net.d
+
+- name: Increase inotify user watches
+  sysctl:
+    name: fs.inotify.max_user_watches
+    state: present
+    value: 1048576
+
+- name: Increase inotify user instances
+  sysctl:
+    name: fs.inotify.max_user_instances
+    state: present
+    value: 1048576
+
+- name: set sysctl vm.overcommit_memory=1 for CentOS
+  sysctl:
+    name: vm.overcommit_memory
+    state: present
+    value: 1
+  when: ansible_distribution == 'CentOS'
+
+- name: inject hostname into /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: |
+        # Added by Ansible from system.yml
+        {{ ansible_default_ipv4.address }} {{ ansible_nodename }}
+    insertafter: 'EOF'
+    regexp: '{{ ansible_default_ipv4.address }}\s+{{ ansible_nodename }}'
+    state: present
+
+- name: Flush the iptables
+  command: iptables -F
+
+- name: Enable localnet routing
+  sysctl:
+    name: net.ipv4.conf.all.route_localnet
+    state: present
+    value: 1
+
+- name: Allow processes inside of containers to send ping
+  sysctl:
+    name: net.ipv4.ping_group_range
+    state: present
+    value: 0 2147483647
+
+- name: Add masquerade for localhost
+  command: iptables -t nat -I POSTROUTING -s 127.0.0.0/8 ! -d 127.0.0.0/8 -j MASQUERADE
+
+- name: Update the kernel cmdline to include quota support
+  command: grubby --update-kernel=ALL --args="rootflags=pquota"
+  when: ansible_distribution in ['RedHat', 'CentOS']
+
+- name: Containers using cgroups and/or systemd after 7.5 are permitted
+  shell: "setsebool -P container_manage_cgroup 1"
+
+- name: remove storage.conf to avoid configuration conflicts
+  file:
+    path: /etc/containers/storage.conf
+    state: absent
+
+- name: create /var/lib/crio directory
+  file:
+    path: /var/lib/crio
+    state: directory
