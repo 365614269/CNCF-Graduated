@@ -61,7 +61,3 @@ jobs:
         pwd
         ls -l
         rm -rf modules
-
-    - name: Run python script
-      run: |
-        python update.py
