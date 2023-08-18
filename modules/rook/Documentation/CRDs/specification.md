@@ -3612,6 +3612,18 @@ string
 <td>
 </td>
 </tr>
+<tr>
+<td>
+<code>osd</code><br/>
+<em>
+<a href="#ceph.rook.io/v1.OSDStatus">
+OSDStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="ceph.rook.io/v1.CephVersionSpec">CephVersionSpec
@@ -7490,6 +7502,31 @@ bool
 </tr>
 <tr>
 <td>
+<code>failureDomainLabel</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+</td>
+</tr>
+<tr>
+<td>
+<code>zones</code><br/>
+<em>
+<a href="#ceph.rook.io/v1.MonZoneSpec">
+[]MonZoneSpec
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Zones are specified when we want to provide zonal awareness to mons</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>stretchCluster</code><br/>
 <em>
 <a href="#ceph.rook.io/v1.StretchClusterSpec">
@@ -7514,6 +7551,62 @@ Kubernetes core/v1.PersistentVolumeClaim
 <td>
 <em>(Optional)</em>
 <p>VolumeClaimTemplate is the PVC definition</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ceph.rook.io/v1.MonZoneSpec">MonZoneSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#ceph.rook.io/v1.MonSpec">MonSpec</a>, <a href="#ceph.rook.io/v1.StretchClusterSpec">StretchClusterSpec</a>)
+</p>
+<div>
+<p>MonZoneSpec represents the specification of a zone in a Ceph Cluster</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Name is the name of the zone</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>arbiter</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Arbiter determines if the zone contains the arbiter used for stretch cluster mode</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>volumeClaimTemplate</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#persistentvolumeclaim-v1-core">
+Kubernetes core/v1.PersistentVolumeClaim
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>VolumeClaimTemplate is the PVC template</p>
 </td>
 </tr>
 </tbody>
@@ -8181,6 +8274,35 @@ string
 </tr>
 </tbody>
 </table>
+<h3 id="ceph.rook.io/v1.OSDStatus">OSDStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#ceph.rook.io/v1.CephStorage">CephStorage</a>)
+</p>
+<div>
+<p>OSDStatus represents OSD status of the ceph Cluster</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>storeType</code><br/>
+<em>
+map[string]int
+</em>
+</td>
+<td>
+<p>StoreType is a mapping between the OSD backend stores and number of OSDs using these stores</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="ceph.rook.io/v1.OSDStore">OSDStore
 </h3>
 <p>
@@ -8207,6 +8329,19 @@ string
 <td>
 <em>(Optional)</em>
 <p>Type of backend storage to be used while creating OSDs. If empty, then bluestore will be used</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>updateStore</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>UpdateStore updates the backend store for existing OSDs. It destroys each OSD one at a time, cleans up the backing disk
+and prepares same OSD on that disk</p>
 </td>
 </tr>
 </tbody>
@@ -11243,70 +11378,14 @@ string
 <td>
 <code>zones</code><br/>
 <em>
-<a href="#ceph.rook.io/v1.StretchClusterZoneSpec">
-[]StretchClusterZoneSpec
+<a href="#ceph.rook.io/v1.MonZoneSpec">
+[]MonZoneSpec
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
 <p>Zones is the list of zones</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="ceph.rook.io/v1.StretchClusterZoneSpec">StretchClusterZoneSpec
-</h3>
-<p>
-(<em>Appears on:</em><a href="#ceph.rook.io/v1.StretchClusterSpec">StretchClusterSpec</a>)
-</p>
-<div>
-<p>StretchClusterZoneSpec represents the specification of a stretched zone in a Ceph Cluster</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Name is the name of the zone</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>arbiter</code><br/>
-<em>
-bool
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Arbiter determines if the zone contains the arbiter</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volumeClaimTemplate</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#persistentvolumeclaim-v1-core">
-Kubernetes core/v1.PersistentVolumeClaim
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>VolumeClaimTemplate is the PVC template</p>
 </td>
 </tr>
 </tbody>
