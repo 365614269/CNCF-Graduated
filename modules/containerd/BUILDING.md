@@ -25,7 +25,7 @@ A codespace will open in a web-based version of Visual Studio Code. The [dev con
 
 To build the `containerd` daemon, and the `ctr` simple test client, the following build system dependencies are required:
 
-* Go 1.19.x or above
+* Go 1.20.x or above
 * Protoc 3.x compiler and headers (download at the [Google protobuf releases page](https://github.com/protocolbuffers/protobuf/releases))
 * Btrfs headers and libraries for your distribution. Note that building the btrfs driver can be disabled via the build tag `no_btrfs`, removing this dependency.
 
@@ -120,6 +120,8 @@ make generate
 >   * `no_btrfs`: A build tag disables building the Btrfs snapshot driver.
 >   * `no_devmapper`: A build tag disables building the device mapper snapshot driver.
 >   * `no_zfs`: A build tag disables building the ZFS snapshot driver.
+> * platform
+>   * `no_systemd`: disables any systemd specific code
 >
 > For example, adding `BUILDTAGS=no_btrfs` to your environment before calling the **binaries**
 > Makefile target will disable the btrfs driver within the containerd Go build.
