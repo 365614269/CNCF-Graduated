@@ -1,6 +1,6 @@
 module github.com/spiffe/spire
 
-go 1.20
+go 1.21
 
 require (
 	cloud.google.com/go/iam v1.1.1
@@ -81,7 +81,7 @@ require (
 	k8s.io/api v0.28.0
 	k8s.io/apimachinery v0.28.0
 	k8s.io/client-go v0.28.0
-	k8s.io/kube-aggregator v0.27.4
+	k8s.io/kube-aggregator v0.28.0
 	sigs.k8s.io/controller-runtime v0.15.1
 )
 
