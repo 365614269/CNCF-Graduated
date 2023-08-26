@@ -27,18 +27,18 @@ jobs:
 
       - uses: actions/setup-go@v4
         with:
-          go-version: "1.20"
+          go-version: "1.21"
 
       - uses: actions/setup-python@v4
         with:
           python-version: 3.9
 
-      - name: Run helm-docs
+      - name: Run docs
         run: |
-          make helm-docs
+          make docs
           DIFF=$(git diff)
           if [ ! -z "$DIFF" ]; then
-            echo "Please run 'make helm-docs' locally, commit the updated docs, and push the change. See https://rook.io/docs/rook/latest/Contributing/documentation/#running-helm-docs"
+            echo "Please run 'make docs' locally, commit the updated docs, and push the change. See https://rook.io/docs/rook/latest/Contributing/documentation/#running-helm-docs"
           fi
           git diff --exit-code
 
