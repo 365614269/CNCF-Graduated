@@ -8,6 +8,7 @@
   * [FAQ](quickstart/faq.md)
   * [Logo](quickstart/logo.md)
   * [td-agent v2 vs v3 vs v4](quickstart/td-agent-v2-vs-v3-vs-v4.md)
+  * [fluent-package v5 vs td-agent v4](quickstart/fluent-package-v5-vs-td-agent.md)
 * [Installation](installation/README.md)
   * [Before Installation](installation/before-install.md)
   * [Install by RPM Package \(Red Hat Linux\)](installation/install-by-rpm.md)
@@ -18,6 +19,11 @@
   * [Install from Source](installation/install-from-source.md)
   * [Post Installation Guide](installation/post-installation-guide.md)
   * Obsolete Installation
+    * Treasure Agent v4 Installation
+      * [Install by RPM Package v4 \(Red Hat Linux\)](installation/install-by-rpm-td-agent-v4.md)
+      * [Install by DEB Package v4 \(Debian/Ubuntu\)](installation/install-by-deb-td-agent-v4.md)
+      * [Install by .dmg Package v4 \(macOS\)](installation/install-by-dmg-td-agent-v4.md)
+      * [Install by .msi Installer v4 \(Windows\)](installation/install-by-msi-td-agent-v4.md)
     * Treasure Agent v3 (EOL) Installation
       * [Install by RPM Package v3 \(Red Hat Linux\)](installation/install-by-rpm-td-agent-v3.md)
       * [Install by DEB Package v3 \(Debian/Ubuntu\)](installation/install-by-deb-td-agent-v3.md)
