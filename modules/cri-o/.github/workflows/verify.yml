@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Lint the markdown
-        uses: DavidAnson/markdownlint-cli2-action@v11
+        uses: DavidAnson/markdownlint-cli2-action@v12
         with:
           globs: |
             **/*.md
@@ -141,6 +141,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: crate-ci/typos@v1.16.8
+      - uses: crate-ci/typos@v1.16.9
         with:
           config: .typos.toml
