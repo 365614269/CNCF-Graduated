@@ -37,11 +37,10 @@ import (
 	sandboxstore "github.com/containerd/containerd/pkg/cri/store/sandbox"
 	runtimeoptions "github.com/containerd/containerd/pkg/runtimeoptions/v1"
 	"github.com/containerd/containerd/plugin"
-	"github.com/containerd/containerd/reference/docker"
 	runcoptions "github.com/containerd/containerd/runtime/v2/runc/options"
 	"github.com/containerd/typeurl/v2"
+	docker "github.com/distribution/reference"
 	runtimespec "github.com/opencontainers/runtime-spec/specs-go"
-	"github.com/sirupsen/logrus"
 
 	runhcsoptions "github.com/Microsoft/hcsshim/cmd/containerd-shim-runhcs-v1/options"
 	imagedigest "github.com/opencontainers/go-digest"
@@ -519,7 +518,7 @@ func (c *criService) generateAndSendContainerEvent(ctx context.Context, containe
 	}
 	containerStatuses, err := c.getContainerStatuses(ctx, sandboxID)
 	if err != nil {
-		logrus.Errorf("Failed to get container statuses for container event for sandboxID %q: %v", sandboxID, err)
+		log.G(ctx).Errorf("Failed to get container statuses for container event for sandboxID %q: %v", sandboxID, err)
 	}
 
 	event := runtime.ContainerEventResponse{
@@ -535,7 +534,7 @@ func (c *criService) generateAndSendContainerEvent(ctx context.Context, containe
 	case c.containerEventsChan <- event:
 	default:
 		containerEventsDroppedCount.Inc()
-		logrus.Debugf("containerEventsChan is full, discarding event %+v", event)
+		log.G(ctx).Debugf("containerEventsChan is full, discarding event %+v", event)
 	}
 }
 
