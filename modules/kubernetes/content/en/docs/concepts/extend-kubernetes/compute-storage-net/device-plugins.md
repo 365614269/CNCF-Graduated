@@ -10,9 +10,8 @@ weight: 20
 <!-- overview -->
 {{< feature-state for_k8s_version="v1.26" state="stable" >}}
 
-Kubernetes provides a [device plugin framework](https://git.k8s.io/design-proposals-archive/resource-management/device-plugin.md)
-that you can use to advertise system hardware resources to the
-{{< glossary_tooltip term_id="kubelet" >}}.
+Kubernetes provides a device plugin framework that you can use to advertise system hardware
+resources to the {{< glossary_tooltip term_id="kubelet" >}}.
 
 Instead of customizing the code for Kubernetes itself, vendors can implement a
 device plugin that you deploy either manually or as a {{< glossary_tooltip term_id="daemonset" >}}.
@@ -246,7 +245,7 @@ of running pods allocated in `ResourceClaims` by the `DynamicResourceAllocation`
 this feature `kubelet` must be started with the following flags:
 
 ```
---feature-gates=DynamicResourceAllocation=true,KubeletPodResourcesDynamiceResources=true
+--feature-gates=DynamicResourceAllocation=true,KubeletPodResourcesDynamicResources=true
 ```
 
 ```gRPC
@@ -411,7 +410,7 @@ allocated by the dynamic resource allocation API. To enable this feature, you mu
 ensure your kubelet services are started with the following flags:
 
 ```
---feature-gates=KubeletPodResourcesGet=true,DynamicResourceAllocation=true,KubeletPodResourcesDynamiceResources=true
+--feature-gates=KubeletPodResourcesGet=true,DynamicResourceAllocation=true,KubeletPodResourcesDynamicResources=true
 ```
 
 ## Device plugin integration with the Topology Manager

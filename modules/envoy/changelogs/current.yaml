@@ -14,12 +14,22 @@ behavior_changes:
     :ref:`initial_fetch_timeout <envoy_v3_api_field_config.core.v3.ConfigSource.initial_fetch_timeout>` times out, and will then apply
     the cached assignment and finish updating the warmed cluster. This change is disabled by default, and can be enabled by setting
     the runtime flag ``envoy.restart_features.use_eds_cache_for_ads`` to true.
+- area: http
+  change: |
+    Switch from http_parser to BalsaParser for handling HTTP/1.1 traffic. See https://github.com/envoyproxy/envoy/issues/21245 for
+    details. This behavioral change can be reverted by setting runtime flag ``envoy.reloadable_features.http1_use_balsa_parser`` to
+    false.
 
 minor_behavior_changes:
 # *Changes that may cause incompatibilities for some users, but should not for most*
 - area: ext_authz
   change: |
     removing any query parameter in the presence of repeated query parameter keys no longer drops the repeats.
+- area: alternate_protocols_cache_filter
+  change: |
+    Changed the alternate protocols cache filter to get the cache from cluster config rather than filter config.
+    This allows one downstream filter to be used with multiple clusters with different caches. This change can be reverted by
+    setting runtime guard ``envoy.reloadable_features.use_cluster_cache_for_alt_protocols_filter`` to false.
 - area: ext_authz
   change: |
     Don't append the local address to ``x-forwarded-for`` header when sending an http (not gRPC) auth request.
@@ -64,6 +74,15 @@ bug_fixes:
 - area: tls
   change: |
     fixed a bug where handshake may fail when both private key provider and cert validation are set.
+- area: dns
+  change: |
+    Fixed a bug where when respect_dns_ttl was set to true, c-ares dns resolver only considered address record for ttl calculation
+    while ignoring CNAME records TTL. Now when respect_dns_ttl is set to true minimum of all TTL records is considered.
+- area: dns
+  change: |
+    Fixed a bug where dns response was not always conforming [RFC 2181](https://datatracker.ietf.org/doc/html/rfc2181) for TTL values.
+    Previously a malicious user could add a TTL greater than 2^31 - 1, and with c-ares library using 32 bit signed int data type
+    would overflow and send a negative TTL.
 - area: healthcheck
   change: |
     The default behavior of unejecting outlier-detection-ejected host on successful active health checking can
