@@ -213,11 +213,7 @@ func (s *Server) createSandboxContainer(ctx context.Context, ctr ctrfactory.Cont
 	}
 	images, err := s.StorageImageServer().ResolveNames(s.config.SystemContext, image)
 	if err != nil {
-		if err == storage.ErrCannotParseImageID {
-			images = append(images, image)
-		} else {
-			return nil, err
-		}
+		return nil, err
 	}
 
 	// Get imageName and imageRef that are later requested in container status
@@ -383,6 +379,11 @@ func (s *Server) createSandboxContainer(ctx context.Context, ctr ctrfactory.Cont
 	// Get blockio class
 	if s.Config().BlockIO().Enabled() {
 		if blockioClass, err := blockio.ContainerClassFromAnnotations(metadata.Name, containerConfig.Annotations, sb.Annotations()); blockioClass != "" && err == nil {
+			if s.Config().BlockIO().ReloadRequired() {
+				if err := s.Config().BlockIO().Reload(); err != nil {
+					log.Warnf(ctx, "Reconfiguring blockio for container %s failed: %v", containerID, err)
+				}
+			}
 			if linuxBlockIO, err := blockio.OciLinuxBlockIO(blockioClass); err == nil {
 				if specgen.Config.Linux.Resources == nil {
 					specgen.Config.Linux.Resources = &rspec.LinuxResources{}
