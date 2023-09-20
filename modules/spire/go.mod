@@ -7,8 +7,8 @@ require (
 	cloud.google.com/go/kms v1.15.0
 	cloud.google.com/go/secretmanager v1.11.1
 	cloud.google.com/go/security v1.15.1
-	cloud.google.com/go/storage v1.32.0
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.7.1
+	cloud.google.com/go/storage v1.33.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.7.2
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/keyvault/azkeys v0.10.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0
@@ -23,12 +23,12 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.26
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.4
 	github.com/aws/aws-sdk-go-v2/service/acmpca v1.22.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.114.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.118.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.22.0
 	github.com/aws/aws-sdk-go-v2/service/kms v1.24.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.38.1
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.21.0
-	github.com/aws/aws-sdk-go-v2/service/sts v1.21.0
+	github.com/aws/aws-sdk-go-v2/service/sts v1.22.0
 	github.com/aws/smithy-go v1.14.2
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cenkalti/backoff/v4 v4.2.1
