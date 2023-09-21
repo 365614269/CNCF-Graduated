@@ -23,7 +23,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.26
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.4
 	github.com/aws/aws-sdk-go-v2/service/acmpca v1.22.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.118.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.119.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.22.0
 	github.com/aws/aws-sdk-go-v2/service/kms v1.24.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.38.1
@@ -32,12 +32,12 @@ require (
 	github.com/aws/smithy-go v1.14.2
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cenkalti/backoff/v4 v4.2.1
-	github.com/docker/docker v24.0.5+incompatible
+	github.com/docker/docker v24.0.6+incompatible
 	github.com/envoyproxy/go-control-plane v0.11.1
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/godbus/dbus/v5 v5.1.0
-	github.com/gofrs/uuid v4.0.0+incompatible
+	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/golang/protobuf v1.5.3
 	github.com/google/go-cmp v0.5.9
