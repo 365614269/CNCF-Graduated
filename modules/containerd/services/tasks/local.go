@@ -35,7 +35,6 @@ import (
 	"github.com/containerd/containerd/events"
 	"github.com/containerd/containerd/filters"
 	"github.com/containerd/containerd/images"
-	"github.com/containerd/containerd/log"
 	"github.com/containerd/containerd/metadata"
 	"github.com/containerd/containerd/mount"
 	"github.com/containerd/containerd/pkg/blockio"
@@ -48,6 +47,7 @@ import (
 	"github.com/containerd/containerd/runtime"
 	"github.com/containerd/containerd/runtime/v2/runc/options"
 	"github.com/containerd/containerd/services"
+	"github.com/containerd/log"
 	"github.com/containerd/typeurl/v2"
 	"github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
@@ -311,7 +311,7 @@ func getProcessState(ctx context.Context, p runtime.Process) (*task.Process, err
 
 	state, err := p.State(ctx)
 	if err != nil {
-		if errdefs.IsNotFound(err) {
+		if errdefs.IsNotFound(err) || errdefs.IsUnavailable(err) {
 			return nil, err
 		}
 		log.G(ctx).WithError(err).Errorf("get state for %s", p.ID())
