@@ -18,6 +18,7 @@ package docker
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -241,10 +242,9 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 	}
 
 	var (
-		firstErr error
-		paths    [][]string
-		dgst     = refspec.Digest()
-		caps     = HostCapabilityPull
+		paths [][]string
+		dgst  = refspec.Digest()
+		caps  = HostCapabilityPull
 	)
 
 	if dgst != "" {
@@ -275,6 +275,13 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 		return "", ocispec.Descriptor{}, err
 	}
 
+	var (
+		// firstErr is the most relevant error encountered during resolution.
+		// We use this to determine the error to return, making sure that the
+		// error created furthest through the resolution process is returned.
+		firstErr         error
+		firstErrPriority int
+	)
 	for _, u := range paths {
 		for _, host := range hosts {
 			ctx := log.WithLogger(ctx, log.G(ctx).WithField("host", host.Host))
@@ -294,9 +301,9 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 				if errors.Is(err, ErrInvalidAuthorization) {
 					err = fmt.Errorf("pull access denied, repository does not exist or may require authorization: %w", err)
 				}
-				// Store the error for referencing later
-				if firstErr == nil {
+				if firstErrPriority < 1 {
 					firstErr = err
+					firstErrPriority = 1
 				}
 				log.G(ctx).WithError(err).Info("trying next host")
 				continue // try another host
@@ -305,14 +312,19 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 
 			if resp.StatusCode > 299 {
 				if resp.StatusCode == http.StatusNotFound {
+					if firstErrPriority < 2 {
+						firstErr = fmt.Errorf("%s: %w", ref, errdefs.ErrNotFound)
+						firstErrPriority = 2
+					}
 					log.G(ctx).Info("trying next host - response was http.StatusNotFound")
 					continue
 				}
 				if resp.StatusCode > 399 {
-					// Set firstErr when encountering the first non-404 status code.
-					if firstErr == nil {
+					if firstErrPriority < 3 {
 						firstErr = remoteerrors.NewUnexpectedStatusErr(resp)
+						firstErrPriority = 3
 					}
+					log.G(ctx).Infof("trying next host - response was %s", resp.Status)
 					continue // try another host
 				}
 				return "", ocispec.Descriptor{}, remoteerrors.NewUnexpectedStatusErr(resp)
@@ -383,8 +395,9 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 			}
 			// Prevent resolving to excessively large manifests
 			if size > MaxManifestSize {
-				if firstErr == nil {
+				if firstErrPriority < 4 {
 					firstErr = fmt.Errorf("rejecting %d byte manifest for %s: %w", size, ref, errdefs.ErrNotFound)
+					firstErrPriority = 4
 				}
 				continue
 			}
@@ -400,10 +413,8 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 		}
 	}
 
-	// If above loop terminates without return, then there was an error.
-	// "firstErr" contains the first non-404 error. That is, "firstErr == nil"
-	// means that either no registries were given or each registry returned 404.
-
+	// If above loop terminates without return or error, then no registries
+	// were provided.
 	if firstErr == nil {
 		firstErr = fmt.Errorf("%s: %w", ref, errdefs.ErrNotFound)
 	}
@@ -706,4 +717,28 @@ func IsLocalhost(host string) bool {
 
 	ip := net.ParseIP(host)
 	return ip.IsLoopback()
+}
+
+// HTTPFallback is an http.RoundTripper which allows fallback from https to http
+// for registry endpoints with configurations for both http and TLS, such as
+// defaulted localhost endpoints.
+type HTTPFallback struct {
+	http.RoundTripper
+}
+
+func (f HTTPFallback) RoundTrip(r *http.Request) (*http.Response, error) {
+	resp, err := f.RoundTripper.RoundTrip(r)
+	var tlsErr tls.RecordHeaderError
+	if errors.As(err, &tlsErr) && string(tlsErr.RecordHeader[:]) == "HTTP/" {
+		// server gave HTTP response to HTTPS client
+		plainHTTPUrl := *r.URL
+		plainHTTPUrl.Scheme = "http"
+
+		plainHTTPRequest := *r
+		plainHTTPRequest.URL = &plainHTTPUrl
+
+		return f.RoundTripper.RoundTrip(&plainHTTPRequest)
+	}
+
+	return resp, err
 }

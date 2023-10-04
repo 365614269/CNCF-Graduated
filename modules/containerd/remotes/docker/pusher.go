@@ -103,12 +103,10 @@ func (p dockerPusher) push(ctx context.Context, desc ocispec.Descriptor, ref str
 		host       = hosts[0]
 	)
 
-	switch desc.MediaType {
-	case images.MediaTypeDockerSchema2Manifest, images.MediaTypeDockerSchema2ManifestList,
-		ocispec.MediaTypeImageManifest, ocispec.MediaTypeImageIndex:
+	if images.IsManifestType(desc.MediaType) || images.IsIndexType(desc.MediaType) {
 		isManifest = true
 		existCheck = getManifestPath(p.object, desc.Digest)
-	default:
+	} else {
 		existCheck = []string{"blobs", desc.Digest.String()}
 	}
 
@@ -190,7 +188,7 @@ func (p dockerPusher) push(ctx context.Context, desc ocispec.Descriptor, ref str
 				resp.Body.Close()
 				resp = nil
 			case http.StatusCreated:
-				mountedFrom = path.Join(p.refspec.Locator, fromRepo)
+				mountedFrom = path.Join(p.refspec.Hostname(), fromRepo)
 			}
 		}
 
