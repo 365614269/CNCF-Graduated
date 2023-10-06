@@ -156,6 +156,9 @@ func mergeConfig(config *libconfig.Config, ctx *cli.Context) error {
 	if ctx.IsSet("selinux") {
 		config.SELinux = ctx.Bool("selinux")
 	}
+	if ctx.IsSet("imagestore") {
+		config.ImageStore = ctx.String("imagestore")
+	}
 	if ctx.IsSet("seccomp-profile") {
 		config.SeccompProfile = ctx.String("seccomp-profile")
 	}
@@ -570,6 +573,13 @@ func getCrioFlags(defConf *libconfig.Config) []cli.Flag {
 			TakesFile: true,
 		},
 		&cli.StringFlag{
+			Name:      "imagestore",
+			Usage:     "Store newly pulled images in the specified path, rather than the path provided by --root.",
+			Value:     defConf.ImageStore,
+			EnvVars:   []string{"CONTAINER_IMAGESTORE"},
+			TakesFile: true,
+		},
+		&cli.StringFlag{
 			Name:    "storage-driver",
 			Aliases: []string{"s"},
 			Usage:   "OCI storage driver.",
@@ -894,12 +904,12 @@ func getCrioFlags(defConf *libconfig.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:    "read-only",
-			Usage:   "Setup all unprivileged containers to run as read-only. Automatically mounts the containers' tmpfs on `/run`, `/tmp` and `/var/tmp`.",
+			Usage:   "Setup all unprivileged containers to run as read-only. Automatically mounts the containers' tmpfs on '/run', '/tmp' and '/var/tmp'.",
 			EnvVars: []string{"CONTAINER_READ_ONLY"},
 		},
 		&cli.StringFlag{
 			Name:    "bind-mount-prefix",
-			Usage:   "A prefix to use for the source of the bind mounts. This option would be useful if you were running CRI-O in a container. And had `/` mounted on `/host` in your container. Then if you ran CRI-O with the `--bind-mount-prefix=/host` option, CRI-O would add /host to any bind mounts it is handed over CRI. If Kubernetes asked to have `/var/lib/foobar` bind mounted into the container, then CRI-O would bind mount `/host/var/lib/foobar`. Since CRI-O itself is running in a container with `/` or the host mounted on `/host`, the container would end up with `/var/lib/foobar` from the host mounted in the container rather then `/var/lib/foobar` from the CRI-O container.",
+			Usage:   "A prefix to use for the source of the bind mounts. This option would be useful if you were running CRI-O in a container. And had '/' mounted on '/host' in your container. Then if you ran CRI-O with the '--bind-mount-prefix=/host' option, CRI-O would add /host to any bind mounts it is handed over CRI. If Kubernetes asked to have '/var/lib/foobar' bind mounted into the container, then CRI-O would bind mount '/host/var/lib/foobar'. Since CRI-O itself is running in a container with '/' or the host mounted on '/host', the container would end up with '/var/lib/foobar' from the host mounted in the container rather then '/var/lib/foobar' from the CRI-O container.",
 			EnvVars: []string{"CONTAINER_BIND_MOUNT_PREFIX"},
 		},
 		&cli.StringFlag{
@@ -1014,7 +1024,7 @@ func getCrioFlags(defConf *libconfig.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:    "no-pivot",
-			Usage:   "If true, the runtime will not use `pivot_root`, but instead use `MS_MOVE`.",
+			Usage:   "If true, the runtime will not use 'pivot_root', but instead use 'MS_MOVE'.",
 			EnvVars: []string{"CONTAINER_NO_PIVOT"},
 			Value:   defConf.NoPivot,
 		},
@@ -1085,7 +1095,7 @@ func getCrioFlags(defConf *libconfig.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:    "internal-wipe",
-			Usage:   "Whether CRI-O should wipe containers after a reboot and images after an upgrade when the server starts. If set to false, one must run `crio wipe` to wipe the containers and images in these situations. This option is deprecated, and will be removed in the future.",
+			Usage:   "Whether CRI-O should wipe containers after a reboot and images after an upgrade when the server starts. If set to false, one must run 'crio wipe' to wipe the containers and images in these situations. This option is deprecated, and will be removed in the future.",
 			Value:   defConf.InternalWipe,
 			EnvVars: []string{"CONTAINER_INTERNAL_WIPE"},
 		},
