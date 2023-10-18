@@ -15,13 +15,7 @@ This page shows how to install the `kubeadm` toolbox.
 For information on how to create a cluster with kubeadm once you have performed this installation process,
 see the [Creating a cluster with kubeadm](/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/) page.
 
-This installation guide is for Kubernetes {{< skew currentVersion >}}. If you want to use a different
-Kubernetes version, please refer to the following pages instead:
-
-- [Installing kubeadm for Kubernetes {{< skew currentVersionAddMinor -1 "." >}}](https://v{{< skew currentVersionAddMinor -1 "-" >}}.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
-- [Installing kubeadm for Kubernetes {{< skew currentVersionAddMinor -2 "." >}}](https://v{{< skew currentVersionAddMinor -2 "-" >}}.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
-- [Installing kubeadm for Kubernetes {{< skew currentVersionAddMinor -3 "." >}}](https://v{{< skew currentVersionAddMinor -3 "-" >}}.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
-- [Installing kubeadm for Kubernetes {{< skew currentVersionAddMinor -4 "." >}}](https://v{{< skew currentVersionAddMinor -4 "-" >}}.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
+{{< doc-versions-list "installation guide" >}}
 
 ## {{% heading "prerequisites" %}}
 
@@ -163,19 +157,12 @@ For more information on version skews, see:
 * Kubernetes [version and version-skew policy](/docs/setup/release/version-skew-policy/)
 * Kubeadm-specific [version skew policy](/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#version-skew-policy)
 
-{{< note >}}
-Kubernetes has [new package repositories hosted at `pkgs.k8s.io`](/blog/2023/08/15/pkgs-k8s-io-introduction/)
-starting from August 2023. The legacy package repositories (`apt.kubernetes.io` and `yum.kubernetes.io`)
-have been frozen starting from September 13, 2023. Please read our
-[deprecation and freezing announcement](/blog/2023/08/31/legacy-package-repository-deprecation/)
-for more details.
-{{< /note >}}
+{{% legacy-repos-deprecation %}}
 
 {{< note >}}
 There's a dedicated package repository for each Kubernetes minor version. If you want to install
 a minor version other than {{< skew currentVersion >}}, please see the installation guide for
-your desired minor version. The official Kubernetes package repositories provide downloads for
-Kubernetes versions starting with v1.24.0. 
+your desired minor version.
 {{< /note >}}
 
 {{< tabs name="k8s_install" >}}

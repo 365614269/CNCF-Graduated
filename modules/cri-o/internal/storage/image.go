@@ -3,6 +3,7 @@ package storage
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -25,13 +26,10 @@ import (
 	"github.com/containers/podman/v4/pkg/rootless"
 	"github.com/containers/storage"
 	"github.com/containers/storage/pkg/reexec"
-	systemdDbus "github.com/coreos/go-systemd/v22/dbus"
-	"github.com/cri-o/cri-o/internal/config/node"
 	"github.com/cri-o/cri-o/internal/dbusmgr"
 	"github.com/cri-o/cri-o/internal/storage/references"
 	"github.com/cri-o/cri-o/pkg/config"
 	"github.com/cri-o/cri-o/utils"
-	"github.com/godbus/dbus/v5"
 	json "github.com/json-iterator/go"
 	digest "github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
@@ -120,8 +118,6 @@ type ImageCopyOptions struct {
 type ImageServer interface {
 	// ListImages returns list of all images.
 	ListImages(systemContext *types.SystemContext) ([]ImageResult, error)
-	// ImageStatus returns status of an image which matches the filter.
-	ImageStatus(systemContext *types.SystemContext, filter string) (*ImageResult, error)
 	// ImageStatusByID returns status of a single image
 	ImageStatusByID(systemContext *types.SystemContext, id StorageImageID) (*ImageResult, error)
 	// ImageStatusByName returns status of an image tagged with name.
@@ -129,9 +125,9 @@ type ImageServer interface {
 
 	// PrepareImage returns an Image where the config digest can be grabbed
 	// for further analysis. Call Close() on the resulting image.
-	PrepareImage(systemContext *types.SystemContext, imageName string) (types.ImageCloser, error)
+	PrepareImage(systemContext *types.SystemContext, imageName RegistryImageReference) (types.ImageCloser, error)
 	// PullImage imports an image from the specified location.
-	PullImage(systemContext *types.SystemContext, imageName string, options *ImageCopyOptions) (types.ImageReference, error)
+	PullImage(systemContext *types.SystemContext, imageName RegistryImageReference, options *ImageCopyOptions) (types.ImageReference, error)
 
 	// DeleteImage deletes a storage image (impacting all its tags)
 	DeleteImage(systemContext *types.SystemContext, id StorageImageID) error
@@ -151,26 +147,6 @@ type ImageServer interface {
 	// CandidatesForPotentiallyShortImageName resolves an image name into a set of fully-qualified image names (domain/repo/image:tag|@digest).
 	// It will only return an empty slice if err != nil.
 	CandidatesForPotentiallyShortImageName(systemContext *types.SystemContext, imageName string) ([]RegistryImageReference, error)
-
-	// ResolveNames takes an image reference and if it's unqualified (w/o hostname),
-	// it uses crio's default registries to qualify it.
-	ResolveNames(systemContext *types.SystemContext, imageName string) ([]string, error)
-}
-
-func (svc *imageService) getRef(name string) (types.ImageReference, error) {
-	ref, err := alltransports.ParseImageName(name)
-	if err != nil {
-		ref2, err2 := istorage.Transport.ParseStoreReference(svc.store, "@"+name)
-		if err2 != nil {
-			ref3, err3 := istorage.Transport.ParseStoreReference(svc.store, name)
-			if err3 != nil {
-				return nil, err
-			}
-			ref2 = ref3
-		}
-		ref = ref2
-	}
-	return ref, nil
 }
 
 func sortNamesByType(names []string) (bestName string, tags, digests []string) {
@@ -359,19 +335,6 @@ func imageIsBeingPulled(image *storage.Image) bool {
 	return false
 }
 
-func (svc *imageService) ImageStatus(systemContext *types.SystemContext, nameOrID string) (*ImageResult, error) {
-	ref, err := svc.getRef(nameOrID)
-	if err != nil {
-		return nil, err
-	}
-	image, err := istorage.Transport.GetStoreImage(svc.store, ref)
-	if err != nil {
-		return nil, err
-	}
-
-	return svc.imageStatus(systemContext, ref, image)
-}
-
 func (svc *imageService) ImageStatusByName(systemContext *types.SystemContext, name RegistryImageReference) (*ImageResult, error) {
 	ref, err := istorage.Transport.NewStoreReference(svc.store, name.Raw(), "")
 	if err != nil {
@@ -425,28 +388,19 @@ func imageSize(img types.Image) *uint64 {
 	return nil
 }
 
-// remoteImageReference creates an image reference from an image string
-func (svc *imageLookupService) remoteImageReference(imageName string) (types.ImageReference, error) {
-	if imageName == "" {
-		return nil, storage.ErrNotAnImage
+// remoteImageReference creates an image reference for a CRI-O image reference
+func (svc *imageLookupService) remoteImageReference(imageName RegistryImageReference) (types.ImageReference, error) {
+	if svc.DefaultTransport == "" {
+		return nil, errors.New("DefaultTransport is not set")
 	}
-
-	srcRef, err := alltransports.ParseImageName(imageName)
-	if err != nil {
-		if svc.DefaultTransport == "" {
-			return nil, err
-		}
-		srcRef2, err2 := alltransports.ParseImageName(svc.DefaultTransport + imageName)
-		if err2 != nil {
-			return nil, err
-		}
-		srcRef = srcRef2
-	}
-	return srcRef, nil
+	// This is not actually out-of-process; the ParseImageName input is defined as cross-process strings, so, close enough.
+	// Practically, the only reasonable value of DefaultTransport is docker://, so this should ideally be replaced by
+	// a call to c/image/v5/docker.NewReference, and DefaultTransport should be deprecated.
+	return alltransports.ParseImageName(svc.DefaultTransport + imageName.StringForOutOfProcessConsumptionOnly())
 }
 
 // prepareReference creates an image reference from an image string and returns an updated types.SystemContext (never nil) for the image
-func (svc *imageLookupService) prepareReference(inputSystemContext *types.SystemContext, imageName string) (*types.SystemContext, types.ImageReference, error) {
+func (svc *imageLookupService) prepareReference(inputSystemContext *types.SystemContext, imageName RegistryImageReference) (*types.SystemContext, types.ImageReference, error) {
 	srcRef, err := svc.remoteImageReference(imageName)
 	if err != nil {
 		return nil, nil, err
@@ -456,16 +410,13 @@ func (svc *imageLookupService) prepareReference(inputSystemContext *types.System
 	if inputSystemContext != nil {
 		sc = *inputSystemContext // A shallow copy
 	}
-	if srcRef.DockerReference() != nil {
-		hostname := reference.Domain(srcRef.DockerReference())
-		if secure := svc.isSecureIndex(hostname); !secure {
-			sc.DockerInsecureSkipTLSVerify = types.OptionalBoolTrue
-		}
+	if secure := svc.isSecureIndex(imageName.Registry()); !secure {
+		sc.DockerInsecureSkipTLSVerify = types.OptionalBoolTrue
 	}
 	return &sc, srcRef, nil
 }
 
-func (svc *imageService) PrepareImage(inputSystemContext *types.SystemContext, imageName string) (types.ImageCloser, error) {
+func (svc *imageService) PrepareImage(inputSystemContext *types.SystemContext, imageName RegistryImageReference) (types.ImageCloser, error) {
 	systemContext, srcRef, err := svc.lookup.prepareReference(inputSystemContext, imageName)
 	if err != nil {
 		return nil, err
@@ -480,18 +431,17 @@ func init() {
 }
 
 type copyImageArgs struct {
-	Lookup         *imageLookupService
-	ImageName      string
-	ParentCgroup   string
-	SystemContext  *types.SystemContext
-	Options        *ImageCopyOptions
-	HasCollectMode bool
+	Lookup        *imageLookupService
+	ImageName     string // In the format of RegistryImageReference.StringForOutOfProcessConsumptionOnly()
+	ParentCgroup  string
+	SystemContext *types.SystemContext
+	Options       *ImageCopyOptions
 
 	StoreOptions storage.StoreOptions
 }
 
 // moveSelfToCgroup moves the current process to a new transient cgroup.
-func moveSelfToCgroup(cgroup string, hasCollectMode bool) error {
+func moveSelfToCgroup(cgroup string) error {
 	slice := "system.slice"
 	if rootless.IsRootless() {
 		slice = "user.slice"
@@ -506,16 +456,7 @@ func moveSelfToCgroup(cgroup string, hasCollectMode bool) error {
 
 	unitName := fmt.Sprintf("crio-pull-image-%d.scope", os.Getpid())
 
-	systemdProperties := []systemdDbus.Property{}
-	if hasCollectMode {
-		systemdProperties = append(systemdProperties,
-			systemdDbus.Property{
-				Name:  "CollectMode",
-				Value: dbus.MakeVariant("inactive-or-failed"),
-			})
-	}
-
-	return utils.RunUnderSystemdScope(dbusmgr.NewDbusConnManager(rootless.IsRootless()), os.Getpid(), slice, unitName, systemdProperties...)
+	return utils.RunUnderSystemdScope(dbusmgr.NewDbusConnManager(rootless.IsRootless()), os.Getpid(), slice, unitName)
 }
 
 func copyImageChild() {
@@ -526,7 +467,7 @@ func copyImageChild() {
 		os.Exit(1)
 	}
 
-	if err := moveSelfToCgroup(args.ParentCgroup, args.HasCollectMode); err != nil {
+	if err := moveSelfToCgroup(args.ParentCgroup); err != nil {
 		fmt.Fprintf(os.Stderr, "%v", err)
 		os.Exit(1)
 	}
@@ -548,7 +489,12 @@ func copyImageChild() {
 		os.Exit(1)
 	}
 
-	srcSystemContext, srcRef, destRef, err := args.Lookup.getReferences(args.Options.SourceCtx, store, args.ImageName)
+	imageName, err := references.ParseRegistryImageReferenceFromOutOfProcessData(args.ImageName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v", err)
+		os.Exit(1)
+	}
+	srcSystemContext, srcRef, destRef, err := args.Lookup.getReferences(args.Options.SourceCtx, store, imageName)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v", err)
 		os.Exit(1)
@@ -587,12 +533,11 @@ func toCopyOptions(options *ImageCopyOptions, progress chan types.ProgressProper
 	}
 }
 
-func (svc *imageService) copyImage(systemContext *types.SystemContext, imageName, parentCgroup string, options *ImageCopyOptions) error {
+func (svc *imageService) copyImage(systemContext *types.SystemContext, imageName RegistryImageReference, parentCgroup string, options *ImageCopyOptions) error {
 	progress := options.Progress
-	dest := imageName
-	// the first argument DEST is not used by the re-execed command but it is useful for debugging as it
+	// the first argument imageName is not used by the re-execed command but it is useful for debugging as it
 	// shows in the ps output.
-	cmd := reexec.CommandContext(svc.ctx, "crio-copy-image", dest)
+	cmd := reexec.CommandContext(svc.ctx, "crio-copy-image", imageName.StringForOutOfProcessConsumptionOnly())
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return fmt.Errorf("error getting stdout pipe for image copy process: %w", err)
@@ -610,18 +555,11 @@ func (svc *imageService) copyImage(systemContext *types.SystemContext, imageName
 		return fmt.Errorf("error getting stdin pipe for image copy process: %w", err)
 	}
 
-	if _, err := alltransports.ParseImageName(imageName); err != nil {
-		if svc.lookup.DefaultTransport == "" {
-			return err
-		}
-		imageName = svc.lookup.DefaultTransport + imageName
-	}
-
 	stdinArguments := copyImageArgs{
 		Lookup:        svc.lookup,
 		SystemContext: systemContext,
 		Options:       options,
-		ImageName:     imageName,
+		ImageName:     imageName.StringForOutOfProcessConsumptionOnly(),
 		ParentCgroup:  parentCgroup,
 		StoreOptions: storage.StoreOptions{
 			RunRoot:            svc.store.RunRoot(),
@@ -631,7 +569,6 @@ func (svc *imageService) copyImage(systemContext *types.SystemContext, imageName
 			UIDMap:             svc.store.UIDMap(),
 			GIDMap:             svc.store.GIDMap(),
 		},
-		HasCollectMode: node.SystemdHasCollectMode(),
 	}
 
 	stdinArguments.Options.Progress = nil
@@ -673,7 +610,7 @@ func (svc *imageService) copyImage(systemContext *types.SystemContext, imageName
 	return nil
 }
 
-func (svc *imageService) PullImage(systemContext *types.SystemContext, imageName string, inputOptions *ImageCopyOptions) (types.ImageReference, error) {
+func (svc *imageService) PullImage(systemContext *types.SystemContext, imageName RegistryImageReference, inputOptions *ImageCopyOptions) (types.ImageReference, error) {
 	options := *inputOptions // A shallow copy
 
 	srcSystemContext, srcRef, destRef, err := svc.lookup.getReferences(options.SourceCtx, svc.store, imageName)
@@ -705,18 +642,13 @@ func (svc *imageService) PullImage(systemContext *types.SystemContext, imageName
 	return destRef, nil
 }
 
-func (svc *imageLookupService) getReferences(inputSystemContext *types.SystemContext, store storage.Store, imageName string) (_ *types.SystemContext, srcRef, destRef types.ImageReference, _ error) {
+func (svc *imageLookupService) getReferences(inputSystemContext *types.SystemContext, store storage.Store, imageName RegistryImageReference) (_ *types.SystemContext, srcRef, destRef types.ImageReference, _ error) {
 	srcSystemContext, srcRef, err := svc.prepareReference(inputSystemContext, imageName)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	dest := imageName
-	if srcRef.DockerReference() != nil {
-		dest = srcRef.DockerReference().String()
-	}
-
-	destRef, err = istorage.Transport.ParseStoreReference(store, dest)
+	destRef, err = istorage.Transport.NewStoreReference(store, imageName.Raw(), "")
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -856,27 +788,6 @@ func (svc *imageService) CandidatesForPotentiallyShortImageName(systemContext *t
 		images[i] = references.RegistryImageReferenceFromRaw(ref)
 	}
 
-	return images, nil
-}
-
-// ResolveNames resolves an image name into a storage image ID or a fully-qualified image name (domain/repo/image:tag).
-// Will only return an empty slice if err != nil.
-func (svc *imageService) ResolveNames(systemContext *types.SystemContext, imageName string) ([]string, error) {
-	if id := svc.HeuristicallyTryResolvingStringAsIDPrefix(imageName); id != nil {
-		// This violates rules of StorageImageID, and should be removed soon (2023-10).
-		id := id.IDStringForOutOfProcessConsumptionOnly()
-		return []string{id}, nil
-	}
-
-	fullyQualified, err := svc.CandidatesForPotentiallyShortImageName(systemContext, imageName)
-	if err != nil {
-		return nil, err
-	}
-	images := make([]string, len(fullyQualified))
-	for i := range fullyQualified {
-		// This violates rules of StorageImageID, and should be removed soon (2023-10).
-		images[i] = fullyQualified[i].StringForOutOfProcessConsumptionOnly()
-	}
 	return images, nil
 }
 
