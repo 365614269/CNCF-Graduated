@@ -77,7 +77,7 @@ type imageService interface {
 	UpdateImage(ctx context.Context, r string) error
 
 	GetImage(id string) (imagestore.Image, error)
-	GetSnapshot(key string) (snapshotstore.Snapshot, error)
+	GetSnapshot(key, snapshotter string) (snapshotstore.Snapshot, error)
 
 	LocalResolve(refOrID string) (imagestore.Image, error)
 }
@@ -87,8 +87,8 @@ type criService struct {
 	imageService
 	// config contains all configurations.
 	config criconfig.Config
-	// imageFSPath is the path to image filesystem.
-	imageFSPath string
+	// imageFSPaths contains path to image filesystem for snapshotters.
+	imageFSPaths map[string]string
 	// os is an interface for all required os operations.
 	os osinterface.OS
 	// sandboxStore stores all resources associated with sandboxes.
@@ -98,9 +98,6 @@ type criService struct {
 	sandboxNameIndex *registrar.Registrar
 	// containerStore stores all resources associated with containers.
 	containerStore *containerstore.Store
-	// sandboxControllers contains different sandbox controller type,
-	// every controller controls sandbox lifecycle (and hides implementation details behind).
-	sandboxControllers map[criconfig.SandboxControllerMode]sandbox.Controller
 	// containerNameIndex stores all container names and make sure each
 	// name is unique.
 	containerNameIndex *registrar.Registrar
@@ -139,11 +136,21 @@ func NewCRIService(config criconfig.Config, client *containerd.Client, nri *nri.
 		return nil, fmt.Errorf("failed to find snapshotter %q", config.ContainerdConfig.Snapshotter)
 	}
 
-	imageFSPath := imageFSPath(config.ContainerdRootDir, config.ContainerdConfig.Snapshotter)
-	log.L.Infof("Get image filesystem path %q", imageFSPath)
+	imageFSPaths := map[string]string{}
+	for _, ociRuntime := range config.ContainerdConfig.Runtimes {
+		// Can not use `c.RuntimeSnapshotter() yet, so hard-coding here.`
+		snapshotter := ociRuntime.Snapshotter
+		if snapshotter != "" {
+			imageFSPaths[snapshotter] = imageFSPath(config.ContainerdRootDir, snapshotter)
+			log.L.Infof("Get image filesystem path %q for snapshotter %q", imageFSPaths[snapshotter], snapshotter)
+		}
+	}
+	snapshotter := config.ContainerdConfig.Snapshotter
+	imageFSPaths[snapshotter] = imageFSPath(config.ContainerdRootDir, snapshotter)
+	log.L.Infof("Get image filesystem path %q for snapshotter %q", imageFSPaths[snapshotter], snapshotter)
 
 	// TODO: expose this as a separate containerd plugin.
-	imageService, err := images.NewService(config, imageFSPath, client)
+	imageService, err := images.NewService(config, imageFSPaths, client)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create CRI image service: %w", err)
 	}
@@ -152,14 +159,13 @@ func NewCRIService(config criconfig.Config, client *containerd.Client, nri *nri.
 		imageService:       imageService,
 		config:             config,
 		client:             client,
-		imageFSPath:        imageFSPath,
+		imageFSPaths:       imageFSPaths,
 		os:                 osinterface.RealOS{},
 		sandboxStore:       sandboxstore.NewStore(labels),
 		containerStore:     containerstore.NewStore(labels),
 		sandboxNameIndex:   registrar.NewRegistrar(),
 		containerNameIndex: registrar.NewRegistrar(),
 		netPlugin:          make(map[string]cni.CNI),
-		sandboxControllers: make(map[criconfig.SandboxControllerMode]sandbox.Controller),
 	}
 
 	// TODO: figure out a proper channel size.
@@ -200,9 +206,8 @@ func NewCRIService(config criconfig.Config, client *containerd.Client, nri *nri.
 		return nil, err
 	}
 
-	// Load all sandbox controllers(pod sandbox controller and remote shim controller)
-	c.sandboxControllers[criconfig.ModePodSandbox] = podsandbox.New(config, client, c.sandboxStore, c.os, c, imageService, c.baseOCISpecs)
-	c.sandboxControllers[criconfig.ModeShim] = client.SandboxController()
+	podSandboxController := c.client.SandboxController(string(criconfig.ModePodSandbox)).(*podsandbox.Controller)
+	podSandboxController.Init(config, client, c.sandboxStore, c.os, c, c.imageService, c.baseOCISpecs)
 
 	c.nri = nri
 
@@ -345,6 +350,17 @@ func (c *criService) register(s *grpc.Server) error {
 	runtime.RegisterRuntimeServiceServer(s, instrumented)
 	runtime.RegisterImageServiceServer(s, instrumented)
 	return nil
+}
+
+// getSandboxController returns the sandbox controller configuration for sandbox.
+// If absent in legacy case, it will return the default controller.
+func (c *criService) getSandboxController(config *runtime.PodSandboxConfig, runtimeHandler string) (sandbox.Controller, error) {
+	ociRuntime, err := c.getSandboxRuntime(config, runtimeHandler)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get sandbox runtime: %w", err)
+	}
+
+	return c.client.SandboxController(ociRuntime.Sandboxer), nil
 }
 
 // imageFSPath returns containerd image filesystem path.
