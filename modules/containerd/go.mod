@@ -35,7 +35,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/intel/goresctrl v0.3.0
-	github.com/klauspost/compress v1.17.1
+	github.com/klauspost/compress v1.17.2
 	github.com/minio/sha256-simd v1.0.1
 	github.com/moby/locker v1.0.1
 	github.com/moby/sys/mountinfo v0.6.2
@@ -66,7 +66,7 @@ require (
 	golang.org/x/sync v0.3.0
 	golang.org/x/sys v0.13.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230726155614-23370e0ffb3e
-	google.golang.org/grpc v1.57.1
+	google.golang.org/grpc v1.58.3
 	google.golang.org/protobuf v1.31.0
 	k8s.io/apimachinery v0.28.2
 	k8s.io/client-go v0.28.2
