@@ -24,8 +24,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/containerd/containerd/v2"
 	containerdio "github.com/containerd/containerd/v2/cio"
+	containerd "github.com/containerd/containerd/v2/client"
 	"github.com/containerd/containerd/v2/errdefs"
 	"github.com/containerd/containerd/v2/oci"
 	"github.com/containerd/log"
@@ -146,6 +146,8 @@ func (c *criService) execInternal(ctx context.Context, container containerd.Cont
 	}
 
 	pspec.Args = opts.cmd
+	// CommandLine may already be set on the container's spec, but we want to only use Args here.
+	pspec.CommandLine = ""
 
 	if opts.stdout == nil {
 		opts.stdout = cio.NewDiscardLogger()
