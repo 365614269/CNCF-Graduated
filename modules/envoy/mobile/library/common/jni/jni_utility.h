@@ -113,33 +113,9 @@ void JavaArrayOfByteToBytesVector(JniHelper& jni_helper, jbyteArray array,
 
 void JavaArrayOfByteToString(JniHelper& jni_helper, jbyteArray jbytes, std::string* out);
 
-std::vector<MatcherData> javaObjectArrayToMatcherData(JniHelper& jni_helper, jobjectArray array,
-                                                      std::string& cluster_out);
-
 /** Parses the proto from Java's byte array and stores the output into `dest` proto. */
 void javaByteArrayToProto(JniHelper& jni_helper, jbyteArray source,
                           Envoy::Protobuf::MessageLite* dest);
-
-// TODO(fredyw): Delete these functions are replaced them with the ones from JniHelper
-
-// Helper functions for JNI's `Call<Type>Method` with proper exception handling in order to satisfy
-// -Xcheck:jni.
-// See
-// https://docs.oracle.com/en/java/javase/11/docs/specs/jni/functions.html#calling-instance-methods
-#define JNI_UTILITY_DECLARE_CALL_METHOD(JAVA_TYPE, JNI_TYPE)                                       \
-  JNI_TYPE call##JAVA_TYPE##Method(JniHelper& jni_helper, jobject object, jmethodID method_id, ...);
-
-JNI_UTILITY_DECLARE_CALL_METHOD(Object, jobject)
-
-// Helper functions for JNI's `CallStatic<Type>Method` with proper exception handling in order to
-// satisfy -Xcheck:jni.
-// See
-// https://docs.oracle.com/en/java/javase/11/docs/specs/jni/functions.html#calling-static-methods
-#define JNI_UTILITY_DECLARE_CALL_STATIC_METHOD(JAVA_TYPE, JNI_TYPE)                                \
-  JNI_TYPE callStatic##JAVA_TYPE##Method(JniHelper& jni_helper, jclass clazz, jmethodID method_id, \
-                                         ...);
-
-JNI_UTILITY_DECLARE_CALL_STATIC_METHOD(Object, jobject)
 
 } // namespace JNI
 } // namespace Envoy
