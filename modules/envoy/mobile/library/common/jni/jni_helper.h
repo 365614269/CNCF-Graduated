@@ -31,6 +31,9 @@ class LocalRefDeleter {
 public:
   explicit LocalRefDeleter(JNIEnv* env) : env_(env) {}
 
+  // This is to allow move semantics in `LocalRefUniquePtr`.
+  LocalRefDeleter& operator=(const LocalRefDeleter&) { return *this; }
+
   void operator()(jobject object) const {
     if (object != nullptr) {
       env_->DeleteLocalRef(object);
@@ -357,6 +360,15 @@ public:
    * https://docs.oracle.com/en/java/javase/17/docs/specs/jni/functions.html#getdirectbuffercapacity
    */
   jlong getDirectBufferCapacity(jobject buffer);
+
+  /**
+   * Gets the address of memory associated with the given NIO direct buffer.
+   *
+   * https://docs.oracle.com/en/java/javase/17/docs/specs/jni/functions.html#getdirectbufferaddress
+   */
+  template <typename T = void*> T getDirectBufferAddress(jobject buffer) {
+    return static_cast<T>(env_->GetDirectBufferAddress(buffer));
+  }
 
 private:
   /** Rethrows the Java exception occurred. */
