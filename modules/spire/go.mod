@@ -18,17 +18,17 @@ require (
 	github.com/Microsoft/go-winio v0.6.1
 	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129
 	github.com/armon/go-metrics v0.4.1
-	github.com/aws/aws-sdk-go-v2 v1.22.1
-	github.com/aws/aws-sdk-go-v2/config v1.22.1
-	github.com/aws/aws-sdk-go-v2/credentials v1.15.1
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.14.2
+	github.com/aws/aws-sdk-go-v2 v1.22.2
+	github.com/aws/aws-sdk-go-v2/config v1.23.0
+	github.com/aws/aws-sdk-go-v2/credentials v1.15.2
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.14.3
 	github.com/aws/aws-sdk-go-v2/service/acmpca v1.24.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.130.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.131.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.27.0
 	github.com/aws/aws-sdk-go-v2/service/kms v1.26.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.42.0
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.23.0
-	github.com/aws/aws-sdk-go-v2/service/sts v1.25.0
+	github.com/aws/aws-sdk-go-v2/service/sts v1.25.1
 	github.com/aws/smithy-go v1.16.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cenkalti/backoff/v4 v4.2.1
@@ -73,8 +73,8 @@ require (
 	github.com/uber-go/tally/v4 v4.1.10
 	github.com/valyala/fastjson v1.6.4
 	github.com/zeebo/errs v1.3.0
-	golang.org/x/crypto v0.14.0
-	golang.org/x/net v0.17.0
+	golang.org/x/crypto v0.15.0
+	golang.org/x/net v0.18.0
 	golang.org/x/sync v0.5.0
 	golang.org/x/sys v0.14.0
 	golang.org/x/time v0.3.0
@@ -131,18 +131,18 @@ require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.5.0 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.5.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.5.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.5.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.6.0 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.2.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.15.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ecrpublic v1.12.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.2.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.10.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.10.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.16.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.17.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.19.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.17.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.19.1 // indirect
 	github.com/awslabs/amazon-ecr-credential-helper/ecr-login v0.0.0-20220228164355-396b2034c795 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
@@ -324,8 +324,8 @@ require (
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/mod v0.13.0 // indirect
 	golang.org/x/oauth2 v0.13.0 // indirect
-	golang.org/x/term v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/term v0.14.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
