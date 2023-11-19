@@ -11,7 +11,7 @@ require (
 	github.com/TwiN/go-color v1.4.0
 	github.com/alibabacloud-go/tea v1.2.1
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.1+incompatible
-	github.com/aliyun/credentials-go v1.3.1
+	github.com/aliyun/credentials-go v1.3.2
 	github.com/antonmedv/expr v1.15.3
 	github.com/argoproj/argo-events v1.7.3
 	github.com/argoproj/pkg v0.13.7-0.20230901113346-235a5432ec98
@@ -30,7 +30,7 @@ require (
 	github.com/google/go-containerregistry v0.16.1
 	github.com/google/go-containerregistry/pkg/authn/k8schain v0.0.0-20220720195016-31786c6cbb82
 	github.com/gorilla/handlers v1.5.1
-	github.com/gorilla/websocket v1.5.0
+	github.com/gorilla/websocket v1.5.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
@@ -257,8 +257,8 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
 	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/term v0.13.0
+	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/term v0.14.0
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
