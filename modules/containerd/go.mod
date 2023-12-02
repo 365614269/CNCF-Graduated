@@ -13,7 +13,7 @@ require (
 	github.com/containerd/btrfs/v2 v2.0.0
 	github.com/containerd/cgroups/v3 v3.0.2
 	github.com/containerd/console v1.0.3
-	github.com/containerd/continuity v0.4.2
+	github.com/containerd/continuity v0.4.3
 	github.com/containerd/fifo v1.1.0
 	github.com/containerd/go-cni v1.1.9
 	github.com/containerd/go-runc v1.1.0
@@ -30,7 +30,7 @@ require (
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c
 	github.com/docker/go-metrics v0.0.1
 	github.com/docker/go-units v0.5.0
-	github.com/fsnotify/fsnotify v1.6.0
+	github.com/fsnotify/fsnotify v1.7.0
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0

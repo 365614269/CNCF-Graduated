@@ -1,5 +1,3 @@
-//go:build gofuzz
-
 /*
    Copyright The containerd Authors.
 
@@ -16,31 +14,40 @@
    limitations under the License.
 */
 
-package fuzz
+package fs
 
 import (
-	fuzz "github.com/AdaLogics/go-fuzz-headers"
-
-	containerd "github.com/containerd/containerd/v2/client"
-	criconfig "github.com/containerd/containerd/v2/pkg/cri/config"
-	"github.com/containerd/containerd/v2/pkg/cri/server"
+	"io"
+	"os"
 )
 
-func FuzzCRISandboxServer(data []byte) int {
-	initDaemon.Do(startDaemon)
+type dirReader struct {
+	buf []os.DirEntry
+	f   *os.File
+	err error
+}
 
-	f := fuzz.NewConsumer(data)
-
-	client, err := containerd.New(defaultAddress)
-	if err != nil {
-		return 0
+func (r *dirReader) Next() os.DirEntry {
+	if len(r.buf) == 0 {
+		infos, err := r.f.ReadDir(32)
+		if err != nil {
+			if err != io.EOF {
+				r.err = err
+			}
+			return nil
+		}
+		r.buf = infos
 	}
-	defer client.Close()
 
-	c, err := server.NewCRIService(criconfig.Config{}, client, nil)
-	if err != nil {
-		panic(err)
+	if len(r.buf) == 0 {
+		return nil
 	}
+	out := r.buf[0]
+	r.buf[0] = nil
+	r.buf = r.buf[1:]
+	return out
+}
 
-	return fuzzCRI(f, c)
+func (r *dirReader) Err() error {
+	return r.err
 }
