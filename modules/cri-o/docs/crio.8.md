@@ -356,7 +356,7 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--pause-image-auth-file**="": Path to a config file containing credentials for --pause-image.
 
-**--pids-limit**="": Maximum number of processes allowed in a container. This option is deprecated. The Kubelet flag '--pod-pids-limit' should be used instead. (default: 0)
+**--pids-limit**="": Maximum number of processes allowed in a container. This option is deprecated. The Kubelet flag '--pod-pids-limit' should be used instead. (default: -1)
 
 **--pinned-images**="": A list of images that will be excluded from the kubelet's garbage collection.
 
@@ -469,7 +469,7 @@ it later with **--config**. Global options will modify the output.
     Please note that the migration will overwrite any fields that have changed
     defaults between versions. To save a custom configuration change, it should
     be in a drop-in configuration file instead.
-    Possible values: "1.17" (default: 1.17)
+    Possible values: "1.17" (default: "1.17")
 
 ## version
 
@@ -489,7 +489,7 @@ wipe CRI-O's container and image storage
 
 Display status information
 
-**--socket, -s**="": absolute path to the unix socket (default: /var/run/crio/crio.sock)
+**--socket, -s**="": absolute path to the unix socket (default: "/var/run/crio/crio.sock")
 
 ### config, c
 

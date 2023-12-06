@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
-	"github.com/container-orchestrated-devices/container-device-interface/pkg/cdi"
 	"github.com/containers/common/pkg/hooks"
 	conmonconfig "github.com/containers/conmon/runner/config"
 	"github.com/containers/image/v5/pkg/sysregistriesv2"
@@ -44,6 +43,7 @@ import (
 	selinux "github.com/opencontainers/selinux/go-selinux"
 	"github.com/sirupsen/logrus"
 	"k8s.io/utils/cpuset"
+	"tags.cncf.io/container-device-interface/pkg/cdi"
 )
 
 // Defaults if none are specified
@@ -104,7 +104,7 @@ const (
 const (
 	// DefaultPidsLimit is the default value for maximum number of processes
 	// allowed inside a container
-	DefaultPidsLimit = 0
+	DefaultPidsLimit = -1
 
 	// DefaultLogSizeMax is the default value for the maximum log size
 	// allowed for a container. Negative values mean that no limit is imposed.
