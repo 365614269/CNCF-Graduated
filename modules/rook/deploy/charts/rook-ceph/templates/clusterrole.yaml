@@ -76,7 +76,6 @@ rules:
   # Node access is needed for determining nodes where mons should run
   - nodes
   - nodes/proxy
-  - services
   # Rook watches secrets which it uses to configure access to external resources.
   # e.g., external Ceph cluster or object store
   - secrets
@@ -96,6 +95,7 @@ rules:
   - persistentvolumeclaims
   # Rook creates endpoints for mgr and object store access
   - endpoints
+  - services
   verbs:
   - get
   - list
@@ -389,8 +389,6 @@ rules:
   - get
   - list
 ---
-# TODO: remove this, once https://github.com/rook/rook/issues/10141
-# is resolved.
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
