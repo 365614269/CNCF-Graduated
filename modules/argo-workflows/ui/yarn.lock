@@ -2109,10 +2109,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-helmet@^6.1.9":
-  version "6.1.9"
-  resolved "https://registry.yarnpkg.com/@types/react-helmet/-/react-helmet-6.1.9.tgz#e79e0def2ad4047cb67e83c5be7cfb3d2121615a"
-  integrity sha512-nuOeTefP4yPTWHvjGksCBKb/4hsgJxSX7aSTjTIDFXJIkZ6Wo2Y4/cmE1FO9OlYBrHjKOer/0zLwY7s4qiQBtw==
+"@types/react-helmet@^6.1.11":
+  version "6.1.11"
+  resolved "https://registry.yarnpkg.com/@types/react-helmet/-/react-helmet-6.1.11.tgz#8cafcafff38f75361f451563ba7b406b0c5d3907"
+  integrity sha512-0QcdGLddTERotCXo3VFlUSWO3ztraw8nZ6e3zJSgG7apwV5xt+pJUS8ewPBqT4NYB1optGLprNQzFleIY84u/g==
   dependencies:
     "@types/react" "*"
 
@@ -3654,10 +3654,10 @@ cron-parser@^4.9.0:
   dependencies:
     luxon "^3.2.1"
 
-cronstrue@^2.44.0:
-  version "2.44.0"
-  resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-2.44.0.tgz#d843ec59182bb4034a1b379ca0c5463af164ee08"
-  integrity sha512-71aQD16uXrqjDUYHsFYY4/SSmEepzQZqTqWsU9x2kDMCYKyIp/5e0QW/cp2lBNO9PJB1xOpIbBJuQEa5yKx98A==
+cronstrue@^2.47.0:
+  version "2.47.0"
+  resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-2.47.0.tgz#3cf447c2a3a070d5bad2cedd6383e7cc16f5a308"
+  integrity sha512-fnFwJy7zslTEz6h7O7BkwgHNBvuuPmkhAYKqPDxK5mBQLz2nG08T9afbnjm+yrvcc/wxrd+otaVSnoXT9ulUOw==
 
 cross-spawn@^6.0.0, cross-spawn@^6.0.5:
   version "6.0.5"
@@ -4234,10 +4234,10 @@ escodegen@^2.0.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-prettier@^9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-9.0.0.tgz#eb25485946dd0c66cd216a46232dc05451518d1f"
-  integrity sha512-IcJsTkJae2S35pRsRAwoCE+925rJJStOdkKnLVgtE+tEpqU0EVVM7OqrwxqgptKdX29NUwC82I5pXsGFIgSevw==
+eslint-config-prettier@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-9.1.0.tgz#31af3d94578645966c082fcb71a5846d3c94867f"
+  integrity sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==
 
 eslint-plugin-prettier@^5.0.1:
   version "5.0.1"
@@ -5198,10 +5198,10 @@ html-minifier-terser@^6.0.2:
     relateurl "^0.2.7"
     terser "^5.10.0"
 
-html-webpack-plugin@^5.5.3:
-  version "5.5.3"
-  resolved "https://registry.yarnpkg.com/html-webpack-plugin/-/html-webpack-plugin-5.5.3.tgz#72270f4a78e222b5825b296e5e3e1328ad525a3e"
-  integrity sha512-6YrDKTuqaP/TquFH7h4srYWsZx+x6k6+FbsTm0ziCwGHDP78Unr1r9F/H4+sGmMbX08GQcJ+K64x55b+7VM/jg==
+html-webpack-plugin@^5.5.4:
+  version "5.5.4"
+  resolved "https://registry.yarnpkg.com/html-webpack-plugin/-/html-webpack-plugin-5.5.4.tgz#517a48e6f046ff1ae1a172c983cd993eb79d2f6a"
+  integrity sha512-3wNSaVVxdxcu0jd4FpQFoICdqgxs4zIQQvj+2yQKFfBOnLETQ6X5CDWdeasuGlSsooFlMkEioWDTqBv1wvw5Iw==
   dependencies:
     "@types/html-minifier-terser" "^6.0.0"
     html-minifier-terser "^6.0.2"
@@ -7956,10 +7956,10 @@ react-copy-to-clipboard@5.1.0:
     copy-to-clipboard "^3.3.1"
     prop-types "^15.8.1"
 
-react-datepicker@^4.23.0:
-  version "4.23.0"
-  resolved "https://registry.yarnpkg.com/react-datepicker/-/react-datepicker-4.23.0.tgz#0da50b3815b3350b7df6cf0dbc63e37c6c3079b4"
-  integrity sha512-w+msqlOZ14v6H1UknTKtZw/dw9naFMgAOspf59eY130gWpvy5dvKj/bgsFICDdvxB7PtKWxDcbGlAqCloY1d2A==
+react-datepicker@^4.24.0:
+  version "4.24.0"
+  resolved "https://registry.yarnpkg.com/react-datepicker/-/react-datepicker-4.24.0.tgz#dfb12e277993f1ae2d350b7ba4dd6bba7d21bfb1"
+  integrity sha512-2QUC2pP+x4v3Jp06gnFllxKsJR0yoT/K6y86ItxEsveTXUpsx+NBkChWXjU0JsGx/PL8EQnsxN0wHl4zdA1m/g==
   dependencies:
     "@popperjs/core" "^2.11.8"
     classnames "^2.2.6"
