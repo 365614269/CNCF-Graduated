@@ -24,7 +24,7 @@ require (
 	github.com/containers/image/v5 v5.29.0
 	github.com/containers/kubensmnt v1.2.0
 	github.com/containers/ocicrypt v1.1.9
-	github.com/containers/podman/v4 v4.8.1
+	github.com/containers/podman/v4 v4.8.2
 	github.com/containers/storage v1.51.0
 	github.com/coreos/go-systemd/v22 v22.5.1-0.20231103132048-7d375ecc2b09
 	github.com/cpuguy83/go-md2man v1.0.10
@@ -70,7 +70,7 @@ require (
 	golang.org/x/net v0.19.0
 	golang.org/x/sync v0.5.0
 	golang.org/x/sys v0.15.0
-	google.golang.org/grpc v1.59.0
+	google.golang.org/grpc v1.60.0
 	google.golang.org/protobuf v1.31.0
 	k8s.io/api v0.29.0-rc.1
 	k8s.io/apimachinery v0.29.0-rc.1
