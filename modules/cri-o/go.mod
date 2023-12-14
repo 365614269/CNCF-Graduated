@@ -10,7 +10,7 @@ require (
 	github.com/checkpoint-restore/checkpointctl v1.1.0
 	github.com/checkpoint-restore/go-criu/v7 v7.0.0
 	github.com/containerd/cgroups v1.1.0
-	github.com/containerd/containerd v1.7.10
+	github.com/containerd/containerd v1.7.11
 	github.com/containerd/cri-containerd v1.19.0
 	github.com/containerd/fifo v1.1.0
 	github.com/containerd/nri v0.5.0
@@ -41,7 +41,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/go-github/v50 v50.2.0
 	github.com/google/renameio v1.0.1
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/intel/goresctrl v0.5.0
 	github.com/json-iterator/go v1.1.12

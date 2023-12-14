@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           path: src/github.com/containerd/containerd
@@ -93,7 +93,7 @@ jobs:
           releasever="${releasever#refs/tags/}"
           echo "RELEASE_VER=${releasever}" >> $GITHUB_ENV
       - name: Checkout containerd
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # Intentionally use github.repository instead of containerd/containerd to
           # make this action runnable on forks.
@@ -106,7 +106,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
         with:
           use: true
-      - uses: crazy-max/ghaction-github-runtime@v2 # sets up needed vars for caching to github
+      - uses: crazy-max/ghaction-github-runtime@v3 # sets up needed vars for caching to github
       - name: Make
         shell: bash
         run: |
