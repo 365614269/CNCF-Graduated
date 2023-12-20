@@ -1,6 +1,6 @@
 module github.com/rook/rook/pkg/apis
 
-go 1.20
+go 1.21
 
 require (
 	github.com/hashicorp/vault/api v1.10.0
@@ -31,7 +31,7 @@ require (
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/uuid v1.4.0 // indirect
+	github.com/google/uuid v1.5.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -58,7 +58,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/oauth2 v0.15.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
@@ -93,21 +93,21 @@ exclude (
 	k8s.io/client-go v1.5.0
 	k8s.io/client-go v1.5.1
 	k8s.io/client-go v1.5.2
-	k8s.io/client-go v10.0.0+incompatible
-	k8s.io/client-go v11.0.0+incompatible
-	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
-	k8s.io/client-go v12.0.0+incompatible
-	k8s.io/client-go v2.0.0+incompatible
 	k8s.io/client-go v2.0.0-alpha.1+incompatible
-	k8s.io/client-go v3.0.0+incompatible
+	k8s.io/client-go v2.0.0+incompatible
 	k8s.io/client-go v3.0.0-beta.0+incompatible
-	k8s.io/client-go v4.0.0+incompatible
+	k8s.io/client-go v3.0.0+incompatible
 	k8s.io/client-go v4.0.0-beta.0+incompatible
+	k8s.io/client-go v4.0.0+incompatible
 	k8s.io/client-go v5.0.0+incompatible
 	k8s.io/client-go v5.0.1+incompatible
 	k8s.io/client-go v6.0.0+incompatible
 	k8s.io/client-go v7.0.0+incompatible
 	k8s.io/client-go v8.0.0+incompatible
-	k8s.io/client-go v9.0.0+incompatible
 	k8s.io/client-go v9.0.0-invalid+incompatible
+	k8s.io/client-go v9.0.0+incompatible
+	k8s.io/client-go v10.0.0+incompatible
+	k8s.io/client-go v11.0.0+incompatible
+	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
+	k8s.io/client-go v12.0.0+incompatible
 )

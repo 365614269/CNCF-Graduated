@@ -344,8 +344,8 @@ github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7Do
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/creack/pty v1.1.21 h1:1/QdRyBaHHJP61QkWMXlOIBfsgdDeeKfK8SYVUWJKf0=
 github.com/creack/pty v1.1.21/go.mod h1:MOBLtS5ELjhRRrroQr9kyvTxUAFNvYEK993ew/Vr4O4=
-github.com/cri-o/ocicni v0.4.1-0.20230504062519-ad62f4ea0c11 h1:tNECj3vbJTpiieCM4wK7VcgzUrhZGXZhEf7iLHlBe14=
-github.com/cri-o/ocicni v0.4.1-0.20230504062519-ad62f4ea0c11/go.mod h1:/i3DeaXVuw12dwFUXeXzrp68osVAzNi4s5jCRKTGZKE=
+github.com/cri-o/ocicni v0.4.1 h1:B7pFAppK9uH2+SJcXaRsS66rDFkKN5JS4XTWSSdzG8Q=
+github.com/cri-o/ocicni v0.4.1/go.mod h1:DrssTsfNjqxATkG4BTaMg9EnE5dLIhpPXxrzsdh4QpY=
 github.com/cyberphone/json-canonicalization v0.0.0-20231011164504-785e29786b46 h1:2Dx4IHfC1yHWI12AxQDJM1QbRCDfk6M+blLzlZCXdrc=
 github.com/cyberphone/json-canonicalization v0.0.0-20231011164504-785e29786b46/go.mod h1:uzvlm1mxhHkdfqitSA92i7Se+S9ksOn3a3qmv/kyOCw=
 github.com/cyphar/filepath-securejoin v0.2.2/go.mod h1:FpkQEhXnPnOthhzymB7CGsFk2G9VLXONKD9G7QGMM+4=
@@ -726,6 +726,8 @@ github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfV
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/karrick/godirwalk v1.8.0/go.mod h1:H5KPZjojv4lE+QYImBI8xVtrBRgYrIVsaRPx4tDPEn4=
 github.com/karrick/godirwalk v1.10.3/go.mod h1:RoGL9dQei4vP9ilrpETWE8CLOZ1kiN0LhBygSwrAsHA=
+github.com/kata-containers/kata-containers/src/runtime v0.0.0-20231214145909-c7c763220340 h1:jcPu+nNmDGbXAE5tL7BCt2gNZyYcgnN+aatdEOYtTlY=
+github.com/kata-containers/kata-containers/src/runtime v0.0.0-20231214145909-c7c763220340/go.mod h1:eKVh2ScPyeprBK6BdE75P6EsyWNazV/g3GXge+QZUIE=
 github.com/kevinburke/ssh_config v1.2.0 h1:x584FjTGwHzMwvHx18PXxbBVzfnxogHaAReU4gf13a4=
 github.com/kevinburke/ssh_config v1.2.0/go.mod h1:CT57kijsi8u/K/BOFA39wgDQJ9CxiF4nAY/ojJ6r6mM=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=

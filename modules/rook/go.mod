@@ -1,20 +1,20 @@
 module github.com/rook/rook
 
-go 1.20
+go 1.21
 
 replace github.com/rook/rook/pkg/apis => ./pkg/apis
 
 require (
 	github.com/IBM/keyprotect-go-client v0.12.2
-	github.com/aws/aws-sdk-go v1.48.16
+	github.com/aws/aws-sdk-go v1.49.4
 	github.com/banzaicloud/k8s-objectmatcher v1.8.0
-	github.com/ceph/go-ceph v0.24.0
+	github.com/ceph/go-ceph v0.25.0
 	github.com/coreos/pkg v0.0.0-20230601102743-20bbbf26f4d8
 	github.com/csi-addons/kubernetes-csi-addons v0.7.0
 	github.com/gemalto/kmip-go v0.0.10
 	github.com/go-ini/ini v1.67.0
 	github.com/google/go-cmp v0.6.0
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/hashicorp/vault/api v1.10.0
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v1.4.0
 	github.com/kube-object-storage/lib-bucket-provisioner v0.0.0-20221122204822-d1a8c34382f1
@@ -116,7 +116,7 @@ require (
 	github.com/xlab/treeprint v1.2.0 // indirect
 	go.starlark.net v0.0.0-20231121155337-90ade8b19d09 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/oauth2 v0.15.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
@@ -151,21 +151,21 @@ exclude (
 	k8s.io/client-go v1.5.0
 	k8s.io/client-go v1.5.1
 	k8s.io/client-go v1.5.2
-	k8s.io/client-go v10.0.0+incompatible
-	k8s.io/client-go v11.0.0+incompatible
-	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
-	k8s.io/client-go v12.0.0+incompatible
-	k8s.io/client-go v2.0.0+incompatible
 	k8s.io/client-go v2.0.0-alpha.1+incompatible
-	k8s.io/client-go v3.0.0+incompatible
+	k8s.io/client-go v2.0.0+incompatible
 	k8s.io/client-go v3.0.0-beta.0+incompatible
-	k8s.io/client-go v4.0.0+incompatible
+	k8s.io/client-go v3.0.0+incompatible
 	k8s.io/client-go v4.0.0-beta.0+incompatible
+	k8s.io/client-go v4.0.0+incompatible
 	k8s.io/client-go v5.0.0+incompatible
 	k8s.io/client-go v5.0.1+incompatible
 	k8s.io/client-go v6.0.0+incompatible
 	k8s.io/client-go v7.0.0+incompatible
 	k8s.io/client-go v8.0.0+incompatible
-	k8s.io/client-go v9.0.0+incompatible
 	k8s.io/client-go v9.0.0-invalid+incompatible
+	k8s.io/client-go v9.0.0+incompatible
+	k8s.io/client-go v10.0.0+incompatible
+	k8s.io/client-go v11.0.0+incompatible
+	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
+	k8s.io/client-go v12.0.0+incompatible
 )

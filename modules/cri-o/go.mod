@@ -29,7 +29,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.5.1-0.20231103132048-7d375ecc2b09
 	github.com/cpuguy83/go-md2man v1.0.10
 	github.com/creack/pty v1.1.21
-	github.com/cri-o/ocicni v0.4.1-0.20230504062519-ad62f4ea0c11
+	github.com/cri-o/ocicni v0.4.1
 	github.com/cyphar/filepath-securejoin v0.2.4
 	github.com/docker/distribution v2.8.3+incompatible
 	github.com/docker/go-units v0.5.0
@@ -45,6 +45,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/intel/goresctrl v0.5.0
 	github.com/json-iterator/go v1.1.12
+	github.com/kata-containers/kata-containers/src/runtime v0.0.0-20231214145909-c7c763220340
 	github.com/onsi/ginkgo/v2 v2.13.2
 	github.com/onsi/gomega v1.30.0
 	github.com/opencontainers/go-digest v1.0.0
