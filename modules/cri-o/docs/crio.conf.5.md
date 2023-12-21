@@ -268,15 +268,20 @@ the container runtime configuration.
 
 **uid_mappings**=""
   The UID mappings for the user namespace of each container. A range is specified in the form containerUID:HostUID:Size. Multiple ranges must be separated by comma.
+  This option is deprecated, and will be replaced with native Kubernetes user namespace support in the future.
+
 
 **minimum_mappable_uid**=-1
   The lowest host UID which can be specified in mappings supplied, either as part of a **uid_mappings** or as part of a request received over CRI, for a pod that will be run as a UID other than 0.
+  This option is deprecated, and will be replaced with Kubernetes user namespace support (KEP-127) in the future.
 
 **gid_mappings**=""
   The GID mappings for the user namespace of each container. A range is specified in the form containerGID:HostGID:Size. Multiple ranges must be separated by comma.
+  This option is deprecated, and will be replaced with Kubernetes user namespace support (KEP-127) in the future.
 
 **minimum_mappable_gid**=-1
   The lowest host GID which can be specified in mappings supplied, either as part of a **gid_mappings** or as part of a request received over CRI, for a pod that will be run as a UID other than 0.
+  This option is deprecated, and will be replaced with Kubernetes user namespace support (KEP-127) in the future.
 
 **ctr_stop_timeout**=30
   The minimal amount of time in seconds to wait before issuing a timeout regarding the proper termination of the container.
@@ -366,12 +371,14 @@ A workload is chosen for a pod based on whether the workload's **activation_anno
   allowed_annotations is a slice of experimental annotations that this workload is allowed to process.
   The currently recognized values are:
   "io.kubernetes.cri-o.userns-mode" for configuring a user namespace for the pod.
+  "io.kubernetes.cri-o.cgroup2-mount-hierarchy-rw" for mounting cgroups writably when set to "true".
   "io.kubernetes.cri-o.Devices" for configuring devices for the pod.
   "io.kubernetes.cri-o.ShmSize" for configuring the size of /dev/shm.
   "io.kubernetes.cri-o.UnifiedCgroup.$CTR_NAME" for configuring the cgroup v2 unified block for a container.
   "io.containers.trace-syscall" for tracing syscalls via the OCI seccomp BPF hook.
   "io.kubernetes.cri-o.seccompNotifierAction" for enabling the seccomp notifier feature.
   "io.kubernetes.cri-o.umask" for setting the umask for container init process.
+  "io.kubernetes.cri.rdt-class" for setting the RDT class of a container
 
 #### Using the seccomp notifier feature:
 
@@ -439,7 +446,7 @@ CRI-O reads its configured registries defaults from the system wide containers-r
   Path to the file which decides what sort of policy we use when deciding whether or not to trust an image that we've pulled. It is not recommended that this option be used, as the default behavior of using the system-wide default policy (i.e., /etc/containers/policy.json) is most often preferred. Please refer to containers-policy.json(5) for more details.
 
 **signature_policy_dir**="/etc/crio/policies"
-  Root path for pod namespace-separated signature policies. The final policy to be used on image pull will be <SIGNATURE_POLICY_DIR>/<NAMESPACE>.json. If no pod namespace is being provided on image pull (via the sandbox config), or the concatenated path is non existent, then the signature_policy or system wide policy will be used as fallback. Must be an absolute path.
+  Root path for pod namespace-separated signature policies. The final policy to be used on image pull will be <SIGNATURE_POLICY_DIR>/\<NAMESPACE\>.json. If no pod namespace is being provided on image pull (via the sandbox config), or the concatenated path is non existent, then the signature_policy or system wide policy will be used as fallback. Must be an absolute path.
 
 **image_volumes**="mkdir"
   Controls how image volumes are handled. The valid values are mkdir, bind and ignore; the latter will ignore volumes entirely.

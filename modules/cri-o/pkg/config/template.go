@@ -1106,6 +1106,7 @@ const templateStringCrioRuntimeLogFilter = `# Filter the log messages by the pro
 const templateStringCrioRuntimeUIDMappings = `# The UID mappings for the user namespace of each container. A range is
 # specified in the form containerUID:HostUID:Size. Multiple ranges must be
 # separated by comma.
+# This option is deprecated, and will be replaced with Kubernetes user namespace support (KEP-127) in the future.
 {{ $.Comment }}uid_mappings = "{{ .UIDMappings }}"
 
 `
@@ -1113,6 +1114,7 @@ const templateStringCrioRuntimeUIDMappings = `# The UID mappings for the user na
 const templateStringCrioRuntimeGIDMappings = `# The GID mappings for the user namespace of each container. A range is
 # specified in the form containerGID:HostGID:Size. Multiple ranges must be
 # separated by comma.
+# This option is deprecated, and will be replaced with Kubernetes user namespace support (KEP-127) in the future.
 {{ $.Comment }}gid_mappings = "{{ .GIDMappings }}"
 
 `
@@ -1120,6 +1122,7 @@ const templateStringCrioRuntimeGIDMappings = `# The GID mappings for the user na
 const templateStringCrioRuntimeMinimumMappableUID = `# If set, CRI-O will reject any attempt to map host UIDs below this value
 # into user namespaces.  A negative value indicates that no minimum is set,
 # so specifying mappings will only be allowed for pods that run as UID 0.
+# This option is deprecated, and will be replaced with Kubernetes user namespace support (KEP-127) in the future.
 {{ $.Comment }}minimum_mappable_uid = {{ .MinimumMappableUID }}
 
 `
@@ -1127,6 +1130,7 @@ const templateStringCrioRuntimeMinimumMappableUID = `# If set, CRI-O will reject
 const templateStringCrioRuntimeMinimumMappableGID = `# If set, CRI-O will reject any attempt to map host GIDs below this value
 # into user namespaces.  A negative value indicates that no minimum is set,
 # so specifying mappings will only be allowed for pods that run as UID 0.
+# This option is deprecated, and will be replaced with Kubernetes user namespace support (KEP-127) in the future.
 {{ $.Comment }}minimum_mappable_gid = {{ .MinimumMappableGID}}
 
 `
@@ -1248,6 +1252,8 @@ const templateStringCrioRuntimeRuntimesRuntimeHandler = `# The "crio.runtime.run
 #   "io.kubernetes.cri-o.ShmSize" for configuring the size of /dev/shm.
 #   "io.kubernetes.cri-o.UnifiedCgroup.$CTR_NAME" for configuring the cgroup v2 unified block for a container.
 #   "io.containers.trace-syscall" for tracing syscalls via the OCI seccomp BPF hook.
+#   "io.kubernetes.cri-o.seccompNotifierAction" for enabling the seccomp notifier feature.
+#   "io.kubernetes.cri-o.umask" for setting the umask for container init process.
 #   "io.kubernetes.cri.rdt-class" for setting the RDT class of a container
 # - monitor_path (optional, string): The path of the monitor binary. Replaces
 #   deprecated option "conmon".
