@@ -52,7 +52,7 @@ Intel and a SIG Testing Tech Lead.
 **Sandipan:** Could you tell us a bit about yourself, your role, and
 how you got involved in the Kubernetes project and SIG Testing?
 -->
-## 会见贡献者
+## 会见贡献者   {#meet-the-contributors}
 
 **Sandipan:** 你能简单介绍一下自己吗，谈谈你的职责角色以及你是如何参与
 Kubernetes 项目和 SIG Testing 的？
@@ -88,7 +88,7 @@ structured logging WG lead.
 **Sandipan:** Testing is a field in which multiple approaches and
 tools exist; how did you arrive at the existing practices?
 -->
-## 测试实践和工具
+## 测试实践和工具    {#testing-practices-and-tools}
 
 **Sandipan:** 测试是一个存在多种方法和工具的领域，你们是如何形成现有实践方式的？
 
@@ -100,7 +100,7 @@ started using it. For E2E testing, that was
 [Ginkgo+Gomega](https://github.com/onsi/ginkgo). Some hacks were
 necessary, for example around cleanup after a test run and for
 categorising tests. Eventually this led to Ginkgo v2 and [revised best
-practices for E2E testing](/blog/2023/04/12/e2e-testing-best-practices-reloaded/).
+practices for E2E testing](https://www.kubernetes.dev/blog/2023/04/12/e2e-testing-best-practices-reloaded/).
 Regarding unit testing opinions are pretty diverse: some maintainers
 prefer to use just the Go standard library with hand-written
 checks. Others use helper packages like stretchr/testify. That
@@ -114,7 +114,7 @@ and other components, then runs tests that are more like E2E tests.
 当时开发人员只是看看有什么可用的工具并开始使用这些工具。对于 E2E 测试来说，使用的是
 [Ginkgo + Gomega](https://github.com/onsi/ginkgo)。集成一些黑科技是必要的，
 例如在测试运行后进行清理和对测试进行分类。最终形成了 Ginkgo v2
-和[重新修订的 E2E 测试最佳实践](/blog/2023/04/12/e2e-testing-best-practices-reloaded/)。
+和[重新修订的 E2E 测试最佳实践](https://www.kubernetes.dev/blog/2023/04/12/e2e-testing-best-practices-reloaded/)。
 关于单元测试，意见非常多样化：一些维护者倾向于只使用 Go 标准库和手动检查。
 而其他人使用 stretchr/testify 这类辅助工具包。这种多样性是可以接受的，因为单元测试是自包含的：
 贡献者只需在处理许多不同领域时保持灵活。集成测试介于二者之间，它基于 Go 单元测试，
@@ -126,7 +126,7 @@ and other components, then runs tests that are more like E2E tests.
 **Sandipan:** SIG Testing is pretty diverse. Can you give a brief
 overview of the various subprojects owned by SIG Testing?
 -->
-## SIG Testing 拥有的子项目
+## SIG Testing 拥有的子项目    {#subprojects-owned-by-sig-testing}
 
 **Sandipan:** SIG Testing 非常多样化。你能简要介绍一下 SIG Testing 拥有的各个子项目吗？
 
@@ -174,7 +174,7 @@ Testing subprojects, check out the [SIG Testing README](https://github.com/kuber
 
 **Sandipan:** What are some of the key challenges you face?
 -->
-## 主要挑战和成就
+## 主要挑战和成就    {#key-challenges-and-accomplishments}
 
 **Sandipan:** 你们面临的一些主要挑战是什么？
 
@@ -260,7 +260,7 @@ be related to a regression in their current change.
 
 **Sandipan:** What are some of your favourite things about this SIG?
 -->
-## 人员和范围
+## 人员和范围    {#the-people-and-the-scope}
 
 **Sandipan:** 这个 SIG 中有哪些让你热爱的？
 
@@ -312,7 +312,7 @@ it might even be yourself!
 
 **Sandipan:** What areas and/or subprojects does your SIG need help with?
 -->
-## 展望未来
+## 展望未来    {#looking-ahead}
 
 **Sandipan:** 在哪些领域和/或子项目上，你们的 SIG 需要帮助？
 
