@@ -29,12 +29,12 @@ require (
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c
 	github.com/docker/go-metrics v0.0.1
 	github.com/docker/go-units v0.5.0
-	github.com/fsnotify/fsnotify v1.6.0
+	github.com/fsnotify/fsnotify v1.7.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/intel/goresctrl v0.5.0
+	github.com/intel/goresctrl v0.6.0
 	github.com/klauspost/compress v1.17.4
 	github.com/minio/sha256-simd v1.0.1
 	github.com/moby/locker v1.0.1
