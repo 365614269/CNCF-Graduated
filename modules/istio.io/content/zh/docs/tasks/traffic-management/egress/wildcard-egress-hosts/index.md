@@ -1,6 +1,6 @@
 ---
-title: Wildcard 主机的 egress
-description: 描述如何开启通用域中一组主机的 egress，无需单独配置每一台主机。
+title: Wildcard 主机的 Egress
+description: 描述如何开启通用域中一组主机的 Egress，无需单独配置每一台主机。
 keywords: [traffic-management,egress]
 weight: 50
 aliases:
@@ -73,7 +73,7 @@ Egress 流量，如：`edition.cnn.com`。本示例描述如何为通用域中�
 请注意，`DNS` 解析不能用于通配符主机。这就是为什么 `NONE` 分辨率（因为它是默认）用于以下服务条目。
 {{< /warning >}}
 
-1. 为 `*.wikipedia.org` 定义一个 `ServiceEntry` 以及相应的 `VirtualService`：
+1. 为 `*.wikipedia.org` 定义一个 `ServiceEntry`：
 
     {{< text bash >}}
     $ kubectl apply -f - <<EOF
@@ -194,13 +194,13 @@ $ kubectl delete serviceentry wikipedia
       - www.wikipedia.org
       ports:
       - number: 443
-        name: tls
-        protocol: TLS
+        name: https
+        protocol: HTTPS
       resolution: DNS
     EOF
     {{< /text >}}
 
-1. 发送请求至
+1. 发送 HTTPS 请求至
     [https://en.wikipedia.org](https://en.wikipedia.org) 和 [https://de.wikipedia.org](https://de.wikipedia.org)：
 
     {{< text bash >}}
@@ -248,9 +248,9 @@ Istio 网关只能将流量路由配置到预定义的主机、预定义的 IP �
 
 * 关闭 [sleep]({{< github_tree >}}/samples/sleep) 服务：
 
-{{< text bash >}}
-$ kubectl delete -f @samples/sleep/sleep.yaml@
-{{< /text >}}
+    {{< text bash >}}
+    $ kubectl delete -f @samples/sleep/sleep.yaml@
+    {{< /text >}}
 
 * 从您的集群中卸载 Istio：
 
