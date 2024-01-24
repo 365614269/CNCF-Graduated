@@ -28,18 +28,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/container-orchestrated-devices/container-device-interface/pkg/cdi"
 	"github.com/containerd/containerd/v2/core/containers"
 	"github.com/containerd/containerd/v2/core/content"
 	"github.com/containerd/containerd/v2/core/images"
 	"github.com/containerd/containerd/v2/core/mount"
 	"github.com/containerd/containerd/v2/pkg/namespaces"
-	"github.com/containerd/containerd/v2/platforms"
 	"github.com/containerd/continuity/fs"
 	"github.com/containerd/log"
+	"github.com/containerd/platforms"
 	"github.com/moby/sys/user"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/opencontainers/runtime-spec/specs-go"
+	"tags.cncf.io/container-device-interface/pkg/cdi"
 )
 
 // SpecOpts sets spec specific information to a newly generated OCI spec

@@ -32,6 +32,9 @@ _wait_for_daemonset istio-system istio-cni-node
 _rewrite_helm_repo snip_install_ztunnel
 _wait_for_daemonset istio-system ztunnel
 
+_rewrite_helm_repo snip_install_ingress
+_wait_for_deployment istio-ingress istio-ingress
+
 # shellcheck disable=SC2154
 _verify_contains snip_check_pods "istiod"
 _verify_contains snip_check_pods "istio-cni-node"
@@ -43,3 +46,4 @@ snip_delete_ztunnel
 snip_delete_discovery
 snip_delete_base
 snip_delete_system_namespace
+snip_delete_ingress
