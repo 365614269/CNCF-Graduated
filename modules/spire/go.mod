@@ -42,7 +42,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/google/btree v1.1.2
 	github.com/google/go-cmp v0.6.0
-	github.com/google/go-containerregistry v0.18.0
+	github.com/google/go-containerregistry v0.19.0
 	github.com/google/go-tpm v0.9.0
 	github.com/google/go-tpm-tools v0.4.2
 	github.com/googleapis/gax-go/v2 v2.12.0
@@ -57,7 +57,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lestrrat-go/jwx/v2 v2.0.19
 	github.com/lib/pq v1.10.9
-	github.com/mattn/go-sqlite3 v1.14.20
+	github.com/mattn/go-sqlite3 v1.14.21
 	github.com/mitchellh/cli v1.1.5
 	github.com/open-policy-agent/opa v0.61.0
 	github.com/prometheus/client_golang v1.18.0
@@ -78,7 +78,7 @@ require (
 	golang.org/x/sync v0.6.0
 	golang.org/x/sys v0.16.0
 	golang.org/x/time v0.5.0
-	google.golang.org/api v0.159.0
+	google.golang.org/api v0.161.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240116215550-a9fa1716bcac
 	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.32.0
