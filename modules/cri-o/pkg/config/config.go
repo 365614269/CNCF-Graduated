@@ -593,7 +593,7 @@ type MetricsConfig struct {
 	// MetricsCollectors specifies enabled metrics collectors.
 	MetricsCollectors collectors.Collectors `toml:"metrics_collectors"`
 
-	// MetricsHost is the ip or hostname on which the metrics server will listen.
+	// MetricsHost is the IP address or hostname on which the metrics server will listen.
 	MetricsHost string `toml:"metrics_host"`
 
 	// MetricsPort is the port on which the metrics server will listen.
@@ -898,6 +898,7 @@ func DefaultConfig() (*Config, error) {
 			PluginDirs: []string{cniBinDir},
 		},
 		MetricsConfig: MetricsConfig{
+			MetricsHost:       "127.0.0.1",
 			MetricsPort:       9090,
 			MetricsCollectors: collectors.All(),
 		},
@@ -1334,13 +1335,6 @@ func (c *RuntimeConfig) ConmonSupportsSync() bool {
 
 func (c *RuntimeConfig) ConmonSupportsLogGlobalSizeMax() bool {
 	return c.conmonManager.SupportsLogGlobalSizeMax()
-}
-
-func (c *RuntimeConfig) ValidatePinnsPath(executable string) error {
-	var err error
-	c.PinnsPath, err = validateExecutablePath(executable, c.PinnsPath)
-
-	return err
 }
 
 func validateCriuInPath() error {
