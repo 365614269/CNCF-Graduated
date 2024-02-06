@@ -8,7 +8,7 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.12
 	github.com/antonmedv/expr v1.15.5
 	github.com/apparentlymart/go-cidr v1.1.0
-	github.com/aws/aws-sdk-go v1.50.5
+	github.com/aws/aws-sdk-go v1.50.10
 	github.com/coredns/caddy v1.1.1
 	github.com/dnstap/golang-dnstap v0.4.0
 	github.com/farsightsec/golang-framestream v0.3.0
@@ -25,12 +25,12 @@ require (
 	github.com/prometheus/client_model v0.5.0
 	github.com/prometheus/common v0.45.0
 	github.com/quic-go/quic-go v0.40.1
-	go.etcd.io/etcd/api/v3 v3.5.11
+	go.etcd.io/etcd/api/v3 v3.5.12
 	go.etcd.io/etcd/client/v3 v3.5.11
 	golang.org/x/crypto v0.18.0
 	golang.org/x/sys v0.16.0
 	google.golang.org/api v0.159.0
-	google.golang.org/grpc v1.60.1
+	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.32.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.57.0
 	k8s.io/api v0.28.4
