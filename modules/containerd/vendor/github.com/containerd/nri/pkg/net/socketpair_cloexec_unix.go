@@ -1,4 +1,4 @@
-// +build solaris,cgo
+//go:build !linux && !windows
 
 /*
    Copyright The containerd Authors.
@@ -16,36 +16,23 @@
    limitations under the License.
 */
 
-package console
+package net
 
 import (
-	"os"
+	"syscall"
 
 	"golang.org/x/sys/unix"
 )
 
-//#include <stdlib.h>
-import "C"
-
-const (
-	cmdTcGet = unix.TCGETS
-	cmdTcSet = unix.TCSETS
-)
-
-// ptsname retrieves the name of the first available pts for the given master.
-func ptsname(f *os.File) (string, error) {
-	ptspath, err := C.ptsname(C.int(f.Fd()))
+func newSocketPairCLOEXEC() ([2]int, error) {
+	syscall.ForkLock.RLock()
+	defer syscall.ForkLock.RUnlock()
+	fds, err := unix.Socketpair(unix.AF_UNIX, unix.SOCK_STREAM, 0)
 	if err != nil {
-		return "", err
+		return fds, err
 	}
-	return C.GoString(ptspath), nil
-}
+	unix.CloseOnExec(fds[0])
+	unix.CloseOnExec(fds[1])
 
-// unlockpt unlocks the slave pseudoterminal device corresponding to the master pseudoterminal referred to by f.
-// unlockpt should be called before opening the slave side of a pty.
-func unlockpt(f *os.File) error {
-	if _, err := C.grantpt(C.int(f.Fd())); err != nil {
-		return err
-	}
-	return nil
+	return fds, err
 }
