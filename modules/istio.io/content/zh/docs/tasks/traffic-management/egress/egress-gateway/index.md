@@ -104,8 +104,8 @@ Egress Gateway 节点，用它引导所有的出站流量，可以使应用节�
 
     {{< text syntax=bash snip_id=none >}}
     $ istioctl install <flags-you-used-to-install-Istio> \
-                       --set components.egressGateways[0].name=istio-egressgateway \
-                       --set components.egressGateways[0].enabled=true
+                       --set "components.egressGateways[0].name=istio-egressgateway" \
+                       --set "components.egressGateways[0].enabled=true"
     {{< /text >}}
 
 ## 定义 Egress gateway 并引导 HTTP 流量 {#egress-gateway-for-http-traffic}
@@ -369,7 +369,7 @@ $ istioctl pc secret -n istio-system "$(kubectl get pod -l istio=egressgateway -
 使用 Istio 生成的 Pod 标签访问与 Egress Gateway 对应的日志：
 
 {{< text bash >}}
-$ kubectl logs -l istio.io/gateway-name=cnn-egress-gateway -c istio-proxy | tail
+$ kubectl logs -l gateway.networking.k8s.io/gateway-name=cnn-egress-gateway -c istio-proxy | tail
 {{< /text >}}
 
 您应该会看到一行类似于下面这样的内容：
@@ -383,7 +383,7 @@ $ kubectl logs -l istio.io/gateway-name=cnn-egress-gateway -c istio-proxy | tail
 并且当您在连接到出口网关时遇到问题，请运行以下命令来验证证书是否正确：
 
 {{< text bash >}}
-$ istioctl pc secret "$(kubectl get pod -l istio.io/gateway-name=cnn-egress-gateway -o jsonpath='{.items[0].metadata.name}')" -ojson | jq '[.dynamicActiveSecrets[] | select(.name == "default")][0].secret.tlsCertificate.certificateChain.inlineBytes' -r | base64 -d | openssl x509 -text -noout | grep 'Subject Alternative Name' -A 1
+$ istioctl pc secret "$(kubectl get pod -l gateway.networking.k8s.io/gateway-name=cnn-egress-gateway -o jsonpath='{.items[0].metadata.name}')" -ojson | jq '[.dynamicActiveSecrets[] | select(.name == "default")][0].secret.tlsCertificate.certificateChain.inlineBytes' -r | base64 -d | openssl x509 -text -noout | grep 'Subject Alternative Name' -A 1
             X509v3 Subject Alternative Name: critical
                 URI:spiffe://cluster.local/ns/default/sa/cnn-egress-gateway-istio
 {{< /text >}}
@@ -638,7 +638,7 @@ $ kubectl logs -l istio=egressgateway -n istio-system
 使用 Istio 生成的 Pod 标签访问与 Egress Gateway 对应的日志：
 
 {{< text bash >}}
-$ kubectl logs -l istio.io/gateway-name=cnn-egress-gateway -c istio-proxy | tail
+$ kubectl logs -l gateway.networking.k8s.io/gateway-name=cnn-egress-gateway -c istio-proxy | tail
 {{< /text >}}
 
 您应该会看到类似于下面的内容：
@@ -952,7 +952,7 @@ $ kubectl logs -l istio=egressgateway -n istio-system
 使用 Istio 生成的 Pod 标签访问与 Egress Gateway 对应的日志：
 
 {{< text bash >}}
-$ kubectl logs -l istio.io/gateway-name=cnn-egress-gateway -c istio-proxy | tail
+$ kubectl logs -l gateway.networking.k8s.io/gateway-name=cnn-egress-gateway -c istio-proxy | tail
 {{< /text >}}
 
 您应该会看到一行类似于下面这样的内容：
