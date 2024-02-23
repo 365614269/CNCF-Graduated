@@ -36,6 +36,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0
 	github.com/intel/goresctrl v0.6.0
 	github.com/klauspost/compress v1.17.6
+	github.com/mdlayher/vsock v1.2.1
 	github.com/minio/sha256-simd v1.0.1
 	github.com/moby/locker v1.0.1
 	github.com/moby/sys/mountinfo v0.7.1
@@ -45,11 +46,11 @@ require (
 	github.com/moby/sys/user v0.1.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0
-	github.com/opencontainers/runtime-spec v1.1.1-0.20230823135140-4fec88fd00a4
+	github.com/opencontainers/runtime-spec v1.2.0
 	github.com/opencontainers/runtime-tools v0.9.1-0.20221107090550-2e043c6bd626
 	github.com/opencontainers/selinux v1.11.0
 	github.com/pelletier/go-toml/v2 v2.1.1
-	github.com/prometheus/client_golang v1.17.0
+	github.com/prometheus/client_golang v1.18.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 	github.com/tchap/go-patricia/v2 v2.3.1
@@ -70,12 +71,12 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240102182953-50ed04b92917
 	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.32.0
-	k8s.io/apimachinery v0.29.1
-	k8s.io/client-go v0.29.1
-	k8s.io/component-base v0.29.1
-	k8s.io/cri-api v0.30.0-alpha.2.0.20240216190946-4e003cc3b0a4
-	k8s.io/klog/v2 v2.110.1
-	k8s.io/kubelet v0.29.1
+	k8s.io/apimachinery v0.29.2
+	k8s.io/client-go v0.29.2
+	k8s.io/component-base v0.29.2
+	k8s.io/cri-api v0.30.0-alpha.2.0.20240217224521-840a52e4cd66
+	k8s.io/klog/v2 v2.120.1
+	k8s.io/kubelet v0.29.2
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 	tags.cncf.io/container-device-interface v0.6.2
 )
@@ -102,16 +103,17 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
+	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
+	github.com/mdlayher/socket v0.4.1 // indirect
 	github.com/moby/spdystream v0.2.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_model v0.4.1-0.20230718164431-9a2bf3000d16 // indirect
-	github.com/prometheus/common v0.44.0 // indirect
-	github.com/prometheus/procfs v0.11.1 // indirect
+	github.com/prometheus/client_model v0.5.0 // indirect
+	github.com/prometheus/common v0.45.0 // indirect
+	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
@@ -131,8 +133,8 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.29.1 // indirect
-	k8s.io/apiserver v0.29.1 // indirect
+	k8s.io/api v0.29.2 // indirect
+	k8s.io/apiserver v0.29.2 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect

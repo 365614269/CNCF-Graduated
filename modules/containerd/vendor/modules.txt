@@ -205,7 +205,6 @@ github.com/fsnotify/fsnotify
 ## explicit; go 1.18
 github.com/go-logr/logr
 github.com/go-logr/logr/funcr
-github.com/go-logr/logr/slogr
 # github.com/go-logr/stdr v1.2.2
 ## explicit; go 1.16
 github.com/go-logr/stdr
@@ -282,9 +281,15 @@ github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/klauspost/cpuid/v2 v2.2.5
 ## explicit; go 1.15
 github.com/klauspost/cpuid/v2
-# github.com/matttproud/golang_protobuf_extensions v1.0.4
-## explicit; go 1.9
-github.com/matttproud/golang_protobuf_extensions/pbutil
+# github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0
+## explicit; go 1.19
+github.com/matttproud/golang_protobuf_extensions/v2/pbutil
+# github.com/mdlayher/socket v0.4.1
+## explicit; go 1.20
+github.com/mdlayher/socket
+# github.com/mdlayher/vsock v1.2.1
+## explicit; go 1.20
+github.com/mdlayher/vsock
 # github.com/minio/sha256-simd v1.0.1
 ## explicit; go 1.17
 github.com/minio/sha256-simd
@@ -328,7 +333,7 @@ github.com/opencontainers/go-digest/digestset
 github.com/opencontainers/image-spec/identity
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
-# github.com/opencontainers/runtime-spec v1.1.1-0.20230823135140-4fec88fd00a4
+# github.com/opencontainers/runtime-spec v1.2.0
 ## explicit
 github.com/opencontainers/runtime-spec/specs-go
 github.com/opencontainers/runtime-spec/specs-go/features
@@ -355,20 +360,20 @@ github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 ## explicit
 github.com/pmezard/go-difflib/difflib
-# github.com/prometheus/client_golang v1.17.0
+# github.com/prometheus/client_golang v1.18.0
 ## explicit; go 1.19
 github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/internal
 github.com/prometheus/client_golang/prometheus/promhttp
-# github.com/prometheus/client_model v0.4.1-0.20230718164431-9a2bf3000d16
-## explicit; go 1.18
+# github.com/prometheus/client_model v0.5.0
+## explicit; go 1.19
 github.com/prometheus/client_model/go
-# github.com/prometheus/common v0.44.0
-## explicit; go 1.18
+# github.com/prometheus/common v0.45.0
+## explicit; go 1.20
 github.com/prometheus/common/expfmt
 github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
 github.com/prometheus/common/model
-# github.com/prometheus/procfs v0.11.1
+# github.com/prometheus/procfs v0.12.0
 ## explicit; go 1.19
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
@@ -488,6 +493,7 @@ golang.org/x/exp/slices
 golang.org/x/mod/semver
 # golang.org/x/net v0.20.0
 ## explicit; go 1.18
+golang.org/x/net/bpf
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/http/httpguts
@@ -672,10 +678,10 @@ gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# k8s.io/api v0.29.1
+# k8s.io/api v0.29.2
 ## explicit; go 1.21
 k8s.io/api/core/v1
-# k8s.io/apimachinery v0.29.1
+# k8s.io/apimachinery v0.29.2
 ## explicit; go 1.21
 k8s.io/apimachinery/pkg/api/errors
 k8s.io/apimachinery/pkg/api/resource
@@ -717,10 +723,10 @@ k8s.io/apimachinery/pkg/version
 k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.29.1
+# k8s.io/apiserver v0.29.2
 ## explicit; go 1.21
 k8s.io/apiserver/pkg/endpoints/responsewriter
-# k8s.io/client-go v0.29.1
+# k8s.io/client-go v0.29.2
 ## explicit; go 1.21
 k8s.io/client-go/pkg/apis/clientauthentication
 k8s.io/client-go/pkg/apis/clientauthentication/install
@@ -742,15 +748,15 @@ k8s.io/client-go/util/exec
 k8s.io/client-go/util/flowcontrol
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/workqueue
-# k8s.io/component-base v0.29.1
+# k8s.io/component-base v0.29.2
 ## explicit; go 1.21
 k8s.io/component-base/logs/logreduction
-# k8s.io/cri-api v0.30.0-alpha.2.0.20240216190946-4e003cc3b0a4
+# k8s.io/cri-api v0.30.0-alpha.2.0.20240217224521-840a52e4cd66
 ## explicit; go 1.21
 k8s.io/cri-api/pkg/apis/runtime/v1
 k8s.io/cri-api/pkg/errors
-# k8s.io/klog/v2 v2.110.1
-## explicit; go 1.13
+# k8s.io/klog/v2 v2.120.1
+## explicit; go 1.18
 k8s.io/klog/v2
 k8s.io/klog/v2/internal/buffer
 k8s.io/klog/v2/internal/clock
@@ -758,7 +764,7 @@ k8s.io/klog/v2/internal/dbg
 k8s.io/klog/v2/internal/serialize
 k8s.io/klog/v2/internal/severity
 k8s.io/klog/v2/internal/sloghandler
-# k8s.io/kubelet v0.29.1
+# k8s.io/kubelet v0.29.2
 ## explicit; go 1.21
 k8s.io/kubelet/pkg/cri/streaming
 k8s.io/kubelet/pkg/cri/streaming/portforward
