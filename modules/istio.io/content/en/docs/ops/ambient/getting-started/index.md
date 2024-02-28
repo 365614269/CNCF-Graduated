@@ -211,7 +211,7 @@ $ export GATEWAY_SERVICE_ACCOUNT=ns/istio-system/sa/istio-ingressgateway-service
 
 {{< tab name="Gateway API" category-value="gateway-api" >}}
 
-Create a [Kubernetes Gateway](https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io%2fv1beta1.Gateway)
+Create a [Kubernetes Gateway](https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.Gateway)
 and [HTTPRoute](https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.HTTPRoute):
 
 {{< text bash >}}
@@ -452,12 +452,10 @@ $ kubectl exec deploy/sleep -- sh -c "for i in \$(seq 1 100); do curl -s http://
 
 ## Uninstall {#uninstall}
 
-To remove the `productpage-viewer` authorization policy, waypoint proxies and uninstall Istio:
+To remove waypoint proxies, installed policies, and uninstall Istio:
 
 {{< text bash >}}
-$ kubectl delete authorizationpolicy productpage-viewer
-$ istioctl x waypoint delete --service-account bookinfo-reviews
-$ istioctl x waypoint delete --service-account bookinfo-productpage
+$ istioctl x waypoint delete --all
 $ istioctl uninstall -y --purge
 $ kubectl delete namespace istio-system
 {{< /text >}}
