@@ -6,11 +6,7 @@
 
 package seccompociartifact
 
-import (
-	"github.com/cri-o/cri-o/internal/config/ociartifact"
-)
-
 // SetOCIArtifactImpl sets the OCI artifact implementation.
-func (s *SeccompOCIArtifact) SetOCIArtifactImpl(impl ociartifact.Impl) {
-	s.ociArtifactImpl = impl
+func (s *SeccompOCIArtifact) SetImpl(impl Impl) {
+	s.impl = impl
 }
