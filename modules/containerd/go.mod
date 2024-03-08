@@ -8,6 +8,8 @@ require (
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20230306123547-8075edf89bb0
 	github.com/Microsoft/go-winio v0.6.1
 	github.com/Microsoft/hcsshim v0.12.0
+	github.com/checkpoint-restore/checkpointctl v1.1.0
+	github.com/checkpoint-restore/go-criu/v7 v7.0.0
 	github.com/containerd/btrfs/v2 v2.0.0
 	github.com/containerd/cgroups/v3 v3.0.3
 	github.com/containerd/console v1.0.4
@@ -52,7 +54,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.1.1
 	github.com/prometheus/client_golang v1.19.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/tchap/go-patricia/v2 v2.3.1
 	github.com/urfave/cli/v2 v2.27.1
 	github.com/vishvananda/netlink v1.2.1-beta.2

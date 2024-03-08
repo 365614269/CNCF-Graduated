@@ -33,7 +33,7 @@ require (
 	github.com/aws/smithy-go v1.20.1
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cenkalti/backoff/v4 v4.2.1
-	github.com/docker/docker v25.0.3+incompatible
+	github.com/docker/docker v25.0.4+incompatible
 	github.com/envoyproxy/go-control-plane v0.12.0
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa
 	github.com/go-jose/go-jose/v3 v3.0.2
@@ -61,7 +61,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/mitchellh/cli v1.1.5
-	github.com/open-policy-agent/opa v0.62.0
+	github.com/open-policy-agent/opa v0.62.1
 	github.com/prometheus/client_golang v1.19.0
 	github.com/shirou/gopsutil/v3 v3.24.2
 	github.com/sigstore/cosign/v2 v2.2.3
@@ -83,8 +83,8 @@ require (
 	golang.org/x/time v0.5.0
 	google.golang.org/api v0.168.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240304161311-37d4d3c04a78
-	google.golang.org/grpc v1.62.0
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/grpc v1.62.1
+	google.golang.org/protobuf v1.33.0
 	k8s.io/api v0.29.2
 	k8s.io/apimachinery v0.29.2
 	k8s.io/client-go v0.29.2
@@ -334,7 +334,7 @@ require (
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20240213162025-012b6fc9bca9 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240221002015-b0ce06bbee7c // indirect
-	gopkg.in/go-jose/go-jose.v2 v2.6.1 // indirect
+	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
