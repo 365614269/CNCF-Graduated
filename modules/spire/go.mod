@@ -81,14 +81,14 @@ require (
 	golang.org/x/sync v0.6.0
 	golang.org/x/sys v0.18.0
 	golang.org/x/time v0.5.0
-	google.golang.org/api v0.169.0
+	google.golang.org/api v0.170.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240311132316-a219d84964c2
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
-	k8s.io/api v0.29.2
-	k8s.io/apimachinery v0.29.2
-	k8s.io/client-go v0.29.2
-	k8s.io/kube-aggregator v0.29.2
+	k8s.io/api v0.29.3
+	k8s.io/apimachinery v0.29.3
+	k8s.io/client-go v0.29.3
+	k8s.io/kube-aggregator v0.29.3
 	sigs.k8s.io/controller-runtime v0.17.2
 )
 
@@ -199,7 +199,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.6.0 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/certificate-transparency-go v1.1.7 // indirect
 	github.com/google/flatbuffers v23.5.26+incompatible // indirect
@@ -327,7 +327,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/oauth2 v0.17.0 // indirect
+	golang.org/x/oauth2 v0.18.0 // indirect
 	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.16.1 // indirect
