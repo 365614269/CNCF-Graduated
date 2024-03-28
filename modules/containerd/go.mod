@@ -9,7 +9,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.1
 	github.com/Microsoft/hcsshim v0.12.0
 	github.com/checkpoint-restore/checkpointctl v1.1.0
-	github.com/checkpoint-restore/go-criu/v7 v7.0.0
+	github.com/checkpoint-restore/go-criu/v7 v7.1.0
 	github.com/containerd/btrfs/v2 v2.0.0
 	github.com/containerd/cgroups/v3 v3.0.3
 	github.com/containerd/console v1.0.4
@@ -36,7 +36,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0
-	github.com/intel/goresctrl v0.6.0
+	github.com/intel/goresctrl v0.7.0
 	github.com/klauspost/compress v1.17.7
 	github.com/mdlayher/vsock v1.2.1
 	github.com/minio/sha256-simd v1.0.1
@@ -51,7 +51,7 @@ require (
 	github.com/opencontainers/runtime-spec v1.2.0
 	github.com/opencontainers/runtime-tools v0.9.1-0.20221107090550-2e043c6bd626
 	github.com/opencontainers/selinux v1.11.0
-	github.com/pelletier/go-toml/v2 v2.1.1
+	github.com/pelletier/go-toml/v2 v2.2.0
 	github.com/prometheus/client_golang v1.19.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.9.0
