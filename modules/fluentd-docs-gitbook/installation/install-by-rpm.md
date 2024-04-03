@@ -16,7 +16,7 @@ That is why [Calyptia, Inc.](https://www.calyptia.com/) provides **the alternati
 
 This installation guide is for `fluent-package` v5 and `calyptia-fluentd` v1. `fluent-package` v5 and `calyptia-fluentd` use fluentd v1 in the core. See [fluent-package-v5-vs-td-agent](../quickstart/fluent-package-v5-vs-td-agent.md) or [td-agent-v2-vs-v3-vs-v4](../quickstart/td-agent-v2-vs-v3-vs-v4.md) for the comparison and supported OS.
 
-## Using to install `fluent-packge`
+## Using to install `fluent-package`
 
 {% hint style='info' %}
 NOTE:
@@ -41,14 +41,16 @@ NOTE: If your OS is not supported, consider [gem installation](install-by-gem.md
 
 Download and execute the install script with `curl`:
 
-```text
-# fluent-package 5 (LTS)
-$ curl -fsSL https://toolbelt.treasuredata.com/sh/install-redhat-fluent-package5-lts.sh | sh
+##### fluent-package 5 (LTS)
+
+```bash
+curl -fsSL https://toolbelt.treasuredata.com/sh/install-redhat-fluent-package5-lts.sh | sh
 ```
 
-```text
-# fluent-package 5
-$ curl -fsSL https://toolbelt.treasuredata.com/sh/install-redhat-fluent-package5.sh | sh
+##### fluent-package 5
+
+```bash
+curl -fsSL https://toolbelt.treasuredata.com/sh/install-redhat-fluent-package5.sh | sh
 ```
 
 Executing this script will automatically install `fluent-package` on your machine. This shell script registers a new `rpm` repository at `/etc/yum.repos.d/fluent-package.repo` (or `/etc/yum.repos.d/fluent-package-lts.repo`) and installs `fluent-package`.
@@ -57,28 +59,32 @@ We use `$releasever` for repository path in the script and `$releasever` should 
 
 #### Amazon Linux
 
-For Amazon Linux 2023:
+##### For Amazon Linux 2023:
 
-```text
-# fluent-package 5 (LTS)
-$ curl -fsSL https://toolbelt.treasuredata.com/sh/install-amazon2023-fluent-package5-lts.sh | sh
+###### fluent-package 5 (LTS)
+
+```bash
+curl -fsSL https://toolbelt.treasuredata.com/sh/install-amazon2023-fluent-package5-lts.sh | sh
 ```
 
-```text
-# fluent-package 5
-$ curl -fsSL https://toolbelt.treasuredata.com/sh/install-amazon2023-fluent-package5.sh | sh
+###### fluent-package 5
+
+```bash
+curl -fsSL https://toolbelt.treasuredata.com/sh/install-amazon2023-fluent-package5.sh | sh
 ```
 
-For Amazon Linux 2:
+##### For Amazon Linux 2:
 
-```text
-# fluent-package 5 (LTS)
-$ curl -fsSL https://toolbelt.treasuredata.com/sh/install-amazon2-fluent-package5-lts.sh | sh
+###### fluent-package 5 (LTS)
+
+```bash
+curl -fsSL https://toolbelt.treasuredata.com/sh/install-amazon2-fluent-package5-lts.sh | sh
 ```
 
-```text
-# fluent-package 5
-$ curl -fsSL https://toolbelt.treasuredata.com/sh/install-amazon2-fluent-package5.sh | sh
+###### fluent-package 5
+
+```bash
+curl -fsSL https://toolbelt.treasuredata.com/sh/install-amazon2-fluent-package5.sh | sh
 ```
 
 ### Step 2: Launch Daemon
