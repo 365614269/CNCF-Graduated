@@ -12,7 +12,7 @@ This document explains the etcd persistent storage format: naming, content and t
 The following articles provide helpful background information for this document:
 
 * etcd data model overview: https://etcd.io/docs/v3.6/learning/data_model
-* Raft overview: http://web.stanford.edu/~ouster/cgi-bin/papers/Raft-atc14.pdf (especially "5.3 Log replication" section).
+* Raft overview: https://raft.github.io/raft.pdf (especially "5.3 Log replication" section).
 
 
 ## Overview
@@ -483,7 +483,7 @@ cat default.etcd/member/snap/0000000000000002-0000000000049425.snap |
   protoc --decode=snappb.snapshot \
     server/etcdserver/api/snap/snappb/snap.proto \
     -I $(go list -f '{{.Dir}}' github.com/gogo/protobuf/proto)/.. \
-    -I .
+    -I . \
     -I $(go list -m -f '{{.Dir}}' github.com/gogo/protobuf)/protobuf
 ```
 
