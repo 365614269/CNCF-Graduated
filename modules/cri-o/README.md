@@ -15,7 +15,7 @@
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fcri-o%2Fcri-o.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fcri-o%2Fcri-o?ref=badge_shield)
 [![Mentioned in Awesome CRI-O](https://awesome.re/mentioned-badge.svg)](awesome.md)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/cri-o/cri-o)
-<a href="https://actuated.dev/"><img alt="Arm CI sponsored by Actuated" src="https://docs.actuated.dev/images/actuated-badge.png" width="20px"></img></a>
+<a href="https://actuated.dev/"><img alt="Arm CI sponsored by Actuated" src="https://docs.actuated.dev/images/actuated-badge.png" height="20px"></img></a>
 
 ## Compatibility matrix: CRI-O ⬄ Kubernetes
 
@@ -94,6 +94,23 @@ Questions and issues should be raised in the Kubernetes [sig-node Slack channel]
 A roadmap that describes the direction of CRI-O can be found [here](/roadmap.md).
 The project is tracking all ongoing efforts as part of the [Feature Roadmap
 GitHub project](https://github.com/orgs/cri-o/projects/1).
+
+## CI images and jobs
+
+CRI-O's CI is split-up between GitHub actions and [OpenShift CI (Prow)](https://prow.ci.openshift.org).
+Relevant virtual machine images used for the prow jobs are built periodically in
+the jobs:
+
+- [periodic-ci-cri-o-cri-o-main-periodics-setup-periodic](https://prow.ci.openshift.org/?job=periodic-ci-cri-o-cri-o-main-periodics-setup-periodic)
+- [periodic-ci-cri-o-cri-o-main-periodics-setup-fedora-periodic](https://prow.ci.openshift.org/?job=periodic-ci-cri-o-cri-o-main-periodics-setup-fedora-periodic)
+- [periodic-ci-cri-o-cri-o-main-periodics-evented-pleg-periodic](https://prow.ci.openshift.org/?job=periodic-ci-cri-o-cri-o-main-periodics-evented-pleg-periodic)
+
+The jobs are maintained [from the openshift/release repository](https://github.com/openshift/release/blob/ecdeb0a/ci-operator/jobs/cri-o/cri-o/cri-o-cri-o-main-periodics.yaml)
+and define workflows used for the particular jobs. The actual job definitions
+can be found in the same repository under [ci-operator/jobs/cri-o/cri-o/cri-o-cri-o-main-presubmits.yaml](https://github.com/openshift/release/blob/ecdeb0a/ci-operator/jobs/cri-o/cri-o/cri-o-cri-o-main-presubmits.yaml)
+for the `main` branch as well as the corresponding files for the release
+branches. The base image configuration for those jobs is available in the same
+repository under [ci-operator/config/cri-o/cri-o](https://github.com/openshift/release/tree/ecdeb0a/ci-operator/config/cri-o/cri-o).
 
 ## Commands
 

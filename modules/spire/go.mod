@@ -32,7 +32,7 @@ require (
 	github.com/aws/smithy-go v1.20.2
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/docker/docker v26.0.0+incompatible
+	github.com/docker/docker v26.0.1+incompatible
 	github.com/envoyproxy/go-control-plane v0.12.0
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa
 	github.com/go-jose/go-jose/v3 v3.0.3
@@ -43,7 +43,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-containerregistry v0.19.1
 	github.com/google/go-tpm v0.9.0
-	github.com/google/go-tpm-tools v0.4.3
+	github.com/google/go-tpm-tools v0.4.4
 	github.com/googleapis/gax-go/v2 v2.12.3
 	github.com/gorilla/handlers v1.5.2
 	github.com/hashicorp/go-hclog v1.6.2
