@@ -10,6 +10,8 @@ dependencies:
       match: GO_VERSION
     - path: .github/workflows/cron.yml
       match: GO_VERSION
+    - path: .github/workflows/patch-release.yml
+      match: GO_VERSION
     - path: contrib/test/ci/vars.yml
       match: golang_version
 
@@ -84,7 +86,7 @@ dependencies:
         match: NIX_VERSION
 
   - name: release-notes
-    version: 0.16.5
+    version: 0.16.8
     refPaths:
       - path: Makefile
         match: RELEASE_NOTES_VERSION
