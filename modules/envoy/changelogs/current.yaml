@@ -32,7 +32,14 @@ removed_config_or_runtime:
 - area: tcp
   change: |
     Removed ``envoy.reloadable_features.detect_and_raise_rst_tcp_connection`` runtime flag and legacy code paths.
+- area: http
+  change: |
+    Removed ``envoy.reloadable_features.lowercase_scheme`` runtime flag and lagacy code paths.
 
 new_features:
+- area: matching
+  change: |
+    Added :ref:`Filter State Input <envoy_v3_api_msg_extensions.matching.common_inputs.network.v3.FilterStateInput>`
+    for matching http input based on filter state objects.
 
 deprecated:
