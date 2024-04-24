@@ -24,7 +24,7 @@ require (
 	github.com/containerd/plugin v0.1.0
 	github.com/containerd/ttrpc v1.2.3
 	github.com/containerd/typeurl/v2 v2.1.1
-	github.com/containernetworking/cni v1.1.2
+	github.com/containernetworking/cni v1.2.0
 	github.com/containernetworking/plugins v1.4.1
 	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/davecgh/go-spew v1.1.1
@@ -80,10 +80,11 @@ require (
 	k8s.io/klog/v2 v2.120.1
 	k8s.io/kubelet v0.29.2
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
-	tags.cncf.io/container-device-interface v0.7.1
+	tags.cncf.io/container-device-interface v0.7.2
 )
 
 require (
+	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
