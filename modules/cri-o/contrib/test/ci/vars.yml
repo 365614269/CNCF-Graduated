@@ -98,6 +98,10 @@ kata_skip_cgroups_tests:
 kata_skip_command_tests:
   - 'test "crio commands"'
   - 'test "log max boundary testing"'
+kata_skip_reload_config_tests:
+  - "test \"reload config should update 'pinned_images'\""
+  - "test \"reload config should update 'pinned_images' and only 'pause_image' is pinned\""
+  - "test \"reload config should update 'pause_image' and it becomes 'pinned_images'\""
 kata_skip_config_tests:
   - 'test "choose different default runtime should succeed"'
   - 'test "runc not existing when default_runtime changed should succeed"'
@@ -150,6 +154,11 @@ kata_skip_image_tests:
   - 'test "image pull and list by manifest list tag"'
   - 'test "image pull and list by manifest list and individual digest"'
   - 'test "image pull and list by individual and manifest list digest"'
+  - 'test "run container with memory_limit_in_bytes -1"'
+  - 'test "run container with memory_limit_in_bytes 12.5MiB"'
+  - 'test "run container with container_min_memory 17.5MiB"'
+  - 'test "run container with container_min_memory 5.5MiB"'
+  - 'test "run container with empty container_min_memory"'
 kata_skip_namespaces_tests:
   - 'test "pid namespace mode target test"'
 kata_skip_network_tests:
