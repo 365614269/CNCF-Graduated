@@ -1,7 +1,10 @@
 ---
-title: Ambient 模式入门
+title: 入门
 description: 如何在 Ambient 模式下部署和安装 Istio。
 weight: 1
+aliases:
+  - /zh/docs/ops/ambient/getting-started
+  - /zh/latest/docs/ops/ambient/getting-started
 owner: istio/wg-networking-maintainers
 test: yes
 ---
@@ -140,13 +143,13 @@ daemonset.apps/ztunnel          1         1         1       1            1      
 
 {{< text bash >}}
 $ kubectl get pods,daemonset -n istio-system
-NAME                          READY   STATUS    RESTARTS   AGE
-pod/istio-cni-node-zq94l      1/1     Running   0          2m15s
-pod/istiod-56d848857c-mhr5w   1/1     Running   0          2m23s
-pod/ztunnel-srrnm             1/1     Running   0          2m9s
+NAME                                        READY   STATUS    RESTARTS   AGE
+pod/istio-cni-node-btbjf                    1/1     Running   0          2m18s
+pod/istiod-55b74b77bd-xggqf                 1/1     Running   0          2m27s
+pod/ztunnel-5m27h                           1/1     Running   0          2m10s
 
 NAME                            DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
-daemonset.apps/istio-cni-node   1         1         1       1            1           kubernetes.io/os=linux   2m16s
+daemonset.apps/istio-cni-node   1         1         1       1            1           kubernetes.io/os=linux   2m18s
 daemonset.apps/ztunnel          1         1         1       1            1           kubernetes.io/os=linux   2m10s
 {{< /text >}}
 
@@ -259,6 +262,7 @@ $ export GATEWAY_SERVICE_ACCOUNT=ns/istio-system/sa/bookinfo-gateway-istio
 
 {{< text bash >}}
 $ kubectl label namespace default istio.io/dataplane-mode=ambient
+namespace/default labeled
 {{< /text >}}
 
 恭喜！您已成功将 default 命名空间中的所有 Pod 添加到网格中。
@@ -281,7 +285,7 @@ $ kubectl exec deploy/notsleep -- curl -s http://productpage:9080/ | grep -o "<t
 <title>Simple Bookstore App</title>
 {{< /text >}}
 
-您将在 Ambient Mesh 的应用之间立即达成 mTLS 通信和 L4 遥测。
+您将在 Ambient 模式的应用之间立即达成 mTLS 通信和 L4 遥测。
 如果按照指示说明安装 [Prometheus](/zh/docs/ops/integrations/prometheus/#installation)
 和 [Kiali](/zh/docs/ops/integrations/kiali/#installation)，
 您将能够在 Kiali 的应用中直观地查看自己的应用：
@@ -452,6 +456,7 @@ $ kubectl exec deploy/sleep -- sh -c "for i in \$(seq 1 100); do curl -s http://
 
 {{< text bash >}}
 $ kubectl label namespace default istio.io/dataplane-mode-
+$ kubectl label namespace default istio.io/use-waypoint-
 {{< /text >}}
 
 要删除 waypoint 代理、已安装的策略并卸载 Istio：
