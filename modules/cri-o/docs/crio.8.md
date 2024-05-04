@@ -16,6 +16,7 @@ crio
 [--additional-devices]=[value]
 [--allowed-devices]=[value]
 [--apparmor-profile]=[value]
+[--auto-reload-registries]
 [--big-files-temporary-dir]=[value]
 [--bind-mount-prefix]=[value]
 [--blockio-config-file]=[value]
@@ -26,6 +27,7 @@ crio
 [--cni-config-dir]=[value]
 [--cni-default-network]=[value]
 [--cni-plugin-dir]=[value]
+[--collection-period]=[value]
 [--config-dir|-d]=[value]
 [--config|-c]=[value]
 [--conmon-cgroup]=[value]
@@ -60,6 +62,7 @@ crio
 [--hostnetwork-disable-selinux]
 [--image-volumes]=[value]
 [--imagestore]=[value]
+[--included-pod-metrics]=[value]
 [--infra-ctr-cpuset]=[value]
 [--insecure-registry]=[value]
 [--internal-repair]
@@ -165,6 +168,8 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--apparmor-profile**="": Name of the apparmor profile to be used as the runtime's default. This only takes effect if the user does not specify a profile via the Kubernetes Pod's metadata annotation. (default: "crio-default")
 
+**--auto-reload-registries**: If true, CRI-O will automatically reload the mirror registry when there is an update to the 'registries.conf.d' directory. Default value is set to 'false'.
+
 **--big-files-temporary-dir**="": Path to the temporary directory to use for storing big files, used to store image blobs and data streams related to containers image management.
 
 **--bind-mount-prefix**="": A prefix to use for the source of the bind mounts. This option would be useful if you were running CRI-O in a container. And had '/' mounted on '/host' in your container. Then if you ran CRI-O with the '--bind-mount-prefix=/host' option, CRI-O would add /host to any bind mounts it is handed over CRI. If Kubernetes asked to have '/var/lib/foobar' bind mounted into the container, then CRI-O would bind mount '/host/var/lib/foobar'. Since CRI-O itself is running in a container with '/' or the host mounted on '/host', the container would end up with '/var/lib/foobar' from the host mounted in the container rather then '/var/lib/foobar' from the CRI-O container.
@@ -184,6 +189,8 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 **--cni-default-network**="": Name of the default CNI network to select. If not set or "", then CRI-O will pick-up the first one found in --cni-config-dir.
 
 **--cni-plugin-dir**="": CNI plugin binaries directory.
+
+**--collection-period**="": The number of seconds between collecting pod/container stats and pod sandbox metrics. If set to 0, the metrics/stats are collected on-demand instead. (default: 0)
 
 **--config, -c**="": Path to configuration file (default: "/etc/crio/crio.conf")
 
@@ -284,6 +291,8 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 	3. ignore: All volumes are just ignored and no action is taken. (default: "mkdir")
 
 **--imagestore**="": Store newly pulled images in the specified path, rather than the path provided by --root.
+
+**--included-pod-metrics**="": A list of pod metrics to include. Specify the names of the metrics to include in this list.
 
 **--infra-ctr-cpuset**="": CPU set to run infra containers, if not specified CRI-O will use all online CPUs to run infra containers.
 
@@ -398,7 +407,7 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--signature-policy-dir**="": Path to the root directory for namespaced signature policies. Must be an absolute path. (default: "/etc/crio/policies")
 
-**--stats-collection-period**="": The number of seconds between collecting pod and container stats. If set to 0, the stats are collected on-demand instead. (default: 0)
+**--stats-collection-period**="": The number of seconds between collecting pod and container stats. If set to 0, the stats are collected on-demand instead. DEPRECATED: This option will be removed in the future. (default: 0)
 
 **--storage-driver, -s**="": OCI storage driver.
 

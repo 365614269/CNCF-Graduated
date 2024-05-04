@@ -476,6 +476,9 @@ CRI-O reads its configured registries defaults from the system wide containers-r
 **separate_pull_cgroup**=""
   [EXPERIMENTAL] If its value is set, then images are pulled into the specified cgroup.  If its value is set to "pod", then the pod's cgroup is used.  It is currently supported only with the systemd cgroup manager.
 
+**auto_reload_registries**=false
+ If true, CRI-O will automatically reload the mirror registry when there is an update to the 'registries.conf.d' directory. Default value is set to 'false'.
+
 ## CRIO.NETWORK TABLE
 The `crio.network` table containers settings pertaining to the management of CNI plugins.
 
@@ -528,7 +531,13 @@ The `crio.metrics` table containers settings pertaining to the Prometheus based 
 The `crio.stats` table specifies all necessary configuration for reporting container and pod stats.
 
 **stats_collection_period**=0
-  The number of seconds between collecting pod and container stats. If set to 0, the stats are collected on-demand instead.
+  The number of seconds between collecting pod and container stats. If set to 0, the stats are collected on-demand instead. **DEPRECATED:** This option will be removed in the future. Please use `collection_period` instead.
+
+**collection_period**=0
+  The number of seconds between collecting pod/container stats and pod sandbox metrics. If set to 0, the metrics/stats are collected on-demand instead.
+
+**included_pod_metrics**=[]
+  A list of pod metrics to include. Specify the names of the metrics to include in this list.
 
 ## CRIO.NRI TABLE
 The `crio.nri` table contains settings for controlling NRI (Node Resource Interface) support in CRI-O.

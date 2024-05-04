@@ -536,6 +536,11 @@ func initCrioTemplateConfig(c *Config) ([]*templateConfigValue, error) {
 			isDefaultValue: simpleEqual(dc.BigFilesTemporaryDir, c.BigFilesTemporaryDir),
 		},
 		{
+			templateString: templateStringCrioImageAutoReloadRegistries,
+			group:          crioImageConfig,
+			isDefaultValue: simpleEqual(dc.AutoReloadRegistries, c.AutoReloadRegistries),
+		},
+		{
 			templateString: templateStringCrioNetworkCniDefaultNetwork,
 			group:          crioNetworkConfig,
 			isDefaultValue: simpleEqual(dc.CNIDefaultNetwork, c.CNIDefaultNetwork),
@@ -604,6 +609,16 @@ func initCrioTemplateConfig(c *Config) ([]*templateConfigValue, error) {
 			templateString: templateStringCrioStatsStatsCollectionPeriod,
 			group:          crioStatsConfig,
 			isDefaultValue: simpleEqual(dc.StatsCollectionPeriod, c.StatsCollectionPeriod),
+		},
+		{
+			templateString: templateStringCrioStatsCollectionPeriod,
+			group:          crioStatsConfig,
+			isDefaultValue: simpleEqual(dc.CollectionPeriod, c.CollectionPeriod),
+		},
+		{
+			templateString: templateStringCrioStatsIncludedPodMetrics,
+			group:          crioNetworkConfig,
+			isDefaultValue: stringSliceEqual(dc.IncludedPodMetrics, c.IncludedPodMetrics),
 		},
 		{
 			templateString: templateStringCrioNRIEnable,
@@ -1472,6 +1487,12 @@ const templateStringCrioImageBigFilesTemporaryDir = `# Temporary directory to us
 
 `
 
+const templateStringCrioImageAutoReloadRegistries = `# If true, CRI-O will automatically reload the mirror registry when
+# there is an update to the 'registries.conf.d' directory. Default value is set to 'false'.
+{{ $.Comment }}auto_reload_registries = {{ .AutoReloadRegistries }}
+
+`
+
 const templateStringCrioNetwork = `# The crio.network table containers settings pertaining to the management of
 # CNI plugins.
 [crio.network]
@@ -1571,6 +1592,18 @@ const templateStringCrioStats = `# Necessary information pertaining to container
 const templateStringCrioStatsStatsCollectionPeriod = `# The number of seconds between collecting pod and container stats.
 # If set to 0, the stats are collected on-demand instead.
 {{ $.Comment }}stats_collection_period = {{ .StatsCollectionPeriod }}
+
+`
+
+const templateStringCrioStatsCollectionPeriod = `# The number of seconds between collecting pod/container stats and pod
+# sandbox metrics. If set to 0, the metrics/stats are collected on-demand instead.
+{{ $.Comment }}collection_period = {{ .CollectionPeriod }}
+
+`
+
+const templateStringCrioStatsIncludedPodMetrics = `# List of included pod metrics.
+{{ $.Comment }}included_pod_metrics = [
+{{ range $opt := .IncludedPodMetrics }}{{ $.Comment }}{{ printf "\t%q,\n" $opt }}{{ end }}{{ $.Comment }}]
 
 `
 

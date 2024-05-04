@@ -401,6 +401,9 @@ func mergeConfig(config *libconfig.Config, ctx *cli.Context) error {
 	if ctx.IsSet("big-files-temporary-dir") {
 		config.BigFilesTemporaryDir = ctx.String("big-files-temporary-dir")
 	}
+	if ctx.IsSet("auto-reload-registries") {
+		config.AutoReloadRegistries = ctx.Bool("auto-reload-registries")
+	}
 	if ctx.IsSet("separate-pull-cgroup") {
 		config.SeparatePullCgroup = ctx.String("separate-pull-cgroup")
 	}
@@ -412,6 +415,12 @@ func mergeConfig(config *libconfig.Config, ctx *cli.Context) error {
 	}
 	if ctx.IsSet("stats-collection-period") {
 		config.StatsCollectionPeriod = ctx.Int("stats-collection-period")
+	}
+	if ctx.IsSet("collection-period") {
+		config.CollectionPeriod = ctx.Int("collection-period")
+	}
+	if ctx.IsSet("included-pod-metrics") {
+		config.IncludedPodMetrics = StringSliceTrySplit(ctx, "included-pod-metrics")
 	}
 	if ctx.IsSet("enable-pod-events") {
 		config.EnablePodEvents = ctx.Bool("enable-pod-events")
@@ -923,6 +932,12 @@ func getCrioFlags(defConf *libconfig.Config) []cli.Flag {
 			Value:   defConf.BigFilesTemporaryDir,
 		},
 		&cli.BoolFlag{
+			Name:    "auto-reload-registries",
+			Usage:   "If true, CRI-O will automatically reload the mirror registry when there is an update to the 'registries.conf.d' directory. Default value is set to 'false'.",
+			EnvVars: []string{"AUTO_RELOAD_REGISTRIES"},
+			Value:   defConf.AutoReloadRegistries,
+		},
+		&cli.BoolFlag{
 			Name:    "read-only",
 			Usage:   "Setup all unprivileged containers to run as read-only. Automatically mounts the containers' tmpfs on '/run', '/tmp' and '/var/tmp'.",
 			EnvVars: []string{"CONTAINER_READ_ONLY"},
@@ -1153,8 +1168,20 @@ func getCrioFlags(defConf *libconfig.Config) []cli.Flag {
 		&cli.IntFlag{
 			Name:    "stats-collection-period",
 			Value:   defConf.StatsCollectionPeriod,
-			Usage:   "The number of seconds between collecting pod and container stats. If set to 0, the stats are collected on-demand instead.",
+			Usage:   "The number of seconds between collecting pod and container stats. If set to 0, the stats are collected on-demand instead. DEPRECATED: This option will be removed in the future.",
 			EnvVars: []string{"CONTAINER_STATS_COLLECTION_PERIOD"},
+		},
+		&cli.IntFlag{
+			Name:    "collection-period",
+			Value:   defConf.CollectionPeriod,
+			Usage:   "The number of seconds between collecting pod/container stats and pod sandbox metrics. If set to 0, the metrics/stats are collected on-demand instead.",
+			EnvVars: []string{"COLLECTION_PERIOD"},
+		},
+		&cli.StringSliceFlag{
+			Name:    "included-pod-metrics",
+			Usage:   "A list of pod metrics to include. Specify the names of the metrics to include in this list.",
+			EnvVars: []string{"CONTAINER_INCLUDED_POD_METRCIS"},
+			Value:   cli.NewStringSlice(defConf.IncludedPodMetrics...),
 		},
 		&cli.BoolFlag{
 			Name:    "enable-criu-support",

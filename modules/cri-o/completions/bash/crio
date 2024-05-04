@@ -19,6 +19,7 @@ h
 --address
 --allowed-devices
 --apparmor-profile
+--auto-reload-registries
 --big-files-temporary-dir
 --bind-mount-prefix
 --blockio-config-file
@@ -29,6 +30,7 @@ h
 --cni-config-dir
 --cni-default-network
 --cni-plugin-dir
+--collection-period
 --config
 --config-dir
 --conmon
@@ -62,6 +64,7 @@ h
 --hostnetwork-disable-selinux
 --image-volumes
 --imagestore
+--included-pod-metrics
 --infra-ctr-cpuset
 --insecure-registry
 --internal-repair
