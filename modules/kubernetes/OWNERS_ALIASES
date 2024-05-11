@@ -12,6 +12,7 @@ aliases:
     - divya-mohan0209
     - natalisucks
     - reylejano
+    - salaxander
     - sftim
     - tengqm
   sig-docs-localization-owners: # Admins for localization content
@@ -20,6 +21,7 @@ aliases:
     - natalisucks
     - nate-double-u
     - reylejano
+    - salaxander
     - sftim
     - seokho-son
     - tengqm
@@ -29,9 +31,20 @@ aliases:
     - natalisucks
     - nate-double-u
     - reylejano
+    - salaxander
     - sftim
     - seokho-son
     - tengqm
+  sig-docs-bn-owners: # Admins for Bengali content
+    - asem-hamid
+    - Imtiaz1234
+    - mitul3737
+    - rajibmitra
+  sig-docs-bn-reviews: # PR reviews for Bengali content
+    - asem-hamid
+    - Imtiaz1234
+    - mitul3737
+    - rajibmitra
   sig-docs-de-owners: # Admins for German content
     - bene2k1
     - rlenferink
@@ -45,6 +58,7 @@ aliases:
     - natalisucks
     - nate-double-u
     - reylejano
+    - salaxander
     - sftim
     - tengqm
   sig-docs-en-reviews: # PR reviews for English content
@@ -57,6 +71,7 @@ aliases:
     - natalisucks
     - nate-double-u
     - reylejano
+    - salaxander
     - sftim
     - shannonxtreme
     - tengqm
@@ -131,6 +146,7 @@ aliases:
     - divya-mohan0209
     - natalisucks
     - reylejano
+    - salaxander
     - sftim
     - tengqm
   sig-docs-zh-owners: # Admins for Chinese content
