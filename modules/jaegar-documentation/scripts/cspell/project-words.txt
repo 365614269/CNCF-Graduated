@@ -9,12 +9,10 @@ bansal
 behaviour
 bohara
 bootcamp
-boths
 certfile
 changeme
 clickhouse
 cncf
-conrolled
 containerd
 cqlsh
 cqlshrc
@@ -22,9 +20,6 @@ daemonset
 datacenter
 datasource
 developercertificate
-dilligence
-distirbuted
-documentiing
 downsampling
 dropwizard
 dsoie
@@ -52,7 +47,6 @@ ingester
 ingester's
 ingesters
 ingestor
-initialisation
 istio
 istio's
 jaegertracing
@@ -140,7 +134,6 @@ upsample
 usercert
 userkey
 valuen
-variery
 vlog
 volz
 weaveworks
