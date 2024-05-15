@@ -23,7 +23,7 @@ require (
 	github.com/containerd/nri v0.6.1
 	github.com/containerd/platforms v0.2.0
 	github.com/containerd/plugin v0.1.0
-	github.com/containerd/ttrpc v1.2.3
+	github.com/containerd/ttrpc v1.2.4
 	github.com/containerd/typeurl/v2 v2.1.1
 	github.com/containernetworking/cni v1.2.0
 	github.com/containernetworking/plugins v1.4.1
@@ -53,7 +53,7 @@ require (
 	github.com/opencontainers/runtime-tools v0.9.1-0.20221107090550-2e043c6bd626
 	github.com/opencontainers/selinux v1.11.0
 	github.com/pelletier/go-toml/v2 v2.2.2
-	github.com/prometheus/client_golang v1.19.0
+	github.com/prometheus/client_golang v1.19.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.9.0
 	github.com/tchap/go-patricia/v2 v2.3.1
