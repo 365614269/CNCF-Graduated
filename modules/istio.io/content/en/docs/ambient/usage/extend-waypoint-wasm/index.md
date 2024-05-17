@@ -4,7 +4,7 @@ description: Describes how to make remote WebAssembly modules available for ambi
 weight: 55
 keywords: [extensibility,Wasm,WebAssembly,Ambient]
 owner: istio/wg-policies-and-telemetry-maintainers
-test: no
+test: yes
 status: Alpha
 ---
 
@@ -226,7 +226,7 @@ EOF
     200
     {{< /text >}}
 
-1. Test internal `/productpage` without credentials
+1. Test internal `/reviews` without credentials
 
     {{< text bash >}}
     $ kubectl exec deploy/sleep -- curl -s -w "%{http_code}" -o /dev/null http://reviews:9080/reviews/1

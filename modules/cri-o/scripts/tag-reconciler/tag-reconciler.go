@@ -65,9 +65,19 @@ func run() error {
 }
 
 func pushTagToRemote(repo *git.Repo, tag, remote string) error {
+	logrus.Infof("Adding tag to repository: %s", tag)
+	if err := repo.Tag(tag, tag); err != nil {
+		return fmt.Errorf("unable to tag repository: %w", err)
+	}
+
 	logrus.Infof("Pushing tag to origin: %s", tag)
 	if err := command.NewWithWorkDir(repo.Dir(), "git", "push", remote, "tag", tag).RunSilentSuccess(); err != nil {
 		return fmt.Errorf("unable to run git push: %w", err)
+	}
+
+	logrus.Infof("Running GitHub `test` workflow")
+	if err := command.NewWithWorkDir(repo.Dir(), "gh", "workflow", "run", "test", "--ref", tag).RunSilentSuccess(); err != nil {
+		return fmt.Errorf("unable to run GitHub workflow: %w", err)
 	}
 
 	return nil
