@@ -191,7 +191,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04, actuated-arm64-4cpu-16gb, macos-12, windows-2019, windows-2022]
-        go-version: ["1.22.3"]
+        go-version: ["1.22.4"]
         exclude:
           - os: ${{ github.repository != 'containerd/containerd' && 'actuated-arm64-4cpu-16gb' }}
     steps:
@@ -528,7 +528,7 @@ jobs:
       matrix:
         box:
           - fedora/39-cloud-base
-          - rockylinux/8@9.0.0
+          - rockylinux/9@4.0.0
     env:
       BOX: ${{ matrix.box }}
 
