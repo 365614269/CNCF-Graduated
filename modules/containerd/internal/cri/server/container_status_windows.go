@@ -1,5 +1,3 @@
-//go:build !linux
-
 /*
    Copyright The containerd Authors.
 
@@ -16,13 +14,15 @@
    limitations under the License.
 */
 
-package seed
+package server
 
 import (
-	"crypto/rand"
-	"io"
+	"context"
+
+	containerstore "github.com/containerd/containerd/v2/internal/cri/store/container"
+	runtime "k8s.io/cri-api/pkg/apis/runtime/v1"
 )
 
-func tryReadRandom(p []byte) {
-	io.ReadFull(rand.Reader, p)
+func toCRIContainerUser(ctx context.Context, container containerstore.Container) (*runtime.ContainerUser, error) {
+	return &runtime.ContainerUser{}, nil
 }
