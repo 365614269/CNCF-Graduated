@@ -26,13 +26,13 @@ dependencies:
       match: GOLANGCI_LINT_VERSION
 
   - name: shellcheck
-    version: v0.9.0
+    version: v0.10.0
     refPaths:
     - path: Makefile
       match: SHELLCHECK_VERSION
 
   - name: cni-plugins
-    version: v1.5.0
+    version: v1.5.1
     refPaths:
     - path: scripts/versions
       match: cni-plugins
@@ -72,7 +72,7 @@ dependencies:
       match: version
 
   - name: zeitgeist
-    version: 0.4.4
+    version: 0.5.3
     refPaths:
       - path: Makefile
         match: ZEITGEIST_VERSION
