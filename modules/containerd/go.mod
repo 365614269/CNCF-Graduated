@@ -27,7 +27,7 @@ require (
 	github.com/containerd/ttrpc v1.2.5
 	github.com/containerd/typeurl/v2 v2.1.1
 	github.com/containernetworking/cni v1.2.1
-	github.com/containernetworking/plugins v1.4.1
+	github.com/containernetworking/plugins v1.5.1
 	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/distribution/reference v0.6.0
@@ -74,7 +74,7 @@ require (
 	golang.org/x/sys v0.21.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be
 	google.golang.org/grpc v1.63.2
-	google.golang.org/protobuf v1.34.1
+	google.golang.org/protobuf v1.34.2
 	k8s.io/apimachinery v0.30.2
 	k8s.io/client-go v0.30.2
 	k8s.io/component-base v0.30.2
