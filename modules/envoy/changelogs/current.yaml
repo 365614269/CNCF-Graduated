@@ -50,6 +50,12 @@ behavior_changes:
   change: |
     Datadog: Disabled remote configuration by default.
     To enable this feature, use the :ref:`remote_config <envoy_v3_api_field_config.trace.v3.DatadogConfig.remote_config>` field.
+- area: local_ratelimit
+  change: |
+    Updated the token bucket implementation to use non-timer based token bucket. The tokens will be refilled when
+    the token bucket is accessed and no dependency on the timer.
+    This behavior can be temporarily reverted by setting the runtime guard
+    ``envoy.reloadable_features.no_timer_based_rate_limit_token_bucket`` to false.
 
 minor_behavior_changes:
 # *Changes that may cause incompatibilities for some users, but should not for most*
@@ -260,6 +266,9 @@ bug_fixes:
   change: |
     Fixed missing :ref:`additional addresses <envoy_v3_api_msg_config.endpoint.v3.Endpoint.AdditionalAddress>`
     for :ref:`LbEndpoint <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.endpoint>` in config dump.
+- area: tracing
+  change: |
+    Added support to configure a static config resource detector for the OpenTelemetry tracer.
 - area: http
   change: |
     Fixed a bug where additional :ref:`cookie attributes <envoy_v3_api_msg_config.route.v3.RouteAction.HashPolicy.cookie>`
@@ -524,11 +533,6 @@ new_features:
     QUIC stream reset error code will be added to transport failure reason.
     This behavior can be reverted by setting the runtime flag ``envoy.reloadable_features.report_stream_reset_error_code``
     to false.
-- area: conn pool
-  change: |
-    Added :ref:`auto_sni_from_upstream <envoy_v3_api_field_config.core.v3.UpstreamHttpProtocolOptions.auto_sni_from_upstream>`
-    to use value of :ref:`hostnames <envoy_v3_api_field_config.endpoint.v3.Endpoint.hostname>` of
-    upstream cluster's endpoints as the value for SNI.
 
 deprecated:
 - area: tracing
