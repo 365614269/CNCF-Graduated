@@ -76,7 +76,7 @@ func (s *UpgradeSuite) TearDownSuite() {
 	s.installer.UninstallRook()
 }
 
-func (s *UpgradeSuite) baseSetup(useHelm bool, initialCephVersion v1.CephVersionSpec) {
+func (s *UpgradeSuite) baseSetup(useHelm bool, initialRookVersion string, initialCephVersion v1.CephVersionSpec) {
 	s.namespace = "upgrade"
 	s.settings = &installer.TestCephSettings{
 		ClusterName:                 s.namespace,
@@ -88,7 +88,7 @@ func (s *UpgradeSuite) baseSetup(useHelm bool, initialCephVersion v1.CephVersion
 		Mons:                        1,
 		EnableDiscovery:             true,
 		SkipClusterCleanup:          true,
-		RookVersion:                 installer.Version1_13,
+		RookVersion:                 initialRookVersion,
 		CephVersion:                 initialCephVersion,
 	}
 
@@ -105,7 +105,7 @@ func (s *UpgradeSuite) TestUpgradeHelm() {
 }
 
 func (s *UpgradeSuite) testUpgrade(useHelm bool, initialCephVersion v1.CephVersionSpec) {
-	s.baseSetup(useHelm, initialCephVersion)
+	s.baseSetup(useHelm, installer.Version1_14, initialCephVersion)
 
 	objectUserID := "upgraded-user"
 	preFilename := "pre-upgrade-file"
@@ -129,7 +129,7 @@ func (s *UpgradeSuite) testUpgrade(useHelm bool, initialCephVersion v1.CephVersi
 	//
 	// Upgrade Rook from v1.13 to master
 	//
-	logger.Infof("*** UPGRADING ROOK FROM %s to master ***", installer.Version1_13)
+	logger.Infof("*** UPGRADING ROOK FROM %s to master ***", installer.Version1_14)
 	s.gatherLogs(s.settings.OperatorNamespace, "_before_master_upgrade")
 	s.upgradeToMaster()
 
@@ -138,7 +138,7 @@ func (s *UpgradeSuite) testUpgrade(useHelm bool, initialCephVersion v1.CephVersi
 	err := s.installer.WaitForToolbox(s.namespace)
 	assert.NoError(s.T(), err)
 
-	logger.Infof("Done with automatic upgrade from %s to master", installer.Version1_13)
+	logger.Infof("Done with automatic upgrade from %s to master", installer.Version1_14)
 	newFile := "post-upgrade-previous-to-master-file"
 	s.verifyFilesAfterUpgrade(newFile, rbdFilesToRead, cephfsFilesToRead)
 	rbdFilesToRead = append(rbdFilesToRead, newFile)
@@ -150,7 +150,7 @@ func (s *UpgradeSuite) testUpgrade(useHelm bool, initialCephVersion v1.CephVersi
 	// do not need retry b/c the OBC controller runs parallel to Rook-Ceph orchestration
 	assert.True(s.T(), s.helper.BucketClient.CheckOBC(obcName, "bound"))
 
-	logger.Infof("Verified upgrade from %s to master", installer.Version1_13)
+	logger.Infof("Verified upgrade from %s to master", installer.Version1_14)
 
 	// SKIP the Ceph version upgrades for the helm test
 	if s.settings.UseHelm {
@@ -183,7 +183,7 @@ func (s *UpgradeSuite) testUpgrade(useHelm bool, initialCephVersion v1.CephVersi
 }
 
 func (s *UpgradeSuite) TestUpgradeCephToQuincyDevel() {
-	s.baseSetup(false, installer.QuincyVersion)
+	s.baseSetup(false, installer.LocalBuildTag, installer.QuincyVersion)
 
 	objectUserID := "upgraded-user"
 	preFilename := "pre-upgrade-file"
@@ -216,7 +216,7 @@ func (s *UpgradeSuite) TestUpgradeCephToQuincyDevel() {
 }
 
 func (s *UpgradeSuite) TestUpgradeCephToReefDevel() {
-	s.baseSetup(false, installer.ReefVersion)
+	s.baseSetup(false, installer.LocalBuildTag, installer.ReefVersion)
 
 	objectUserID := "upgraded-user"
 	preFilename := "pre-upgrade-file"
@@ -249,7 +249,7 @@ func (s *UpgradeSuite) TestUpgradeCephToReefDevel() {
 }
 
 func (s *UpgradeSuite) TestUpgradeCephToSquidDevel() {
-	s.baseSetup(false, installer.SquidVersion)
+	s.baseSetup(false, installer.LocalBuildTag, installer.SquidVersion)
 
 	objectUserID := "upgraded-user"
 	preFilename := "pre-upgrade-file"
@@ -330,7 +330,7 @@ func (s *UpgradeSuite) deployClusterforUpgrade(objectUserID, preFilename string)
 	require.True(s.T(), created)
 
 	// verify that we're actually running the right pre-upgrade image
-	s.verifyOperatorImage(installer.Version1_13)
+	s.verifyOperatorImage(installer.Version1_14)
 
 	assert.NoError(s.T(), s.k8sh.WriteToPod("", rbdPodName, preFilename, simpleTestMessage))
 	assert.NoError(s.T(), s.k8sh.ReadFromPod("", rbdPodName, preFilename, simpleTestMessage))
