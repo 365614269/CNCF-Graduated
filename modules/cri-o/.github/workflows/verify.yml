@@ -30,7 +30,6 @@ jobs:
       - uses: golangci/golangci-lint-action@a4f60bb28d35aeee14e6880718e0c85ff1882e64 # v6.0.1
         with:
           version: ${{ env.GOLANGCI_LINT_VERSION }}
-          args: --timeout=10m
 
   lint-markdown:
     runs-on: ubuntu-latest
@@ -107,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
-      - uses: crate-ci/typos@3ddcf00482aad5eb418a6cd1955ea2125d0785c1 # v1.23.3
+      - uses: crate-ci/typos@c7af4712eda24dd1ef54bd8212973888489eb0ce # v1.23.5
         with:
           config: .typos.toml
 
