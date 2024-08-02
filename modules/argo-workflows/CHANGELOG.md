@@ -1,5 +1,25 @@
 # Changelog
 
+## v3.5.10 (2024-08-01)
+
+Full Changelog: [v3.5.9...v3.5.10](https://github.com/argoproj/argo-workflows/compare/v3.5.9...v3.5.10)
+
+### Selected Changes
+
+* [258299274](https://github.com/argoproj/argo-workflows/commit/25829927431d9a0f46d17b72ae74aedb8d700884) fix(release): set `$DOCKER_CONFIG` if unset (#13155)
+* [c5922a4f8](https://github.com/argoproj/argo-workflows/commit/c5922a4f863edf7cd888a83d6e2bb9c6af435f57) chore(deps): bump github.com/docker/docker from 24.0.9+incompatible to 26.1.4+incompatible in the go_modules group (#13416)
+* [72d0d22e6](https://github.com/argoproj/argo-workflows/commit/72d0d22e6254c2871f7f4f3798a362094409064f) fix(ui): import `getTemplateNameFromNode`
+* [3ceecb64c](https://github.com/argoproj/argo-workflows/commit/3ceecb64cca2fda4a5f58ae95b2f6bc463f3730f) chore(deps): use `docker/login-action` consistently instead of `Azure/docker-login` (#12791)
+* [d49bcebcb](https://github.com/argoproj/argo-workflows/commit/d49bcebcb99f49e71542586a3e20a7f11bf15a2a) chore(deps): upgrade `actions/cache` and `create-pull-request` to Node v20 (#12775)
+
+<details><summary><h3>Contributors</h3></summary>
+
+* Anton Gilgur
+* dependabot[bot]
+* github-actions[bot]
+
+</details>
+
 ## v3.5.9 (2024-07-30)
 
 Full Changelog: [v3.5.8...v3.5.9](https://github.com/argoproj/argo-workflows/compare/v3.5.8...v3.5.9)
