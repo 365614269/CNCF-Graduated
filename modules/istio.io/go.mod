@@ -13,7 +13,7 @@ replace github.com/imdario/mergo => github.com/imdario/mergo v0.3.5
 require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 	golang.org/x/sync v0.7.0
-	istio.io/istio v0.0.0-20240726223832-d29a4dea41ab
+	istio.io/istio v0.0.0-20240802232721-749dbacd692e
 	k8s.io/apimachinery v0.30.1
 	k8s.io/client-go v0.30.1
 )
@@ -43,7 +43,7 @@ require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/docker/cli v26.1.4+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v26.0.2+incompatible // indirect
+	github.com/docker/docker v26.1.4+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.12.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.12.1-0.20240716023226-bc563f4e9b28 // indirect
