@@ -59,7 +59,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.9.0
 	github.com/tchap/go-patricia/v2 v2.3.1
-	github.com/urfave/cli/v2 v2.27.3
+	github.com/urfave/cli/v2 v2.27.4
 	github.com/vishvananda/netlink v1.2.1-beta.2
 	go.etcd.io/bbolt v1.3.10
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0
@@ -72,14 +72,14 @@ require (
 	go.opentelemetry.io/otel/trace v1.28.0
 	golang.org/x/mod v0.20.0
 	golang.org/x/sync v0.8.0
-	golang.org/x/sys v0.23.0
+	golang.org/x/sys v0.24.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240701130421-f6361c86f094
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 	k8s.io/apimachinery v0.30.3
 	k8s.io/client-go v0.30.3
 	k8s.io/component-base v0.30.3
-	k8s.io/cri-api v0.31.0-beta.0.0.20240716205706-865479a3e1b3
+	k8s.io/cri-api v0.32.0-alpha.0
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/kubelet v0.30.3
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
