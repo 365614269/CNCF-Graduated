@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	cephv1 "github.com/rook/rook/pkg/apis/ceph.rook.io/v1"
 	"github.com/rook/rook/pkg/operator/ceph/cluster/telemetry"
 	opcontroller "github.com/rook/rook/pkg/operator/ceph/controller"
 	"github.com/rook/rook/pkg/operator/k8sutil"
@@ -150,13 +151,13 @@ var (
 // manually challenging.
 var (
 	// image names
-	DefaultCSIPluginImage   = "quay.io/cephcsi/cephcsi:v3.11.0"
+	DefaultCSIPluginImage   = "quay.io/cephcsi/cephcsi:v3.12.0"
 	DefaultRegistrarImage   = "registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.10.1"
 	DefaultProvisionerImage = "registry.k8s.io/sig-storage/csi-provisioner:v4.0.1"
 	DefaultAttacherImage    = "registry.k8s.io/sig-storage/csi-attacher:v4.5.1"
 	DefaultSnapshotterImage = "registry.k8s.io/sig-storage/csi-snapshotter:v7.0.2"
 	DefaultResizerImage     = "registry.k8s.io/sig-storage/csi-resizer:v1.10.1"
-	DefaultCSIAddonsImage   = "quay.io/csiaddons/k8s-sidecar:v0.8.0"
+	DefaultCSIAddonsImage   = "quay.io/csiaddons/k8s-sidecar:v0.9.0"
 
 	// image pull policy
 	DefaultCSIImagePullPolicy = string(corev1.PullIfNotPresent)
@@ -873,6 +874,10 @@ func (r *ReconcileCSI) validateCSIVersion(ownerInfo *k8sutil.OwnerInfo) (*CephCS
 	job.Spec.Template.Spec.Tolerations = getToleration(r.opConfig.Parameters, provisionerTolerationsEnv, []corev1.Toleration{})
 	job.Spec.Template.Spec.Affinity = &corev1.Affinity{
 		NodeAffinity: getNodeAffinity(r.opConfig.Parameters, provisionerNodeAffinityEnv, &corev1.NodeAffinity{}),
+	}
+	if r.firstCephCluster != nil {
+		cephv1.GetCmdReporterAnnotations(r.firstCephCluster.Annotations).ApplyToObjectMeta(&job.Spec.Template.ObjectMeta)
+		cephv1.GetCmdReporterLabels(r.firstCephCluster.Labels).ApplyToObjectMeta(&job.Spec.Template.ObjectMeta)
 	}
 
 	stdout, _, retcode, err := versionReporter.Run(r.opManagerContext, timeout)

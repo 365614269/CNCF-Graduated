@@ -1,6 +1,6 @@
 dependencies:
   - name: go
-    version: 1.22
+    version: 1.23
     refPaths:
     - path: .github/workflows/verify.yml
       match: GO_VERSION
@@ -14,11 +14,9 @@ dependencies:
       match: GO_VERSION
     - path: .github/workflows/tag-reconciler.yml
       match: GO_VERSION
-    - path: contrib/test/ci/vars.yml
-      match: golang_version
 
   - name: golangci-lint
-    version: v1.59.1
+    version: v1.60.1
     refPaths:
     - path: .github/workflows/verify.yml
       match: GOLANGCI_LINT_VERSION
@@ -120,3 +118,19 @@ dependencies:
     refPaths:
       - path: Makefile
         match: MDTOC_VERSION
+
+  - name: pause
+    version: 3.10
+    refPaths:
+      - path: docs/crio.8.md
+        match: "registry.k8s.io/pause:"
+      - path: docs/crio.conf.5.md
+        match: "registry.k8s.io/pause:"
+      - path: internal/storage/image_test.go
+        match: "registry.k8s.io/pause:"
+      - path: pkg/config/config_linux.go
+        match: "registry.k8s.io/pause:"
+      - path: pkg/config/config_unsupported.go
+        match: "registry.k8s.io/pause:"
+      - path: test/common.sh
+        match: "registry.k8s.io/pause:"
