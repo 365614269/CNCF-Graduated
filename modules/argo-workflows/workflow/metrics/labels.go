@@ -10,13 +10,18 @@ const (
 	labelBuildGitTreeState string = `git_treestate`
 	labelBuildGitTag       string = `git_tag`
 
+	labelCronWFName string = `name`
+
 	labelErrorCause string = "cause"
 
 	labelLogLevel string = `level`
 
 	labelNodePhase string = `node_phase`
 
-	labelPodPhase  string = `phase`
+	labelPodPhase         string = `phase`
+	labelPodNamespace     string = `namespace`
+	labelPodPendingReason string = `reason`
+
 	labelQueueName string = `queue_name`
 
 	labelRecentlyStarted string = `recently_started`

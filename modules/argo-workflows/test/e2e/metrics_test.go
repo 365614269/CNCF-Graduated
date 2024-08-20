@@ -4,10 +4,12 @@ package e2e
 
 import (
 	"testing"
+	"time"
 
 	"github.com/gavv/httpexpect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	wfv1 "github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
@@ -107,6 +109,52 @@ func (s *MetricsSuite) TestFailedMetric() {
 				Body().
 				Contains(`argo_workflows_task_failure 1`)
 		})
+}
+
+func (s *MetricsSuite) TestCronTriggeredCounter() {
+	s.Given().
+		CronWorkflow(`@testdata/cronworkflow-metrics.yaml`).
+		When().
+		CreateCronWorkflow().
+		Wait(1 * time.Minute). // This pattern is used in cron_test.go too
+		Then().
+		ExpectCron(func(t *testing.T, cronWf *wfv1.CronWorkflow) {
+			s.e(s.T()).GET("").
+				Expect().
+				Status(200).
+				Body().
+				Contains(`cronworkflows_triggered_total{name="test-cron-metric",namespace="argo"} 1`)
+		})
+}
+
+func (s *MetricsSuite) TestPodPendingMetric() {
+	s.Given().
+		Workflow(`@testdata/workflow-pending-metrics.yaml`).
+		When().
+		SubmitWorkflow().
+		WaitForPod(fixtures.PodCondition(func(p *corev1.Pod) bool {
+			if p.Status.Phase == corev1.PodPending {
+				for _, cond := range p.Status.Conditions {
+					if cond.Reason == corev1.PodReasonUnschedulable {
+						return true
+					}
+				}
+			}
+			return false
+		})).
+		Wait(2 * time.Second). // Hack: We may well observe the pod change faster than the controller
+		Then().
+		ExpectWorkflow(func(t *testing.T, metadata *metav1.ObjectMeta, status *wfv1.WorkflowStatus) {
+			assert.Equal(t, wfv1.WorkflowRunning, status.Phase)
+			s.e(s.T()).GET("").
+				Expect().
+				Status(200).
+				Body().
+				Contains(`pod_pending_count{namespace="argo",reason="Unschedulable"} 1`)
+		}).
+		When().
+		DeleteWorkflow().
+		WaitForWorkflowDeletion()
 }
 
 func TestMetricsSuite(t *testing.T) {

@@ -25,7 +25,11 @@ These notes explain the differences in using the Prometheus `/metrics` endpoint 
 
 The following are new metrics:
 
+* `cronworkflows_triggered_total`
 * `is_leader`
+* `k8s_request_duration`
+* `pod_pending_count`
+* `pods_total_count`
 * `queue_duration`
 * `queue_longest_running`
 * `queue_retries`

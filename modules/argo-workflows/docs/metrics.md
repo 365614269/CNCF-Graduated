@@ -201,6 +201,15 @@ Metrics for the [Four Golden Signals](https://sre.google/sre-book/monitoring-dis
     Some metric attributes may have high cardinality and are marked with ⚠️ to warn you. You may need to disable this metric or disable the attribute.
 <!-- titles should be the exact metric name for deep-linking, alphabetical ordered -->
 <!-- titles are without argo_workflows prefix -->
+#### `cronworkflows_triggered_total`
+
+A counter of the number of times a CronWorkflow has been
+
+| attribute   | explanation                               |
+|-------------|-------------------------------------------|
+| `name`     | ⚠️ The name of the CronWorkflow. |
+| `namespace` | The namespace in which the pod is running |
+
 #### `gauge`
 
 A gauge of the number of workflows currently in the cluster in each phase. The `Running` count does not mean that a workflows pods are running, just that the controller has scheduled them. A workflow can be stuck in `Running` with pending pods for a long time.
@@ -232,6 +241,20 @@ A counter of the number of API requests sent to the Kubernetes API.
 | `kind`        | The kubernetes `kind` involved in the request such as `configmaps` |
 | `verb`        | The verb of the request, such as `Get` or `List`                   |
 | `status_code` | The HTTP status code of the response                               |
+
+This metric is calculable from `k8s_request_duration`, and it is suggested you just collect that metric instead.
+
+#### `k8s_request_duration`
+
+A histogram recording how long each type of request took.
+
+| attribute     | explanation                                                        |
+|---------------|--------------------------------------------------------------------|
+| `kind`        | The kubernetes `kind` involved in the request such as `configmaps` |
+| `verb`        | The verb of the request, such as `Get` or `List`                   |
+| `status_code` | The HTTP status code of the response                               |
+
+This is contains all the information contained in `k8s_request_total` along with timings.
 
 #### `is_leader`
 
@@ -278,6 +301,29 @@ You should only see this under high load.
 | `node_phase`       | The phase that the pod's node was in   |
 
 `recently_started` is controlled by the [environment variable](environment-variables.md) `RECENTLY_STARTED_POD_DURATION` and defaults to 10 seconds.
+
+#### `pod_pending_count`
+
+A counter of pods that have been seen in the Pending state.
+
+| attribute          | explanation                               |
+|--------------------|-------------------------------------------|
+| `reason` | Summary of the kubernetes Reason for pending.    |
+| `namespace`        | The namespace in which the pod is running |
+
+This metric ignores the `PodInitializing` reason and does not count it.
+The `reason` attribute is the value from the Reason message before the `:` in the message.
+This is not directly controlled by the workflow controller, so it is possible for some pod pending states to be missed.
+
+#### `pods_total_count`
+
+A gauge of the number of pods which have entered each phase and then observed by the controller.
+This is not directly controlled by the workflow controller, so it is possible for some pod phases to be missed.
+
+| attribute   | explanation                               |
+|-------------|-------------------------------------------|
+| `phase`     | The phase that the pod is in              |
+| `namespace` | The namespace in which the pod is running |
 
 #### `queue_adds_count`
 
