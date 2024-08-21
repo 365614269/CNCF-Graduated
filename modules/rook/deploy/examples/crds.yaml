@@ -8,7 +8,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephblockpoolradosnamespaces.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -98,7 +98,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephblockpools.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -529,7 +529,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephbucketnotifications.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -691,7 +691,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephbuckettopics.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -850,7 +850,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephclients.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -933,7 +933,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephclusters.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -1282,10 +1282,10 @@ spec:
                                     format: int32
                                     type: integer
                                   service:
+                                    default: ""
                                     description: |-
                                       Service is the name of the service to place in the gRPC HealthCheckRequest
                                       (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
-
 
                                       If this is not specified, the default behavior is defined by gRPC.
                                     type: string
@@ -1430,10 +1430,10 @@ spec:
                                     format: int32
                                     type: integer
                                   service:
+                                    default: ""
                                     description: |-
                                       Service is the name of the service to place in the gRPC HealthCheckRequest
                                       (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
-
 
                                       If this is not specified, the default behavior is defined by gRPC.
                                     type: string
@@ -1850,7 +1850,7 @@ spec:
                                           set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
                                           exists.
                                           More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-                                          (Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.
+                                          (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
                                         type: string
                                       volumeMode:
                                         description: |-
@@ -2076,7 +2076,7 @@ spec:
                                 set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
                                 exists.
                                 More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-                                (Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.
+                                (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
                               type: string
                             volumeMode:
                               description: |-
@@ -2309,7 +2309,7 @@ spec:
                                       set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
                                       exists.
                                       More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-                                      (Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.
+                                      (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
                                     type: string
                                   volumeMode:
                                     description: |-
@@ -2371,7 +2371,6 @@ spec:
                                   the event) or if no container name is specified "spec.containers[2]" (container with
                                   index 2 in this pod). This syntax is chosen only to have some well-defined way of
                                   referencing a part of an object.
-                                  TODO: this design is not final and this field is subject to change in the future.
                                 type: string
                               kind:
                                 description: |-
@@ -2442,7 +2441,6 @@ spec:
                             description: |-
                               An IPv4 or IPv6 network CIDR.
 
-
                               This naive kubebuilder regex provides immediate feedback for some typos and for a common problem
                               case where the range spec is forgotten (e.g., /24). Rook does in-depth validation in code.
                             pattern: ^[0-9a-fA-F:.]{2,}\/[0-9]{1,3}$
@@ -2453,7 +2451,6 @@ spec:
                           items:
                             description: |-
                               An IPv4 or IPv6 network CIDR.
-
 
                               This naive kubebuilder regex provides immediate feedback for some typos and for a common problem
                               case where the range spec is forgotten (e.g., /24). Rook does in-depth validation in code.
@@ -2550,14 +2547,11 @@ spec:
                         networks when the "multus" network provider is used. This config section is not used for
                         other network providers.
 
-
                         Valid keys are "public" and "cluster". Refer to Ceph networking documentation for more:
                         https://docs.ceph.com/en/reef/rados/configuration/network-config-ref/
 
-
                         Refer to Multus network annotation documentation for help selecting values:
                         https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/docs/how-to-use.md#run-pod-with-network-annotation
-
 
                         Rook will make a best-effort attempt to automatically detect CIDR address ranges for given
                         network attachment definitions. Rook's methods are robust but may be imprecise for
@@ -2565,7 +2559,6 @@ spec:
                         lease for each CephCluster reconcile. If Rook fails to detect, incorrectly detects, only
                         partially detects, or if underlying networks do not support reusing old IP addresses, it is
                         best to use the 'addressRanges' config section to specify CIDR ranges for the Ceph cluster.
-
 
                         As a contrived example, one can use a theoretical Kubernetes-wide network for Ceph client
                         traffic and a theoretical Rook-only network for Ceph replication traffic as shown:
@@ -3113,10 +3106,8 @@ spec:
                           Claims lists the names of resources, defined in spec.resourceClaims,
                           that are used by this container.
 
-
                           This is an alpha field and requires enabling the
                           DynamicResourceAllocation feature gate.
-
 
                           This field is immutable. It can only be set for containers.
                         items:
@@ -3127,6 +3118,12 @@ spec:
                                 Name must match the name of one entry in pod.spec.resourceClaims of
                                 the Pod where this field is used. It makes that resource available
                                 inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
                               type: string
                           required:
                             - name
@@ -3205,6 +3202,12 @@ spec:
                   properties:
                     allowDeviceClassUpdate:
                       description: Whether to allow updating the device class after the OSD is initially provisioned
+                      type: boolean
+                    allowOsdCrushWeightUpdate:
+                      description: |-
+                        Whether Rook will resize the OSD CRUSH weight when the OSD PVC size is increased.
+                        This allows cluster data to be rebalanced to make most effective use of new OSD space.
+                        The default is false since data rebalancing can cause temporary cluster slowdown.
                       type: boolean
                     backfillFullRatio:
                       description: BackfillFullRatio is the ratio at which the cluster is too full for backfill. Backfill will be disabled if above this threshold. Default is 0.90.
@@ -3310,10 +3313,8 @@ spec:
                                   Claims lists the names of resources, defined in spec.resourceClaims,
                                   that are used by this container.
 
-
                                   This is an alpha field and requires enabling the
                                   DynamicResourceAllocation feature gate.
-
 
                                   This field is immutable. It can only be set for containers.
                                 items:
@@ -3324,6 +3325,12 @@ spec:
                                         Name must match the name of one entry in pod.spec.resourceClaims of
                                         the Pod where this field is used. It makes that resource available
                                         inside a container.
+                                      type: string
+                                    request:
+                                      description: |-
+                                        Request is the name chosen for a request in the referenced claim.
+                                        If empty, everything from the claim is made available, otherwise
+                                        only the result of this request.
                                       type: string
                                   required:
                                     - name
@@ -3572,7 +3579,7 @@ spec:
                                         set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
                                         exists.
                                         More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-                                        (Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.
+                                        (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
                                       type: string
                                     volumeMode:
                                       description: |-
@@ -4645,10 +4652,8 @@ spec:
                                   Claims lists the names of resources, defined in spec.resourceClaims,
                                   that are used by this container.
 
-
                                   This is an alpha field and requires enabling the
                                   DynamicResourceAllocation feature gate.
-
 
                                   This field is immutable. It can only be set for containers.
                                 items:
@@ -4659,6 +4664,12 @@ spec:
                                         Name must match the name of one entry in pod.spec.resourceClaims of
                                         the Pod where this field is used. It makes that resource available
                                         inside a container.
+                                      type: string
+                                    request:
+                                      description: |-
+                                        Request is the name chosen for a request in the referenced claim.
+                                        If empty, everything from the claim is made available, otherwise
+                                        only the result of this request.
                                       type: string
                                   required:
                                     - name
@@ -4914,7 +4925,7 @@ spec:
                                         set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
                                         exists.
                                         More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-                                        (Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.
+                                        (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
                                       type: string
                                     volumeMode:
                                       description: |-
@@ -5166,7 +5177,7 @@ spec:
                                   set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
                                   exists.
                                   More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-                                  (Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.
+                                  (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
                                 type: string
                               volumeMode:
                                 description: |-
@@ -5370,7 +5381,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephcosidrivers.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -5938,10 +5949,8 @@ spec:
                         Claims lists the names of resources, defined in spec.resourceClaims,
                         that are used by this container.
 
-
                         This is an alpha field and requires enabling the
                         DynamicResourceAllocation feature gate.
-
 
                         This field is immutable. It can only be set for containers.
                       items:
@@ -5952,6 +5961,12 @@ spec:
                               Name must match the name of one entry in pod.spec.resourceClaims of
                               the Pod where this field is used. It makes that resource available
                               inside a container.
+                            type: string
+                          request:
+                            description: |-
+                              Request is the name chosen for a request in the referenced claim.
+                              If empty, everything from the claim is made available, otherwise
+                              only the result of this request.
                             type: string
                         required:
                           - name
@@ -5997,7 +6012,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephfilesystemmirrors.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -6574,10 +6589,8 @@ spec:
                         Claims lists the names of resources, defined in spec.resourceClaims,
                         that are used by this container.
 
-
                         This is an alpha field and requires enabling the
                         DynamicResourceAllocation feature gate.
-
 
                         This field is immutable. It can only be set for containers.
                       items:
@@ -6588,6 +6601,12 @@ spec:
                               Name must match the name of one entry in pod.spec.resourceClaims of
                               the Pod where this field is used. It makes that resource available
                               inside a container.
+                            type: string
+                          request:
+                            description: |-
+                              Request is the name chosen for a request in the referenced claim.
+                              If empty, everything from the claim is made available, otherwise
+                              only the result of this request.
                             type: string
                         required:
                           - name
@@ -6667,7 +6686,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephfilesystems.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -7146,10 +7165,10 @@ spec:
                                   format: int32
                                   type: integer
                                 service:
+                                  default: ""
                                   description: |-
                                     Service is the name of the service to place in the gRPC HealthCheckRequest
                                     (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
-
 
                                     If this is not specified, the default behavior is defined by gRPC.
                                   type: string
@@ -7774,10 +7793,8 @@ spec:
                             Claims lists the names of resources, defined in spec.resourceClaims,
                             that are used by this container.
 
-
                             This is an alpha field and requires enabling the
                             DynamicResourceAllocation feature gate.
-
 
                             This field is immutable. It can only be set for containers.
                           items:
@@ -7788,6 +7805,12 @@ spec:
                                   Name must match the name of one entry in pod.spec.resourceClaims of
                                   the Pod where this field is used. It makes that resource available
                                   inside a container.
+                                type: string
+                              request:
+                                description: |-
+                                  Request is the name chosen for a request in the referenced claim.
+                                  If empty, everything from the claim is made available, otherwise
+                                  only the result of this request.
                                 type: string
                             required:
                               - name
@@ -7862,10 +7885,10 @@ spec:
                                   format: int32
                                   type: integer
                                 service:
+                                  default: ""
                                   description: |-
                                     Service is the name of the service to place in the gRPC HealthCheckRequest
                                     (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
-
 
                                     If this is not specified, the default behavior is defined by gRPC.
                                   type: string
@@ -8236,7 +8259,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephfilesystemsubvolumegroups.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -8374,7 +8397,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephnfses.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -8440,12 +8463,10 @@ spec:
                             ConfigFiles defines where the Kerberos configuration should be sourced from. Config files
                             will be placed into the `/etc/krb5.conf.rook/` directory.
 
-
                             If this is left empty, Rook will not add any files. This allows you to manage the files
                             yourself however you wish. For example, you may build them into your custom Ceph container
                             image or use the Vault agent injector to securely add the files via annotations on the
                             CephNFS spec (passed to the NFS server pods).
-
 
                             Rook configures Kerberos to log to stderr. We suggest removing logging sections from config
                             files to avoid consuming unnecessary disk space from logging to files.
@@ -9248,10 +9269,8 @@ spec:
                                     Claims lists the names of resources, defined in spec.resourceClaims,
                                     that are used by this container.
 
-
                                     This is an alpha field and requires enabling the
                                     DynamicResourceAllocation feature gate.
-
 
                                     This field is immutable. It can only be set for containers.
                                   items:
@@ -9262,6 +9281,12 @@ spec:
                                           Name must match the name of one entry in pod.spec.resourceClaims of
                                           the Pod where this field is used. It makes that resource available
                                           inside a container.
+                                        type: string
+                                      request:
+                                        description: |-
+                                          Request is the name chosen for a request in the referenced claim.
+                                          If empty, everything from the claim is made available, otherwise
+                                          only the result of this request.
                                         type: string
                                     required:
                                       - name
@@ -9616,10 +9641,10 @@ spec:
                                   format: int32
                                   type: integer
                                 service:
+                                  default: ""
                                   description: |-
                                     Service is the name of the service to place in the gRPC HealthCheckRequest
                                     (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
-
 
                                     If this is not specified, the default behavior is defined by gRPC.
                                   type: string
@@ -10247,10 +10272,8 @@ spec:
                             Claims lists the names of resources, defined in spec.resourceClaims,
                             that are used by this container.
 
-
                             This is an alpha field and requires enabling the
                             DynamicResourceAllocation feature gate.
-
 
                             This field is immutable. It can only be set for containers.
                           items:
@@ -10261,6 +10284,12 @@ spec:
                                   Name must match the name of one entry in pod.spec.resourceClaims of
                                   the Pod where this field is used. It makes that resource available
                                   inside a container.
+                                type: string
+                              request:
+                                description: |-
+                                  Request is the name chosen for a request in the referenced claim.
+                                  If empty, everything from the claim is made available, otherwise
+                                  only the result of this request.
                                 type: string
                             required:
                               - name
@@ -10347,7 +10376,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephobjectrealms.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -10437,7 +10466,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephobjectstores.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -11303,10 +11332,8 @@ spec:
                             Claims lists the names of resources, defined in spec.resourceClaims,
                             that are used by this container.
 
-
                             This is an alpha field and requires enabling the
                             DynamicResourceAllocation feature gate.
-
 
                             This field is immutable. It can only be set for containers.
                           items:
@@ -11317,6 +11344,12 @@ spec:
                                   Name must match the name of one entry in pod.spec.resourceClaims of
                                   the Pod where this field is used. It makes that resource available
                                   inside a container.
+                                type: string
+                              request:
+                                description: |-
+                                  Request is the name chosen for a request in the referenced claim.
+                                  If empty, everything from the claim is made available, otherwise
+                                  only the result of this request.
                                 type: string
                             required:
                               - name
@@ -11420,10 +11453,10 @@ spec:
                                   format: int32
                                   type: integer
                                 service:
+                                  default: ""
                                   description: |-
                                     Service is the name of the service to place in the gRPC HealthCheckRequest
                                     (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
-
 
                                     If this is not specified, the default behavior is defined by gRPC.
                                   type: string
@@ -11566,10 +11599,10 @@ spec:
                                   format: int32
                                   type: integer
                                 service:
+                                  default: ""
                                   description: |-
                                     Service is the name of the service to place in the gRPC HealthCheckRequest
                                     (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
-
 
                                     If this is not specified, the default behavior is defined by gRPC.
                                   type: string
@@ -12090,7 +12123,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephobjectstoreusers.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -12332,7 +12365,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephobjectzonegroups.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -12427,7 +12460,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephobjectzones.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -12478,7 +12511,6 @@ spec:
                     In many cases, you should set this to the endpoint of the ingress resource that makes the
                     CephObjectStore associated with this CephObjectStoreZone reachable to peer clusters.
                     The list can have one or more endpoints pointing to different RGW servers in the zone.
-
 
                     If a CephObjectStore endpoint is omitted from this list, that object store's gateways will
                     not receive multisite replication data
@@ -12926,7 +12958,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: cephrbdmirrors.ceph.rook.io
 spec:
   group: ceph.rook.io
@@ -13520,10 +13552,8 @@ spec:
                         Claims lists the names of resources, defined in spec.resourceClaims,
                         that are used by this container.
 
-
                         This is an alpha field and requires enabling the
                         DynamicResourceAllocation feature gate.
-
 
                         This field is immutable. It can only be set for containers.
                       items:
@@ -13534,6 +13564,12 @@ spec:
                               Name must match the name of one entry in pod.spec.resourceClaims of
                               the Pod where this field is used. It makes that resource available
                               inside a container.
+                            type: string
+                          request:
+                            description: |-
+                              Request is the name chosen for a request in the referenced claim.
+                              If empty, everything from the claim is made available, otherwise
+                              only the result of this request.
                             type: string
                         required:
                           - name

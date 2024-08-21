@@ -12603,6 +12603,20 @@ bool
 <p>Whether to allow updating the device class after the OSD is initially provisioned</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>allowOsdCrushWeightUpdate</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Whether Rook will resize the OSD CRUSH weight when the OSD PVC size is increased.
+This allows cluster data to be rebalanced to make most effective use of new OSD space.
+The default is false since data rebalancing can cause temporary cluster slowdown.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="ceph.rook.io/v1.StoreType">StoreType
@@ -13007,7 +13021,7 @@ If the resource referred to by volumeAttributesClass does not exist, this Persis
 set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
 exists.
 More info: <a href="https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/">https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/</a>
-(Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.</p>
+(Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).</p>
 </td>
 </tr>
 </table>

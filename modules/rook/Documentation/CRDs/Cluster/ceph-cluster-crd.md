@@ -82,6 +82,9 @@ For more details on the mons and when to choose a number other than `3`, see the
     * `config`: Config settings applied to all OSDs on the node unless overridden by `devices`. See the [config settings](#osd-configuration-settings) below.
     * `allowDeviceClassUpdate`: Whether to allow changing the device class of an OSD after it is created. The default is false
         to prevent unintentional data movement or CRUSH changes if the device class is changed accidentally.
+    * `allowOsdCrushWeightUpdate`: Whether Rook will resize the OSD CRUSH weight when the OSD PVC size is increased.
+        This allows cluster data to be rebalanced to make most effective use of new OSD space.
+        The default is false since data rebalancing can cause temporary cluster slowdown.
     * [storage selection settings](#storage-selection-settings)
     * [Storage Class Device Sets](#storage-class-device-sets)
     * `onlyApplyOSDPlacement`: Whether the placement specific for OSDs is merged with the `all` placement. If `false`, the OSD placement will be merged with the `all` placement. If true, the `OSD placement will be applied` and the `all` placement will be ignored. The placement for OSDs is computed from several different places depending on the type of OSD:
@@ -322,7 +325,7 @@ The following are the settings for Storage Class Device Sets which can be config
 * `preparePlacement`: The placement criteria for the preparation of the OSD devices. Creating OSDs is a two-step process and the prepare job may require different placement than the OSD daemons. If the `preparePlacement` is not specified, the `placement` will instead be applied for consistent placement for the OSD prepare jobs and OSD deployments. The `preparePlacement` is only useful for `portable` OSDs in the device sets. OSDs that are not portable will be tied to the host where the OSD prepare job initially runs.
     * For example, provisioning may require topology spread constraints across zones, but the OSD daemons may require constraints across hosts within the zones.
 * `portable`: If `true`, the OSDs will be allowed to move between nodes during failover. This requires a storage class that supports portability (e.g. `aws-ebs`, but not the local storage provisioner). If `false`, the OSDs will be assigned to a node permanently. Rook will configure Ceph's CRUSH map to support the portability.
-* `tuneDeviceClass`: For example, Ceph cannot detect AWS volumes as HDDs from the storage class "gp2", so you can improve Ceph performance by setting this to true.
+* `tuneDeviceClass`: For example, Ceph cannot detect AWS volumes as HDDs from the storage class "gp2-csi", so you can improve Ceph performance by setting this to true.
 * `tuneFastDeviceClass`: For example, Ceph cannot detect Azure disks as SSDs from the storage class "managed-premium", so you can improve Ceph performance by setting this to true..
 * `volumeClaimTemplates`: A list of PVC templates to use for provisioning the underlying storage devices.
     * `metadata.name`: "data", "metadata", or "wal". If a single template is provided, the name must be "data". If the name is "metadata" or "wal", the devices are used to store the Ceph metadata or WAL respectively. In both cases, the devices must be raw devices or LVM logical volumes.
