@@ -4,7 +4,7 @@ TRIMPATH ?= -trimpath
 GO_ARCH=$(shell $(GO) env GOARCH)
 GO_BUILD ?= $(GO) build $(TRIMPATH)
 GO_RUN ?= $(GO) run
-NIX_IMAGE ?= nixos/nix:2.3.16
+NIX_IMAGE ?= nixos/nix:2.24.3
 
 PROJECT := github.com/cri-o/cri-o
 CRIO_INSTANCE := crio_dev
@@ -181,7 +181,6 @@ build-static:
 		$(NIX_IMAGE) nix --print-build-logs --option cores 8 --option max-jobs 8 build --file nix/
 	mkdir -p bin
 	cp -r result/bin bin/static
-
 
 crio.conf: bin/crio
 	./bin/crio -d "" --config="" $(CONF_OVERRIDES) config > crio.conf
@@ -402,11 +401,11 @@ test-binaries: test/copyimg/copyimg test/checkseccomp/checkseccomp test/checkcri
 MANPAGES_MD := $(wildcard docs/*.md)
 MANPAGES    := $(MANPAGES_MD:%.md=%)
 
-docs/%.5: docs/%.5.md  ${GO_MD2MAN}
+docs/%.5: docs/%.5.md ${GO_MD2MAN}
 	(${GO_MD2MAN} -in $< -out $@.tmp && touch $@.tmp && mv $@.tmp $@) || \
 		(${GO_MD2MAN} -in $< -out $@.tmp && touch $@.tmp && mv $@.tmp $@)
 
-docs/%.8: docs/%.8.md  ${GO_MD2MAN}
+docs/%.8: docs/%.8.md ${GO_MD2MAN}
 	(${GO_MD2MAN} -in $< -out $@.tmp && touch $@.tmp && mv $@.tmp $@) || \
 		(${GO_MD2MAN} -in $< -out $@.tmp && touch $@.tmp && mv $@.tmp $@)
 
