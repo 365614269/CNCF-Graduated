@@ -374,7 +374,7 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--pinns-path**="": The path to find the pinns binary, which is needed to manage namespace lifecycle. Will be searched for in $PATH if empty.
 
-**--profile**: Enable pprof remote profiler on localhost:6060.
+**--profile**: Enable pprof remote profiler on 127.0.0.1:6060.
 
 **--profile-cpu**="": Write a pprof CPU profile to the provided path.
 
@@ -426,7 +426,7 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--timezone, --tz**="": To set the timezone for a container in CRI-O. If an empty string is provided, CRI-O retains its default behavior. Use 'Local' to match the timezone of the host machine.
 
-**--tracing-endpoint**="": Address on which the gRPC tracing collector will listen. (default: "0.0.0.0:4317")
+**--tracing-endpoint**="": Address on which the gRPC tracing collector will listen. (default: "127.0.0.1:4317")
 
 **--tracing-sampling-rate-per-million**="": Number of samples to collect per million OpenTelemetry spans. Set to 1000000 to always sample. (default: 0)
 
