@@ -9,7 +9,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/Microsoft/hcsshim v0.12.6
 	github.com/checkpoint-restore/checkpointctl v1.2.1
-	github.com/checkpoint-restore/go-criu/v7 v7.1.0
+	github.com/checkpoint-restore/go-criu/v7 v7.2.0
 	github.com/containerd/btrfs/v2 v2.0.0
 	github.com/containerd/cgroups/v3 v3.0.3
 	github.com/containerd/console v1.0.4
@@ -54,7 +54,7 @@ require (
 	github.com/opencontainers/runtime-tools v0.9.1-0.20221107090550-2e043c6bd626
 	github.com/opencontainers/selinux v1.11.0
 	github.com/pelletier/go-toml/v2 v2.2.3
-	github.com/prometheus/client_golang v1.20.2
+	github.com/prometheus/client_golang v1.20.3
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.9.0
 	github.com/tchap/go-patricia/v2 v2.3.1
@@ -71,7 +71,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.29.0
 	golang.org/x/mod v0.20.0
 	golang.org/x/sync v0.8.0
-	golang.org/x/sys v0.24.0
+	golang.org/x/sys v0.25.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240822170219-fc7c04adadcd
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
