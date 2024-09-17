@@ -22,11 +22,8 @@ set -o pipefail
 source "tests/util/samples.sh"
 source "tests/util/addons.sh"
 
-# FIXME To re-enable this test, rename this file to test.sh once
-# https://github.com/istio/istio.io/issues/15680 is fixed 
-
 # @setup profile=none
-echo "$snip_configure_tracing_1" | istioctl install -y -r skywalkingagent -f -
+echo "$snip_configure_tracing_1" | istioctl install -y -f -
 snip_configure_tracing_2
 
 _deploy_and_wait_for_addons skywalking
@@ -88,6 +85,6 @@ pgrep istioctl | xargs kill
 _undeploy_addons skywalking
 
 kubectl delete telemetries.telemetry.istio.io -n istio-system mesh-default
-istioctl uninstall -r skywalkingagent --skip-confirmation
+istioctl uninstall --purge --skip-confirmation
 kubectl label namespace default istio-injection-
 kubectl delete ns istio-system
