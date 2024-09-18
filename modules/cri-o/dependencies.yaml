@@ -18,7 +18,7 @@ dependencies:
         match: buildGo123Module
 
   - name: golangci-lint
-    version: v1.60.3
+    version: v1.61.0
     refPaths:
       - path: .github/workflows/verify.yml
         match: GOLANGCI_LINT_VERSION
@@ -88,7 +88,7 @@ dependencies:
         match: NIX_IMAGE
 
   - name: release-notes
-    version: 0.17.0
+    version: 0.17.8
     refPaths:
       - path: Makefile
         match: RELEASE_NOTES_VERSION
@@ -110,6 +110,12 @@ dependencies:
     refPaths:
       - path: Makefile
         match: GO_MOD_OUTDATED_VERSION
+
+  - name: govulncheck
+    version: v1.1.3
+    refPaths:
+      - path: hack/govulncheck.sh
+        match: GOVULNCHECK_VERSION
 
   - name: gosec
     version: 2.19.0
