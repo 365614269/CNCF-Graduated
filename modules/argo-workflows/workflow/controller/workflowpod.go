@@ -318,13 +318,16 @@ func (woc *wfOperationCtx) createWorkflowPod(ctx context.Context, nodeName strin
 		{Name: common.EnvVarNodeID, Value: nodeID},
 		{Name: common.EnvVarIncludeScriptOutput, Value: strconv.FormatBool(opts.includeScriptOutput)},
 		{Name: common.EnvVarDeadline, Value: woc.getDeadline(opts).Format(time.RFC3339)},
-		{Name: common.EnvVarProgressFile, Value: common.ArgoProgressPath},
 	}
 
-	// only set tick durations if progress is enabled. The EnvVarProgressFile is always set (user convenience) but the
-	// progress is only monitored if the tick durations are >0.
+	// only set tick durations/EnvVarProgressFile if progress is enabled.
+	// The progress is only monitored if the tick durations are >0.
 	if woc.controller.progressPatchTickDuration != 0 && woc.controller.progressFileTickDuration != 0 {
 		envVars = append(envVars,
+			apiv1.EnvVar{
+				Name:  common.EnvVarProgressFile,
+				Value: common.ArgoProgressPath,
+			},
 			apiv1.EnvVar{
 				Name:  common.EnvVarProgressPatchTickDuration,
 				Value: woc.controller.progressPatchTickDuration.String(),
@@ -474,9 +477,13 @@ func (woc *wfOperationCtx) createWorkflowPod(ctx context.Context, nodeName strin
 		}
 		created, err := woc.controller.kubeclientset.CoreV1().ConfigMaps(woc.wf.ObjectMeta.Namespace).Create(ctx, cm, metav1.CreateOptions{})
 		if err != nil {
-			return nil, err
+			if !apierr.IsAlreadyExists(err) {
+				return nil, err
+			}
+			woc.log.Infof("Configmap already exists: %s", cm.Name)
+		} else {
+			woc.log.Infof("Created configmap: %s", created.Name)
 		}
-		woc.log.Infof("Created configmap: %s", created.Name)
 
 		volumeConfig := apiv1.Volume{
 			Name: "argo-env-config",
