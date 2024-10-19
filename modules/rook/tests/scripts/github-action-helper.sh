@@ -273,12 +273,15 @@ function deploy_toolbox() {
 }
 
 function replace_ceph_image() {
-  local file="$1"           # parameter 1: the file in which to replace the ceph image
-  local ceph_image="${2:-}" # parameter 2: the new ceph image to use
-  if [[ -z ${ceph_image} ]]; then
-    echo "No Ceph image given. Not adjusting manifests."
-    return 0
+  local file="$1"  # parameter 1: the file in which to replace the ceph image
+  local ceph_image="${2?ceph_image is required}"  # parameter 2: the new ceph image to use
+
+  # check for ceph_image being an empty string
+  if [ -z "$ceph_image" ]; then
+    echo "ceph_image may not be an empty string"
+    exit 1
   fi
+
   sed -i "s|image: .*ceph/ceph:.*|image: ${ceph_image}|g" "${file}"
 }
 
@@ -788,17 +791,17 @@ function radosgw-admin() {
   toolbox radosgw-admin "$@"
 }
 
-function test_object_with_cephblockpools_extra_pools() {
+function test_object_separate_pools() {
   expected_pools=(
     .mgr
     .rgw.root
-    object-with-cephblockpools.rgw.control
-    object-with-cephblockpools.rgw.meta
-    object-with-cephblockpools.rgw.log
-    object-with-cephblockpools.rgw.buckets.index
-    object-with-cephblockpools.rgw.buckets.non-ec
-    object-with-cephblockpools.rgw.otp
-    object-with-cephblockpools.rgw.buckets.data
+    object-separate-pools.rgw.control
+    object-separate-pools.rgw.meta
+    object-separate-pools.rgw.log
+    object-separate-pools.rgw.buckets.index
+    object-separate-pools.rgw.buckets.non-ec
+    object-separate-pools.rgw.otp
+    object-separate-pools.rgw.buckets.data
   )
 
   output=$(ceph osd pool ls)
