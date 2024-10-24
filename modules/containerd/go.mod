@@ -13,7 +13,7 @@ require (
 	github.com/containerd/btrfs/v2 v2.0.0
 	github.com/containerd/cgroups/v3 v3.0.3
 	github.com/containerd/console v1.0.4
-	github.com/containerd/containerd/api v1.8.0-rc.3
+	github.com/containerd/containerd/api v1.8.0-rc.4
 	github.com/containerd/continuity v0.4.3
 	github.com/containerd/errdefs v0.3.0
 	github.com/containerd/errdefs/pkg v0.3.0
@@ -22,7 +22,7 @@ require (
 	github.com/containerd/go-runc v1.1.0
 	github.com/containerd/imgcrypt v1.2.0-rc1
 	github.com/containerd/log v0.1.0
-	github.com/containerd/nri v0.6.2-0.20241010080438-159f5754db39
+	github.com/containerd/nri v0.7.0
 	github.com/containerd/otelttrpc v0.0.0-20240305015340-ea5083fda723
 	github.com/containerd/platforms v0.2.1
 	github.com/containerd/plugin v0.1.0
@@ -150,5 +150,3 @@ require (
 	sigs.k8s.io/yaml v1.4.0 // indirect
 	tags.cncf.io/container-device-interface/specs-go v0.8.0 // indirect
 )
-
-replace github.com/containerd/containerd/api => ./api
