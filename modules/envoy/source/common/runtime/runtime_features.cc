@@ -39,7 +39,6 @@ RUNTIME_GUARD(envoy_reloadable_features_defer_processing_backedup_streams);
 RUNTIME_GUARD(envoy_reloadable_features_disallow_quic_client_udp_mmsg);
 RUNTIME_GUARD(envoy_reloadable_features_dns_details);
 RUNTIME_GUARD(envoy_reloadable_features_dns_nodata_noname_is_success);
-RUNTIME_GUARD(envoy_reloadable_features_edf_lb_host_scheduler_init_fix);
 RUNTIME_GUARD(envoy_reloadable_features_edf_lb_locality_scheduler_init_fix);
 RUNTIME_GUARD(envoy_reloadable_features_enable_compression_bomb_protection);
 RUNTIME_GUARD(envoy_reloadable_features_enable_include_histograms);
@@ -109,7 +108,6 @@ RUNTIME_GUARD(envoy_reloadable_features_xds_failover_to_primary_enabled);
 RUNTIME_GUARD(envoy_reloadable_features_xdstp_path_avoid_colon_encoding);
 RUNTIME_GUARD(envoy_restart_features_allow_slot_destroy_on_worker_threads);
 RUNTIME_GUARD(envoy_restart_features_fix_dispatcher_approximate_now);
-RUNTIME_GUARD(envoy_restart_features_quic_handle_certs_with_shared_tls_code);
 RUNTIME_GUARD(envoy_restart_features_use_eds_cache_for_ads);
 
 // Begin false flags. Most of them should come with a TODO to flip true.
