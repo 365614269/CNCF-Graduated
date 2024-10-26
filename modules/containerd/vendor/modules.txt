@@ -189,12 +189,12 @@ github.com/containerd/otelttrpc/internal
 # github.com/containerd/platforms v0.2.1
 ## explicit; go 1.20
 github.com/containerd/platforms
-# github.com/containerd/plugin v0.1.0
+# github.com/containerd/plugin v1.0.0
 ## explicit; go 1.20
 github.com/containerd/plugin
 github.com/containerd/plugin/dynamic
 github.com/containerd/plugin/registry
-# github.com/containerd/ttrpc v1.2.6-0.20240827082320-b5cd6e4b3287
+# github.com/containerd/ttrpc v1.2.6
 ## explicit; go 1.19
 github.com/containerd/ttrpc
 # github.com/containerd/typeurl/v2 v2.2.0
