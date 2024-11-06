@@ -22,12 +22,12 @@ require (
 	github.com/containerd/go-runc v1.1.0
 	github.com/containerd/imgcrypt/v2 v2.0.0-rc.1
 	github.com/containerd/log v0.1.0
-	github.com/containerd/nri v0.7.0
+	github.com/containerd/nri v0.8.0
 	github.com/containerd/otelttrpc v0.0.0-20240305015340-ea5083fda723
-	github.com/containerd/platforms v0.2.1
+	github.com/containerd/platforms v1.0.0-rc.0
 	github.com/containerd/plugin v1.0.0
 	github.com/containerd/ttrpc v1.2.6
-	github.com/containerd/typeurl/v2 v2.2.0
+	github.com/containerd/typeurl/v2 v2.2.2
 	github.com/containerd/zfs/v2 v2.0.0-rc.0
 	github.com/containernetworking/cni v1.2.3
 	github.com/containernetworking/plugins v1.5.1
@@ -78,12 +78,12 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241021214115-324edc3d5d38
 	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.35.1
-	k8s.io/apimachinery v0.31.1
-	k8s.io/client-go v0.31.1
-	k8s.io/component-base v0.31.1
-	k8s.io/cri-api v0.32.0-alpha.0
+	k8s.io/apimachinery v0.31.2
+	k8s.io/client-go v0.31.2
+	k8s.io/component-base v0.31.2
+	k8s.io/cri-api v0.31.2
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kubelet v0.31.1
+	k8s.io/kubelet v0.31.2
 	k8s.io/utils v0.0.0-20240711033017-18e509b52bc8
 	tags.cncf.io/container-device-interface v0.8.0
 )
@@ -144,8 +144,8 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.31.1 // indirect
-	k8s.io/apiserver v0.31.1 // indirect
+	k8s.io/api v0.31.2 // indirect
+	k8s.io/apiserver v0.31.2 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
