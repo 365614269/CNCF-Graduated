@@ -3,12 +3,12 @@
 */
 
 .enterprise {
-  // Override all h2s on the enterprise page
+  // Override all h2s on the page
   h2 {
     font-size: $font-size-h1;
   }
   .page__container {
-    @include make-stack(6);
+    @include make-stack(7);
   }
   .enterprise__section {
     @include make-stack(5);
@@ -19,20 +19,6 @@
       @include make-card--reverse;
       gap: spacer(6);
       padding: spacer(6);
-    }
-    .hero__container {
-      background-image: url("/enterprise/images/bkgd.svg");
-      background-repeat: no-repeat;
-      background-size: 500px auto;
-      background-position: right;
-    }
-    .hero__body {
-      max-width: 700px;
-    }
-  }
-  @media (min-width: breakpoint-min-width("xl")) {
-    .hero__container {
-      background-size: auto 100%;
     }
   }
 }
