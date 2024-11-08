@@ -21,10 +21,9 @@ Istio 1.24.0 is officially supported on Kubernetes versions `1.28` to `1.31`.
 
 ## What’s new?
 
-### Ambient mode is promoted to stable
+### Ambient mode is generally available
 
-We are thrilled to announce the promotion of Istio ambient mode to Stable (or "General Available" or "GA")!
-This marks the final stage in Istio's [feature phase progression](/docs/releases/feature-stages/), signaling the feature is fully ready for broad production usage.
+We are thrilled to announce [the General Availability of Istio's ambient mode](/blog/2024/ambient-reaches-ga/)! The core features (ztunnel, waypoints and APIs) have been marked as Stable by the Istio TOC. This marks the final stage in Istio's [feature phase progression](/docs/releases/feature-stages/), signaling the features are fully ready for broad production usage.
 
 Since its [announcement in 2022](/blog/2022/introducing-ambient-mesh/), the community has been hard at work [innovating](/blog/2024/inpod-traffic-redirection-ambient/),
 [scaling](/blog/2024/ambient-vs-cilium/), [stabilizing](/blog/2024/ambient-reaches-beta/), and tuning ambient mode to be ready for prime time.
@@ -34,7 +33,7 @@ On top of [countless changes since the Beta release](/news/releases/1.23.x/annou
 * New `status` messages are now written to a variety of resources, including `Services` and `AuthorizationPolicies`, to help understand the current state of the object.
 * Policies can now be attached directly to `ServiceEntry`s. Give it a try with a simplified [egress gateway](https://www.solo.io/blog/egress-gateways-made-easy/)!
 * A brand new, exhaustive, [troubleshooting guide](https://github.com/istio/istio/wiki/Troubleshooting-Istio-Ambient). Fortunately, a number of bug fixes in Istio 1.24 makes many of these troubleshooting steps no longer needed!
-* Many bug fixes. In particular, edge cases around pods with multiple interfaces, GKE Intranode visibility, IPv4-only clusters, and many more have been improved.
+* Many bug fixes. In particular, edge cases around pods with multiple interfaces, GKE intranode visibility, IPv4-only clusters, and many more issues have been resolved.
 
 ### Improved retries
 
@@ -44,7 +43,7 @@ In Istio 1.24, it gets even better.
 Previously, retries were exclusively implemented on the *client sidecar*.
 However, a common source of connection failures actually comes from communicating between the *server sidecar* and the server application,
 typically from attempting to re-use a connection the backend is closing.
-With the improved functionality, we are able to detect this case and retry on the server sidecar automatically.
+With this improved functionality, we are able to detect this case and retry on the server sidecar automatically.
 
 Additionally, the default policy of retrying `503` errors has been removed.
 This was initially added primarily to handle the above failure types, but has some negative side effects on some applications.
