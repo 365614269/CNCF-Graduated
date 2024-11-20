@@ -131,7 +131,7 @@ github.com/containerd/containerd/api/types/runc/options
 github.com/containerd/containerd/api/types/runtimeoptions/v1
 github.com/containerd/containerd/api/types/task
 github.com/containerd/containerd/api/types/transfer
-# github.com/containerd/continuity v0.4.4
+# github.com/containerd/continuity v0.4.5
 ## explicit; go 1.21
 github.com/containerd/continuity
 github.com/containerd/continuity/devices
@@ -699,7 +699,7 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-# google.golang.org/protobuf v1.35.1
+# google.golang.org/protobuf v1.35.2
 ## explicit; go 1.21
 google.golang.org/protobuf/compiler/protogen
 google.golang.org/protobuf/encoding/protodelim
