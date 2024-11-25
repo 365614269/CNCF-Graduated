@@ -6,7 +6,7 @@ weight: 10
 
 Jaeger backend is itself a distributed system, composed of different components, potentially running on many hosts. It might be the case that one of these moving parts is not working properly, causing spans to not be processed or stored. When something goes wrong, make sure to check the items listed here.
 
-If you are using the OpenTelemetry Collector as part of your pipeline, make sure to check its own [Troubleshooting guide](https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/troubleshooting.md).
+If you are using the OpenTelemetry Collector as part of your pipeline, make sure to check its own [Troubleshooting guide](https://opentelemetry.io/docs/collector/troubleshooting/).
 
 ## Verify the sampling strategy
 
@@ -45,7 +45,7 @@ The logging reporter follows the sampling decision made by the sampler, meaning 
 
 ### Remote Sampling
 
-The Jaeger backend supports [Remote Sampling](../sampling/#remote-sampling), i.e., configuring sampling strategies centrally and making them available to the SDKs. All Jaeger SDKs support it by setting `JAEGER_SAMPLER_TYPE=remote`. Some, but not all, OpenTelemetry SDKs also support remote sampling, often via extensions (refer to [Migration to OpenTelemetry](../client-libraries/#migration-to-opentelemetry) for details).
+The Jaeger backend supports [Remote Sampling](../sampling/#remote-sampling), i.e., configuring sampling strategies centrally and making them available to the SDKs. Some, but not all, OpenTelemetry SDKs support remote sampling, often via extensions (refer to [Migration to OpenTelemetry](../../../sdk-migration/#migration-to-opentelemetry) for details).
 
 If you suspect the remote sampling is not working correctly, try these steps:
 

@@ -51,8 +51,7 @@ The feature can be accessed from the "Monitor" tab along the top menu.
 This demo includes [Microsim](https://github.com/yurishkuro/microsim); a microservices
 simulator to generate trace data.
 
-If generating traces manually is preferred, the [Sample App: HotROD](../getting-started/#sample-app-hotrod)
-can be started via docker. Be sure to include `--net monitor_backend` in the `docker run` command.
+If generating traces manually is preferred, the [Sample App: HotROD](../getting-started/#-hotrod-demo) can be started via docker. Be sure to include `--net monitor_backend` in the `docker run` command.
 
 ## Architecture
 
@@ -167,8 +166,8 @@ Note:
 
 The following configuration is required to enable the SPM feature:
 
-- [Jaeger UI](../frontend-ui#monitor)
-- [Jaeger Query](../cli#jaeger-query-prometheus)
+- [Jaeger UI](../frontend-ui/#monitor)
+- Jaeger Query (TODO: these instructions need to be updated for config file)
   - Set the `METRICS_STORAGE_TYPE` environment variable to `prometheus`.
   - Optional: Set `--prometheus.server-url` (or `PROMETHEUS_SERVER_URL` environment variable)
     to the URL of the prometheus server. Default: http://localhost:9090.
@@ -338,7 +337,7 @@ Some questions to ask while troubleshooting are:
   - See: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector
 - Is the Prometheus server reachable by the OpenTelemetry Collector?
 - Are the services sending spans to the OpenTelemetry Collector?
-  - See: https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/troubleshooting.md
+  - See: https://opentelemetry.io/docs/collector/troubleshooting/
 
 ### Service/Operation missing in Monitor Tab
 
