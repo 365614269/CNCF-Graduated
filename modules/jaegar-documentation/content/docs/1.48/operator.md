@@ -520,7 +520,7 @@ spec:
 
 <3> TLS configuration. In this case only CA certificate, but it can also contain `es.tls.key` and `es.tls.cert` when using mutual TLS.
 
-<4> Secret which defines environment variables `ES_PASSWORD` and `ES_USERNAME`. Created by `kubectl create secret generic jaeger-secret --from-literal=ES_PASSWORD=changeme --from-literal=ES_USERNAME=elastic`
+<4> Secret which defines environment variables `ES_PASSWORD` and `ES_USERNAME`. Created by `kubectl create secret generic jaeger-secret --from-literal=ES_PASSWORD=password --from-literal=ES_USERNAME=elastic`
 
 <5> Volume mounts and volumes which are mounted into all storage components.
 
@@ -958,7 +958,7 @@ Error from server (InternalError): Internal error occurred: failed calling webho
 In order to workaround that issue:
 
 - set `hostNetwork:true` on `jaeger-operator` deployment
-- change `/healtz` and `/readyz` ports from 8081 to other value
+- change `/healthz` and `/readyz` ports from 8081 to other value
 - change `kube-rbac-proxy` secure port from 8443 to other value
 - change `webhook-server` port from 9443 to other value
   - this setting is controlled by `webhook-bind-port` flag
