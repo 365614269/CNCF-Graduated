@@ -48,7 +48,7 @@ GO_MD2MAN ?= ${BUILD_BIN_PATH}/go-md2man
 GINKGO := ${BUILD_BIN_PATH}/ginkgo
 MOCKGEN := ${BUILD_BIN_PATH}/mockgen
 GOLANGCI_LINT := ${BUILD_BIN_PATH}/golangci-lint
-GOLANGCI_LINT_VERSION := v1.62.0
+GOLANGCI_LINT_VERSION := v1.62.2
 GO_MOD_OUTDATED := ${BUILD_BIN_PATH}/go-mod-outdated
 GO_MOD_OUTDATED_VERSION := 0.9.0
 GOSEC := ${BUILD_BIN_PATH}/gosec
@@ -454,7 +454,8 @@ mockgen: \
 	mock-image-types \
 	mock-ocicni-types \
 	mock-seccompociartifact-types \
-	mock-ociartifact-types
+	mock-ociartifact-types \
+	mock-systemd
 
 .PHONY: mock-containereventserver
 mock-containereventserver: ${MOCKGEN}
@@ -525,6 +526,13 @@ mock-ociartifact-types: ${MOCKGEN}
 		-package ociartifactmock \
 		-destination ${MOCK_PATH}/ociartifact/ociartifact.go \
 		github.com/cri-o/cri-o/internal/config/ociartifact Impl
+
+.PHONY: mock-systemd
+mock-systemd: ${MOCKGEN}
+	${MOCKGEN} \
+		-package systemdmock \
+		-destination ${MOCK_PATH}/systemd/systemd.go \
+		github.com/cri-o/cri-o/internal/watchdog Systemd
 
 MANPAGES_MD := $(wildcard docs/*.md)
 MANPAGES    := $(MANPAGES_MD:%.md=%)

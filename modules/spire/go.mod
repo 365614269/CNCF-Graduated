@@ -36,7 +36,7 @@ require (
 	github.com/aws/smithy-go v1.22.1
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/docker/docker v27.3.1+incompatible
+	github.com/docker/docker v27.4.0+incompatible
 	github.com/envoyproxy/go-control-plane v0.13.1
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa
 	github.com/go-jose/go-jose/v4 v4.0.4
@@ -87,13 +87,13 @@ require (
 	golang.org/x/time v0.8.0
 	google.golang.org/api v0.211.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241206012308-a4fef0638583
-	google.golang.org/grpc v1.68.0
+	google.golang.org/grpc v1.68.1
 	google.golang.org/protobuf v1.35.2
-	k8s.io/api v0.31.3
-	k8s.io/apimachinery v0.31.3
-	k8s.io/client-go v0.31.3
-	k8s.io/kube-aggregator v0.31.3
-	k8s.io/mount-utils v0.31.3
+	k8s.io/api v0.31.4
+	k8s.io/apimachinery v0.31.4
+	k8s.io/client-go v0.31.4
+	k8s.io/kube-aggregator v0.31.4
+	k8s.io/mount-utils v0.31.4
 	sigs.k8s.io/controller-runtime v0.19.3
 )
 
