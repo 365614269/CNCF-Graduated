@@ -332,9 +332,16 @@ new_features:
   change: |
     Added new health check filter stats including total requests, successful/failed checks, cached responses, and
     cluster health status counters. These stats help track health check behavior and cluster health state.
+- area: filters
+  change: |
+    Updatd the ``set_filter_state`` :ref:`filter <config_http_filters_set_filter_state>` to support per-route overrides.
 - area: grpc-json
   change: |
     Added a new http filter for :ref:`gRPC to JSON transcoding <config_http_filters_grpc_json_reverse_transcoder>`.
+- area: attributes
+  change: |
+    added new ``xds.virtual_host_name`` and ``xds.virtual_host_metadata`` attributes support. See
+    :ref:`attributes <arch_overview_attributes>` for looking up xDS configuration information.
 
 deprecated:
 - area: rbac
