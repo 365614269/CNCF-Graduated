@@ -181,7 +181,7 @@ dimensions:
    like” histograms where each bucket is a gauge, representing arbitrary
    distributions at a point in time. The concept of a gauge histogram was
    previously introduced for classic histograms by
-   [OpenMetrics](https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#gaugehistogram).
+   [OpenMetrics](https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#gaugehistogram).
 2. Integer vs. floating point (short: float): The obvious use case of
    histograms is to count observations, resulting in integer numbers of
    observations ≥ 0 within each bucket, including the _zero bucket_, and for
@@ -720,7 +720,7 @@ Note the following:
   `offset` and `length` set to 0, in the repeated `positive_span` field.
 - Any number of exemplars for native histograms MAY be added in the repeated
   `Exemplar` field of the `Histogram` message, but each one MUST have a
-  timestamp. If there are no examplars provided in this way, a parser MAY use
+  timestamp. If there are no exemplars provided in this way, a parser MAY use
   timestamped exemplars provided for classic buckets (as at most one exemplar
   per bucket in the `Exemplar` field of the `Bucket` message).
 - The number and distribution of native histogram exemplars SHOULD fit the use

@@ -17,7 +17,6 @@ limitations under the License.
 package object
 
 import (
-	"fmt"
 	"testing"
 
 	cephv1 "github.com/rook/rook/pkg/apis/ceph.rook.io/v1"
@@ -102,6 +101,7 @@ func TestGenerateCephXUser(t *testing.T) {
 // RGW configs determined here are applied to the running RGW
 func Test_clusterConfig_generateMonConfigOptions(t *testing.T) {
 	defaultConfigs := map[string]string{
+		"rgw_enable_ops_log":         "false",
 		"rgw_enable_usage_log":       "true",
 		"rgw_log_nonexistent_bucket": "true",
 		"rgw_log_object_name_utc":    "true",
@@ -178,7 +178,7 @@ func Test_clusterConfig_generateMonConfigOptions(t *testing.T) {
 				t.Errorf("clusterConfig.generateMonConfigOptions() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			assert.Equal(t, fmt.Sprint(tt.want), fmt.Sprint(got)) // go maps are stringified in sorted order for testing
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

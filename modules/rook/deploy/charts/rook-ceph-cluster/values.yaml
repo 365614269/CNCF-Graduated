@@ -594,6 +594,8 @@ cephObjectStores:
         erasureCoded:
           dataChunks: 2
           codingChunks: 1
+        parameters:
+          bulk: "true"
       preservePoolsOnDelete: true
       gateway:
         port: 80
@@ -607,6 +609,13 @@ cephObjectStores:
         # sslCertificateRef:
         instances: 1
         priorityClassName: system-cluster-critical
+        # opsLogSidecar:
+        #   resources:
+        #     limits:
+        #       memory: "100Mi"
+        #     requests:
+        #       cpu: "100m"
+        #       memory: "40Mi"
     storageClass:
       enabled: true
       name: ceph-bucket
