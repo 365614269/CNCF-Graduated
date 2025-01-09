@@ -1,5 +1,6 @@
 name: Bug Report for https://docs.fluentd.org/
 description: Create a report about Fluentd's documentation
+labels: "waiting-for-triage"
 body:
   - type: markdown
     attributes:
