@@ -14,15 +14,19 @@ linters:
     - bodyclose
     - durationcheck
     - errorlint
+    - gofmt
     - goimports
     - revive
     - gosec
     - misspell
     - nakedret
+    - nilerr
     - unconvert
     - unparam
+    - intrange
     - whitespace
     - gocritic
+    - wastedassign
     - nolintlint
 
 linters-settings:
