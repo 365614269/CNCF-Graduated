@@ -9,15 +9,21 @@
   * [fluent-package v5 vs td-agent v4](quickstart/fluent-package-v5-vs-td-agent.md)
 * [Installation](installation/README.md)
   * [Before Installation](installation/before-install.md)
-  * [Install by RPM Package \(Red Hat Linux\)](installation/install-by-rpm.md)
-  * [Install by DEB Package \(Debian/Ubuntu\)](installation/install-by-deb.md)
-  * [Install by .dmg Package \(macOS\)](installation/install-by-dmg.md)
-  * [Install by .msi Installer \(Windows\)](installation/install-by-msi.md)
+  * Install fluent-package
+    * [RPM Package \(Red Hat Linux\)](installation/install-by-rpm-fluent-package.md)
+    * [DEB Package \(Debian/Ubuntu\)](installation/install-by-deb-fluent-package.md)
+    * [.dmg Package \(macOS\)](installation/install-by-dmg-fluent-package.md)
+    * [.msi Installer \(Windows\)](installation/install-by-msi-fluent-package.md)
+  * Install calyptia-fluentd
+    * [RPM Package \(Red Hat Linux\)](installation/install-by-rpm-calyptia-fluentd.md)
+    * [DEB Package \(Debian/Ubuntu\)](installation/install-by-deb-calyptia-fluentd.md)
+    * [.dmg Package \(macOS\)](installation/install-by-dmg-calyptia-fluentd.md)
+    * [.msi Installer \(Windows\)](installation/install-by-msi-calyptia-fluentd.md)
   * [Install by Ruby Gem](installation/install-by-gem.md)
   * [Install from Source](installation/install-from-source.md)
   * [Post Installation Guide](installation/post-installation-guide.md)
   * Obsolete Installation
-    * Treasure Agent v4 Installation
+    * Treasure Agent v4 (EOL) Installation
       * [Install by RPM Package v4 \(Red Hat Linux\)](installation/install-by-rpm-td-agent-v4.md)
       * [Install by DEB Package v4 \(Debian/Ubuntu\)](installation/install-by-deb-td-agent-v4.md)
       * [Install by .dmg Package v4 \(macOS\)](installation/install-by-dmg-td-agent-v4.md)
