@@ -12,18 +12,21 @@ which is formerly known as `td-agent`.
 
 | Platform | v4\(x86\_64\) | v4\(Arm64\) | v5\(x86\_64\) | v5\(Arm64\) |
 | :--- | :---: | :---: | :---: | :---: |
-| RedHat/CentOS 7 | ✔ | ✔ | ✔ | ✔ |
+| RedHat/CentOS 7 | ✔ | ✔ | - (\*1) | - (\*1) |
 | RedHat/CentOS 8 | ✔ | ✔ | ✔ | ✔ |
 | RedHat/CentOS 9 | ✔ | ✔ | ✔ | ✔ |
 | Amazon Linux 2 |  ✔ | ✔ | ✔ | ✔ |
 | Amazon Linux 2023 | - | - |  ✔ | ✔ |
 | Ubuntu Focal | ✔ | ✔ | ✔ | ✔ |
 | Ubuntu Jammy | ✔ | ✔ | ✔ | ✔ |
+| Ubuntu Noble | - | - | ✔ | ✔ |
 | Debian Buster | ✔ | ✔ | - | - |
 | Debian Bullseye | ✔ | ✔ | ✔ | ✔ |
 | Debian Bookworm | - | - | ✔ | ✔ |
-| macOS | ✔ | - | ✔ | - |
+| macOS | ✔ | - | - | - |
 | Windows | ✔ | - | ✔ |  - |
+
+\*1: Since v5.0.4, RHEL 7 / CentOS 7 is not supported anymore because CentOS 7 has reached EOL (June, 2024).
 
 ## Features
 
@@ -53,10 +56,10 @@ See also [Changes from Treasure Agent 3](https://github.com/fluent-plugins-nurse
 
 ## How to Install
 
-* [Ubuntu/Debian](../installation/install-by-deb-fluent-package.md)
-* [RedHat/CentOS](../installation/install-by-rpm-fluent-package.md)
-* [Windows](../installation/install-by-msi-fluent-package.md)
-* [macOS](../installation/install-by-dmg-fluent-package.md)
+* [Ubuntu/Debian](../installation/install-fluent-package/install-by-deb-fluent-package.md)
+* [RedHat/CentOS](../installation/install-fluent-package/install-by-rpm-fluent-package.md)
+* [Windows](../installation/install-fluent-package/install-by-msi-fluent-package.md)
+* [macOS](../installation/install-fluent-package/install-by-dmg-fluent-package.md)
 * [RubyGems](../installation/install-by-gem.md)
 
 If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under under [the Apache License 2.0.](https://www.apache.org/licenses/LICENSE-2.0)

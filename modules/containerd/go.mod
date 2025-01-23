@@ -6,7 +6,7 @@ require (
 	dario.cat/mergo v1.0.1
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6
 	github.com/Microsoft/go-winio v0.6.2
-	github.com/Microsoft/hcsshim v0.12.9
+	github.com/Microsoft/hcsshim v0.13.0-rc.3
 	github.com/checkpoint-restore/checkpointctl v1.3.0
 	github.com/checkpoint-restore/go-criu/v7 v7.2.0
 	github.com/containerd/btrfs/v2 v2.0.0
@@ -59,7 +59,7 @@ require (
 	github.com/prometheus/client_golang v1.20.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
-	github.com/tchap/go-patricia/v2 v2.3.1
+	github.com/tchap/go-patricia/v2 v2.3.2
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/vishvananda/netlink v1.3.0
 	go.etcd.io/bbolt v1.3.11
