@@ -36,7 +36,7 @@ The primary goal of this milestone is to integrate GitHub App for Git repositori
 and to extend Flux functionality with Common Expression Language(CEL) support.
 
 - **Git integrations**
-  - [ ] [Support for GitHub App auth in source-controller](https://github.com/fluxcd/source-controller/pull/1647)
+  - [x] [Support for GitHub App auth in source-controller](https://github.com/fluxcd/source-controller/pull/1647)
   - [ ] [Support for GitHub App auth in image-automation-controller](https://github.com/fluxcd/image-automation-controller/pull/780)
   - [ ] [Generate GitHub App secrets with the Flux CLI](https://github.com/fluxcd/flux2/pull/5103)
 
@@ -48,7 +48,7 @@ and to extend Flux functionality with Common Expression Language(CEL) support.
 
 - **Alerting integrations**
   - [x] [Custom Event Metadata from Annotations](https://github.com/fluxcd/flux2/pull/4809/)
-  - [ ] [Support Git commit status updates for OCIRepository](https://github.com/fluxcd/flux2/issues/5148)
+  - [x] [Support Git commit status updates for OCIRepository](https://github.com/fluxcd/flux2/issues/5148)
 
 - **Webhook integrations**
   - [ ] [Implement `Receiver` resource filtering with CEL](https://github.com/fluxcd/notification-controller/pull/948)
