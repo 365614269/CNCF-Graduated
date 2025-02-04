@@ -68,6 +68,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.34.0
 	go.opentelemetry.io/otel/trace v1.34.0
 	go.uber.org/mock v0.5.0
+	golang.org/x/sync v0.10.0
 	golang.org/x/sys v0.29.0
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.4
@@ -80,7 +81,7 @@ require (
 	k8s.io/kubelet v0.32.1
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
 	sigs.k8s.io/release-sdk v0.12.1
-	sigs.k8s.io/release-utils v0.9.0
+	sigs.k8s.io/release-utils v0.10.0
 	sigs.k8s.io/yaml v1.4.0
 	tags.cncf.io/container-device-interface v0.8.0
 )
@@ -222,7 +223,6 @@ require (
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/term v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
