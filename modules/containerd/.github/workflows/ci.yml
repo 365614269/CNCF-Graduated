@@ -23,9 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-24.04, arm64-8core-32gb, macos-13, windows-2019]
-        exclude:
-          - os: ${{ github.repository != 'containerd/containerd' && 'arm64-8core-32gb' }}
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-13, windows-2019]
 
 
     steps:
@@ -190,10 +188,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, arm64-8core-32gb, macos-13, windows-2019, windows-2022]
+        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-24.04-arm, macos-13, windows-2019, windows-2022]
         go-version: ["1.23.6", "1.24.0"]
-        exclude:
-          - os: ${{ github.repository != 'containerd/containerd' && 'arm64-8core-32gb' }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: ./.github/actions/install-go
@@ -367,7 +363,7 @@ jobs:
           }
           critest.exe --runtime-endpoint=npipe://.//pipe//containerd-containerd --test-images-file='${{env.CRI_TEST_IMAGES}}' --report-dir='${{github.workspace}}/critestreport' $skip
 
-      - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+      - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
         with:
           name: TestResults ${{ matrix.os }} ${{ matrix.cgroup_driver }}
@@ -388,9 +384,7 @@ jobs:
         runtime:
           - io.containerd.runc.v2
         runc: [runc]  # crun can be added here to debug crun issues
-        os: [ubuntu-22.04, ubuntu-24.04, arm64-8core-32gb]
-        exclude:
-          - os: ${{ github.repository != 'containerd/containerd' && 'arm64-8core-32gb' }}
+        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-24.04-arm]
         cgroup_driver: [cgroupfs, systemd]
 
     env:
@@ -412,10 +406,6 @@ jobs:
           script/setup/install-failpoint-binaries
 
       - name: Install criu
-        # NOTE: Required arm64 enable CONFIG_CHECKPOINT_RESTORE (need to confirm GitHub action runners config)
-        #
-        # REF: https://criu.org/Linux_kernel
-        if: matrix.os != 'arm64-8core-32gb'
         run: |
           sudo add-apt-repository -y ppa:criu/ppa
           sudo apt-get update
@@ -514,7 +504,7 @@ jobs:
           sudo lsmod
           sudo dmesg -T -f kern
 
-      - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+      - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
         with:
           name: TestResults ${{ matrix.runtime }} ${{matrix.runc}} ${{ matrix.os }} ${{ matrix.cgroup_driver }}
@@ -575,7 +565,7 @@ jobs:
           cat /proc/cpuinfo
           free -mt
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+      - uses: actions/cache@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
         with:
           path: /root/.vagrant.d
           key: vagrant-${{ matrix.box }}
@@ -686,7 +676,7 @@ jobs:
         if: always()
       - run: script/test/test2annotation.sh *-gotest.json
         if: always()
-      - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+      - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
         with:
           name: TestResults MacOS
