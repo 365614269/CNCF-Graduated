@@ -60,7 +60,7 @@ dependencies:
         match: version
 
   - name: conmon
-    version: v2.1.12
+    version: v2.1.13
     refPaths:
       - path: scripts/versions
         match: conmon
@@ -108,7 +108,7 @@ dependencies:
         match: NIX_IMAGE
 
   - name: release-notes
-    version: 0.17.11
+    version: 0.18.0
     refPaths:
       - path: Makefile
         match: RELEASE_NOTES_VERSION
