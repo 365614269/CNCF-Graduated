@@ -19,7 +19,7 @@ require (
 	github.com/containerd/fifo v1.1.0
 	github.com/containerd/go-cni v1.1.12
 	github.com/containerd/go-runc v1.1.0
-	github.com/containerd/imgcrypt/v2 v2.0.0
+	github.com/containerd/imgcrypt/v2 v2.0.1
 	github.com/containerd/log v0.1.0
 	github.com/containerd/nri v0.8.0
 	github.com/containerd/otelttrpc v0.1.0
@@ -78,14 +78,14 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
-	k8s.io/apimachinery v0.32.2
-	k8s.io/client-go v0.32.2
-	k8s.io/component-base v0.32.2
-	k8s.io/cri-api v0.32.2
+	k8s.io/apimachinery v0.32.3
+	k8s.io/client-go v0.32.3
+	k8s.io/component-base v0.32.3
+	k8s.io/cri-api v0.32.3
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kubelet v0.32.2
+	k8s.io/kubelet v0.32.3
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
-	tags.cncf.io/container-device-interface v0.8.1
+	tags.cncf.io/container-device-interface v1.0.0
 )
 
 require (
@@ -137,20 +137,21 @@ require (
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f // indirect
-	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
 	golang.org/x/term v0.30.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250218202821-56aae31c358a // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.32.2 // indirect
-	k8s.io/apiserver v0.32.2 // indirect
+	k8s.io/api v0.32.3 // indirect
+	k8s.io/apiserver v0.32.3 // indirect
 	sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
-	tags.cncf.io/container-device-interface/specs-go v0.8.0 // indirect
+	tags.cncf.io/container-device-interface/specs-go v1.0.0 // indirect
 )
 
 exclude (
