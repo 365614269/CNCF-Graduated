@@ -29,7 +29,7 @@ require (
 	github.com/containerd/typeurl/v2 v2.2.3
 	github.com/containerd/zfs/v2 v2.0.0-rc.0
 	github.com/containernetworking/cni v1.2.3
-	github.com/containernetworking/plugins v1.5.1
+	github.com/containernetworking/plugins v1.6.2
 	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/distribution/reference v0.6.0
@@ -54,7 +54,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/opencontainers/runtime-spec v1.2.1
 	github.com/opencontainers/runtime-tools v0.9.1-0.20221107090550-2e043c6bd626
-	github.com/opencontainers/selinux v1.11.1
+	github.com/opencontainers/selinux v1.12.0
 	github.com/pelletier/go-toml/v2 v2.2.3
 	github.com/prometheus/client_golang v1.21.1
 	github.com/sirupsen/logrus v1.9.3
@@ -77,7 +77,7 @@ require (
 	golang.org/x/sys v0.31.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a
 	google.golang.org/grpc v1.71.0
-	google.golang.org/protobuf v1.36.5
+	google.golang.org/protobuf v1.36.6
 	k8s.io/apimachinery v0.32.3
 	k8s.io/client-go v0.32.3
 	k8s.io/component-base v0.32.3
@@ -110,7 +110,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/mdlayher/socket v0.4.1 // indirect
+	github.com/mdlayher/socket v0.5.1 // indirect
 	github.com/miekg/pkcs11 v1.1.1 // indirect
 	github.com/mistifyio/go-zfs/v3 v3.0.1 // indirect
 	github.com/moby/spdystream v0.5.0 // indirect

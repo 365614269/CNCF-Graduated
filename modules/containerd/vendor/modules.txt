@@ -215,8 +215,8 @@ github.com/containernetworking/cni/pkg/types/create
 github.com/containernetworking/cni/pkg/types/internal
 github.com/containernetworking/cni/pkg/utils
 github.com/containernetworking/cni/pkg/version
-# github.com/containernetworking/plugins v1.5.1
-## explicit; go 1.20
+# github.com/containernetworking/plugins v1.6.2
+## explicit; go 1.23
 github.com/containernetworking/plugins/pkg/ns
 # github.com/containers/ocicrypt v1.2.1
 ## explicit; go 1.22
@@ -346,7 +346,7 @@ github.com/klauspost/compress/internal/le
 github.com/klauspost/compress/internal/snapref
 github.com/klauspost/compress/zstd
 github.com/klauspost/compress/zstd/internal/xxhash
-# github.com/mdlayher/socket v0.4.1
+# github.com/mdlayher/socket v0.5.1
 ## explicit; go 1.20
 github.com/mdlayher/socket
 # github.com/mdlayher/vsock v1.2.1
@@ -413,7 +413,7 @@ github.com/opencontainers/runtime-spec/specs-go/features
 github.com/opencontainers/runtime-tools/generate
 github.com/opencontainers/runtime-tools/generate/seccomp
 github.com/opencontainers/runtime-tools/validate/capabilities
-# github.com/opencontainers/selinux v1.11.1
+# github.com/opencontainers/selinux v1.12.0
 ## explicit; go 1.19
 github.com/opencontainers/selinux/go-selinux
 github.com/opencontainers/selinux/go-selinux/label
@@ -722,8 +722,8 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-# google.golang.org/protobuf v1.36.5
-## explicit; go 1.21
+# google.golang.org/protobuf v1.36.6
+## explicit; go 1.22
 google.golang.org/protobuf/compiler/protogen
 google.golang.org/protobuf/encoding/protodelim
 google.golang.org/protobuf/encoding/protojson
