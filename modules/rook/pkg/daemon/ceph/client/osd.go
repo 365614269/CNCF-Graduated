@@ -149,19 +149,18 @@ type SafeToDestroyStatus struct {
 // OsdTree represents the CRUSH hierarchy
 type OsdTree struct {
 	Nodes []struct {
-		ID          int    `json:"id"`
-		Name        string `json:"name"`
-		Type        string `json:"type"`
-		TypeID      int    `json:"type_id"`
-		Children    []int  `json:"children,omitempty"`
-		PoolWeights struct {
-		} `json:"pool_weights,omitempty"`
-		CrushWeight     float64 `json:"crush_weight,omitempty"`
-		Depth           int     `json:"depth,omitempty"`
-		Exists          int     `json:"exists,omitempty"`
-		Status          string  `json:"status,omitempty"`
-		Reweight        float64 `json:"reweight,omitempty"`
-		PrimaryAffinity float64 `json:"primary_affinity,omitempty"`
+		ID              int      `json:"id"`
+		Name            string   `json:"name"`
+		Type            string   `json:"type"`
+		TypeID          int      `json:"type_id"`
+		Children        []int    `json:"children,omitempty"`
+		PoolWeights     struct{} `json:"pool_weights,omitempty"`
+		CrushWeight     float64  `json:"crush_weight,omitempty"`
+		Depth           int      `json:"depth,omitempty"`
+		Exists          int      `json:"exists,omitempty"`
+		Status          string   `json:"status,omitempty"`
+		Reweight        float64  `json:"reweight,omitempty"`
+		PrimaryAffinity float64  `json:"primary_affinity,omitempty"`
 	} `json:"nodes"`
 	Stray []struct {
 		ID              int     `json:"id"`
@@ -447,4 +446,23 @@ func SetPrimaryAffinity(context *clusterd.Context, clusterInfo *ClusterInfo, osd
 	}
 	logger.Infof("successfully applied osd.%d primary-affinity %q", osdID, affinity)
 	return nil
+}
+
+type OSDMetadata struct {
+	Id       int    `json:"id"`
+	HostName string `json:"hostname"`
+}
+
+// GetOSDMetadata returns the output of `ceph osd metadata`
+func GetOSDMetadata(context *clusterd.Context, clusterInfo *ClusterInfo) (*[]OSDMetadata, error) {
+	args := []string{"osd", "metadata"}
+	buf, err := NewCephCommand(context, clusterInfo, args).Run()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get osd metadata")
+	}
+	var osdMetadata []OSDMetadata
+	if err := json.Unmarshal(buf, &osdMetadata); err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal osd metadata response")
+	}
+	return &osdMetadata, nil
 }
