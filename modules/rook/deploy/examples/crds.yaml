@@ -67,7 +67,7 @@ spec:
                   description: Mirroring configuration of CephBlockPoolRadosNamespace
                   properties:
                     mode:
-                      description: Mode is the mirroring mode; either pool or image
+                      description: Mode is the mirroring mode; either pool or image.
                       enum:
                         - ""
                         - pool
@@ -390,7 +390,11 @@ spec:
                       description: Enabled whether this pool is mirrored or not
                       type: boolean
                     mode:
-                      description: 'Mode is the mirroring mode: either pool or image'
+                      description: 'Mode is the mirroring mode: pool, image or init-only.'
+                      enum:
+                        - pool
+                        - image
+                        - init-only
                       type: string
                     peers:
                       description: Peers represents the peers spec
@@ -960,6 +964,16 @@ spec:
                         disableVerifySSL:
                           description: Indicate whether the server certificate is validated by the client or not
                           type: boolean
+                        mechanism:
+                          default: PLAIN
+                          description: The authentication mechanism for this topic (PLAIN/SCRAM-SHA-512/SCRAM-SHA-256/GSSAPI/OAUTHBEARER)
+                          enum:
+                            - PLAIN
+                            - SCRAM-SHA-512
+                            - SCRAM-SHA-256
+                            - GSSAPI
+                            - OAUTHBEARER
+                          type: string
                         uri:
                           description: The URI of the Kafka endpoint to push notification to
                           minLength: 1
@@ -7008,7 +7022,11 @@ spec:
                             description: Enabled whether this pool is mirrored or not
                             type: boolean
                           mode:
-                            description: 'Mode is the mirroring mode: either pool or image'
+                            description: 'Mode is the mirroring mode: pool, image or init-only.'
+                            enum:
+                              - pool
+                              - image
+                              - init-only
                             type: string
                           peers:
                             description: Peers represents the peers spec
@@ -7192,7 +7210,11 @@ spec:
                           description: Enabled whether this pool is mirrored or not
                           type: boolean
                         mode:
-                          description: 'Mode is the mirroring mode: either pool or image'
+                          description: 'Mode is the mirroring mode: pool, image or init-only.'
+                          enum:
+                            - pool
+                            - image
+                            - init-only
                           type: string
                         peers:
                           description: Peers represents the peers spec
@@ -10844,7 +10866,11 @@ spec:
                           description: Enabled whether this pool is mirrored or not
                           type: boolean
                         mode:
-                          description: 'Mode is the mirroring mode: either pool or image'
+                          description: 'Mode is the mirroring mode: pool, image or init-only.'
+                          enum:
+                            - pool
+                            - image
+                            - init-only
                           type: string
                         peers:
                           description: Peers represents the peers spec
@@ -12440,7 +12466,11 @@ spec:
                           description: Enabled whether this pool is mirrored or not
                           type: boolean
                         mode:
-                          description: 'Mode is the mirroring mode: either pool or image'
+                          description: 'Mode is the mirroring mode: pool, image or init-only.'
+                          enum:
+                            - pool
+                            - image
+                            - init-only
                           type: string
                         peers:
                           description: Peers represents the peers spec
@@ -13286,7 +13316,11 @@ spec:
                           description: Enabled whether this pool is mirrored or not
                           type: boolean
                         mode:
-                          description: 'Mode is the mirroring mode: either pool or image'
+                          description: 'Mode is the mirroring mode: pool, image or init-only.'
+                          enum:
+                            - pool
+                            - image
+                            - init-only
                           type: string
                         peers:
                           description: Peers represents the peers spec
@@ -13465,7 +13499,11 @@ spec:
                           description: Enabled whether this pool is mirrored or not
                           type: boolean
                         mode:
-                          description: 'Mode is the mirroring mode: either pool or image'
+                          description: 'Mode is the mirroring mode: pool, image or init-only.'
+                          enum:
+                            - pool
+                            - image
+                            - init-only
                           type: string
                         peers:
                           description: Peers represents the peers spec
