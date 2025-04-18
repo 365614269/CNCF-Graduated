@@ -21,8 +21,6 @@ type Warning string
 const (
 	// Prefix is a standard prefix for all Warnings, used for filtering plugin Exports
 	Prefix = "io.containerd.deprecation/"
-	// GoPluginLibrary is a warning for the use of dynamic library Go plugins
-	GoPluginLibrary Warning = Prefix + "go-plugin-library"
 	// CRIRegistryMirrors is a warning for the use of the `mirrors` property
 	CRIRegistryMirrors Warning = Prefix + "cri-registry-mirrors"
 	// CRIRegistryAuths is a warning for the use of the `auths` property
@@ -42,19 +40,18 @@ const (
 )
 
 var messages = map[Warning]string{
-	GoPluginLibrary: "Dynamically-linked Go plugins as containerd runtimes are deprecated since containerd v2.0 and removed in containerd v2.1.",
 	CRIRegistryMirrors: "The `mirrors` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.5 and will be removed in containerd v2.1." +
 		"Use `config_path` instead.",
-	CRIRegistryAuths: "The `auths` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.3 and will be removed in containerd v2.1." +
+	CRIRegistryAuths: "The `auths` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.3 and will be removed in containerd v2.2." +
 		"Use `ImagePullSecrets` instead.",
-	CRIRegistryConfigs: "The `configs` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.5 and will be removed in containerd v2.1." +
+	CRIRegistryConfigs: "The `configs` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.5 and will be removed in containerd v2.2." +
 		"Use `config_path` instead.",
 	CRICNIBinDir: "The `bin_dir` property of `[plugins.\"io.containerd.cri.v1.runtime\".cni`] is deprecated since containerd v2.1 and will be removed in containerd v2.2. " +
 		"Use `bin_dirs` in the same section instead.",
 
-	TracingOTLPConfig: "The `otlp` property of `[plugins.\"io.containerd.tracing.processor.v1\".otlp]` is deprecated since containerd v1.6 and will be removed in containerd v2.0." +
+	TracingOTLPConfig: "The `otlp` property of `[plugins.\"io.containerd.tracing.processor.v1\".otlp]` is deprecated since containerd v1.6 and will be removed in containerd v2.2." +
 		"Use OTLP environment variables instead: https://opentelemetry.io/docs/specs/otel/protocol/exporter/",
-	TracingServiceConfig: "The `tracing` property of `[plugins.\"io.containerd.internal.v1\".tracing]` is deprecated since containerd v1.6 and will be removed in containerd v2.0." +
+	TracingServiceConfig: "The `tracing` property of `[plugins.\"io.containerd.internal.v1\".tracing]` is deprecated since containerd v1.6 and will be removed in containerd v2.2." +
 		"Use OTEL environment variables instead: https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/",
 }
 
