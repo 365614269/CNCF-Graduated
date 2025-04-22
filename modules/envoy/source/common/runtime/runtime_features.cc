@@ -32,7 +32,6 @@
 RUNTIME_GUARD(envoy_reloadable_features_allow_alt_svc_for_ips);
 RUNTIME_GUARD(envoy_reloadable_features_async_host_selection);
 RUNTIME_GUARD(envoy_reloadable_features_avoid_dfp_cluster_removal_on_cds_update);
-RUNTIME_GUARD(envoy_reloadable_features_boolean_to_string_fix);
 RUNTIME_GUARD(envoy_reloadable_features_dfp_cluster_resolves_hosts);
 RUNTIME_GUARD(envoy_reloadable_features_dfp_fail_on_empty_host_header);
 RUNTIME_GUARD(envoy_reloadable_features_disallow_quic_client_udp_mmsg);
@@ -91,14 +90,12 @@ RUNTIME_GUARD(envoy_reloadable_features_skip_dns_lookup_for_proxied_requests);
 RUNTIME_GUARD(envoy_reloadable_features_skip_ext_proc_on_local_reply);
 RUNTIME_GUARD(envoy_reloadable_features_streaming_shadow);
 RUNTIME_GUARD(envoy_reloadable_features_tcp_proxy_retry_on_different_event_loop);
-RUNTIME_GUARD(envoy_reloadable_features_tcp_tunneling_send_downstream_fin_on_upstream_trailers);
 RUNTIME_GUARD(envoy_reloadable_features_test_feature_true);
 RUNTIME_GUARD(envoy_reloadable_features_udp_set_do_not_fragment);
 RUNTIME_GUARD(envoy_reloadable_features_udp_socket_apply_aggregated_read_limit);
 RUNTIME_GUARD(envoy_reloadable_features_uhv_allow_malformed_url_encoding);
 RUNTIME_GUARD(envoy_reloadable_features_use_config_in_happy_eyeballs);
 RUNTIME_GUARD(envoy_reloadable_features_use_filter_manager_state_for_downstream_end_stream);
-RUNTIME_GUARD(envoy_reloadable_features_use_route_host_mutation_for_auto_sni_san);
 RUNTIME_GUARD(envoy_reloadable_features_use_typed_metadata_in_proxy_protocol_listener);
 RUNTIME_GUARD(envoy_reloadable_features_validate_connect);
 RUNTIME_GUARD(envoy_reloadable_features_validate_upstream_headers);
@@ -142,6 +139,8 @@ FALSE_RUNTIME_GUARD(envoy_reloadable_features_reresolve_if_no_connections);
 FALSE_RUNTIME_GUARD(envoy_restart_features_xds_failover_support);
 // TODO(fredyw): evaluate and either make this a config knob or remove.
 FALSE_RUNTIME_GUARD(envoy_reloadable_features_dns_cache_set_ip_version_to_remove);
+// TODO(abeyad): evaluate and either make this the default or remove.
+FALSE_RUNTIME_GUARD(envoy_reloadable_features_dns_cache_filter_unusable_ip_version);
 // TODO(alyssawilk): evaluate and make this a config knob or remove.
 FALSE_RUNTIME_GUARD(envoy_reloadable_features_reset_brokenness_on_nework_change);
 // TODO(alyssawilk): evaluate and make this a config knob or remove.
