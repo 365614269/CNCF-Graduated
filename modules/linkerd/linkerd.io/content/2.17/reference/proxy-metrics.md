@@ -64,6 +64,24 @@ Each of these metrics has the following labels:
                `outbound` if the request originated from inside of the pod.
 * `tls`: `true` if the request's connection was secured with TLS.
 
+#### Authority Label
+
+For metrics with the `direction=inbound` label value, the `authority` label is
+omitted. This is done as a security measure to prevent malicious clients from
+being able to cause Linkerd to create an arbitrary number of metrics by sending
+requests with an arbitrary number of different authority values.
+
+If this is not a concern in your environment, it is possible to re-enable the
+`authority` label on these metrics by setting an additional env value in
+Linkerd's `values.yml`:
+
+```yaml
+proxy:
+  additionalEnv:
+    - name: LINKERD2_PROXY_INBOUND_METRICS_AUTHORITY_LABELS
+      value: unsafe
+```
+
 #### Response Labels
 
 The following labels are only applicable on `response_*` metrics.
@@ -269,9 +287,9 @@ following labels:
 
   Endpoints may be "pending" when a connection is being established (or
   reestablished), or when the endpoint has been [made unavailable by failure
-  accrual](../circuit-breaking/).
+  accrual](circuit-breaking/).
 
 [prom-format]: https://prometheus.io/docs/instrumenting/exposition_formats/#format-version-0.0.4
 [pod-template-hash]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#pod-template-hash-label
 [ttfb]: https://en.wikipedia.org/wiki/Time_to_first_byte
-[HTTPRoute]: ../httproute/
+[HTTPRoute]: httproute/
