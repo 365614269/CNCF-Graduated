@@ -18,5 +18,18 @@
         debug: false // Set debug to true if you want to inspect the dropdown
       });
     </script>
+    <script>
+      function hideBanner() {
+        const banner = document.getElementById('banner');
+        if (banner) {
+          banner.style.display = 'none';
+        }
+        localStorage.setItem("hide-banner", "true");
+      }
+
+      if (localStorage.getItem("hide-banner") === "true") {
+        hideBanner();
+      }
+    </script>
   </body>
 </html>
