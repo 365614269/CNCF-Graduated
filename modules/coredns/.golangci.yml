@@ -2,9 +2,11 @@ version: "2"
 linters:
   default: none
   enable:
+    - canonicalheader
     - copyloopvar
     - govet
     - ineffassign
+    - intrange
     - staticcheck
     - unconvert
     - unused
