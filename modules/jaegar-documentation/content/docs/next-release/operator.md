@@ -741,7 +741,7 @@ storage:
 The connection configuration to storage is derived from storage options.
 
 {{< warning >}}
-Make sure to assign enough memory resources. Spark [documentation](https://spark.apache.org/docs/2.4.4/hardware-provisioning.html#memory) recommends at least `8Gi` of memory.
+Make sure to assign enough memory resources. Spark [documentation](https://archive.apache.org/dist/spark/docs/2.4.4/hardware-provisioning.html#memory) recommends at least `8Gi` of memory.
 However the job is able to starts with at least `2Gi` of memory. The right memory settings
 will depend on the amount of data being processed.
 Note that the job loads all data for the current day into memory.
@@ -1100,7 +1100,7 @@ spec:
 
 This example defines a default sampling strategy that is probabilistic, with a 50% chance of the trace instances being sampled.
 
-Refer to the Jaeger documentation on [Collector Sampling Configuration](/docs/latest/sampling/#collector-sampling-configuration) to see how service and endpoint sampling can be configured. The JSON representation described in that documentation can be used in the operator by converting to YAML.
+Refer to the Jaeger documentation on [Sampling Configuration](</docs/{{% param latest %}}/sampling/>) to see how service and endpoint sampling can be configured. The JSON representation described in that documentation can be used in the operator by converting to YAML.
 
 ## Finer grained configuration
 
