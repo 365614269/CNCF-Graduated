@@ -1,4 +1,5 @@
 name: Test
+# cSpell:ignore github wjdp
 
 on:
   workflow_dispatch:
@@ -12,13 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with:
-        submodules: true
+
+    - uses: actions/setup-node@v4
+      with: { node-version-file: .nvmrc }
+    - run: npm install
 
     - name: ✨ Setup Hugo
       env:
         # should match one from netlify.toml
-        HUGO_VERSION: 0.143.1
+        HUGO_VERSION: 0.147.6
       run: |
         mkdir ~/hugo
         cd ~/hugo
@@ -50,9 +53,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with:
-        submodules: true
-
+    - uses: actions/setup-node@v4
+      with: { node-version-file: .nvmrc }
+    - run: npm install
     - name: Spellcheck
       run: |
         make spellcheck
