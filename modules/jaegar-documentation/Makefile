@@ -1,7 +1,7 @@
 # Copyright (c) The Jaeger Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
-# cSpell:ignore htmltest refcache
+# cSpell:ignore docsy htmltest refcache
 
 DEPLOY_PRIME_URL ?= http://localhost
 HUGO_THEME   = jaeger-docs
@@ -13,7 +13,7 @@ HTMLTEST_DIR ?= tmp/.htmltest
 generate:
 
 develop: generate
-	HUGO_PREVIEW=true hugo server \
+	HUGO_PREVIEW=true hugo --config hugo.yaml,hugo.pre-docsy.yaml server \
 		--buildDrafts \
 		--buildFuture \
 		--ignoreCache
@@ -22,51 +22,51 @@ clean:
 	rm -rf public/*
 
 netlify-production-build: generate
-	hugo --minify
+	hugo --config hugo.yaml,hugo.pre-docsy.yaml --minify
 
 netlify-deploy-preview:	generate
-	HUGO_PREVIEW=true hugo \
+	HUGO_PREVIEW=true hugo --config hugo.yaml,hugo.pre-docsy.yaml \
 	--buildDrafts \
 	--buildFuture \
 	--baseURL $(DEPLOY_PRIME_URL) \
 	--minify
 
 netlify-branch-deploy: generate
-	hugo \
+	hugo --config hugo.yaml,hugo.pre-docsy.yaml \
 	--buildDrafts \
 	--buildFuture \
 	--baseURL $(DEPLOY_PRIME_URL) \
 	--minify
 
 build: clean generate
-	hugo --cleanDestinationDir -e dev -DFE --logLevel info
+	hugo --config hugo.yaml,hugo.pre-docsy.yaml --cleanDestinationDir -e dev -DFE --logLevel info
 
 link-checker-setup:
 	curl https://raw.githubusercontent.com/wjdp/htmltest/master/godownloader.sh | bash
 
-check-links:
-	$(HTMLTEST) --conf .htmltest.yml
-
-check-links-older:
-	$(HTMLTEST) --log-level 1 --conf .htmltest.old-versions.yml
-
 # Use --keep-going to ensure that the refcache gets saved even if there are
 # link-checking errors.
-check-links-external:
-	$(MAKE) --keep-going _restore-refcache _check-links-external _save-refcache
+check-links:
+	$(MAKE) --keep-going _restore-refcache _check-links _save-refcache
 
 _restore-refcache:
 	mkdir -p $(HTMLTEST_DIR)
 	cp data/refcache.json $(HTMLTEST_DIR)/refcache.json
 
-_check-links-external:
-	$(HTMLTEST) --log-level 1 --conf .htmltest.external.yml
+_check-links:
+	$(HTMLTEST) --log-level 1 --conf .htmltest.yml
 
 _save-refcache:
 	@echo "Saving refcache.json to data/refcache.json"
 	jq . $(HTMLTEST_DIR)/refcache.json > data/refcache.json
 
-check-links-all: check-links check-links-older check-links-external
+check-links-all: check-links check-links-older
+
+check-links-older:
+	$(HTMLTEST) --log-level 1 --conf .htmltest.old-versions.yml
+
+check-links-internal:
+	$(HTMLTEST) --log-level 1 --skip-external --conf .htmltest.yml
 
 .cspell/project-names.g.txt: .cspell/project-names-src.txt
 	cat .cspell/project-names-src.txt | grep -v '^#' | grep -v '^\s*$$' | tr ' ' '\n' > .cspell/project-names.g.txt
