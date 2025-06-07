@@ -27,7 +27,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/acmpca v1.40.0
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.224.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.42.0
-	github.com/aws/aws-sdk-go-v2/service/kms v1.38.1
+	github.com/aws/aws-sdk-go-v2/service/kms v1.39.0
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.38.0
 	github.com/aws/aws-sdk-go-v2/service/rolesanywhere v1.17.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.80.0
@@ -56,7 +56,7 @@ require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/hashicorp/hcl v1.0.1-vault-7
 	github.com/hashicorp/vault/api v1.20.0
-	github.com/hashicorp/vault/sdk v0.17.0
+	github.com/hashicorp/vault/sdk v0.18.0
 	github.com/imdario/mergo v0.3.16
 	github.com/imkira/go-observer v1.0.3
 	github.com/jackc/pgx/v5 v5.7.5
@@ -80,7 +80,7 @@ require (
 	golang.org/x/crypto v0.38.0
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
 	golang.org/x/net v0.40.0
-	golang.org/x/sync v0.14.0
+	golang.org/x/sync v0.15.0
 	golang.org/x/sys v0.33.0
 	golang.org/x/time v0.12.0
 	google.golang.org/api v0.236.0
