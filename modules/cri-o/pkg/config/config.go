@@ -17,6 +17,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/containers/common/pkg/hooks"
+	conmonrsClient "github.com/containers/conmon-rs/pkg/client"
 	"github.com/containers/image/v5/pkg/sysregistriesv2"
 	"github.com/containers/image/v5/types"
 	"github.com/containers/storage"
@@ -271,6 +272,13 @@ type RuntimeHandler struct {
 	// Default annotations specified for runtime handler if they're not overridden by
 	// the pod spec.
 	DefaultAnnotations map[string]string `toml:"default_annotations,omitempty"`
+
+	// StreamWebsockets can be used to enable the WebSocket protocol for
+	// container exec, attach and port forward.
+	//
+	// conmon-rs (runtime_type = "pod") supports this configuration for exec
+	// and attach. Forwarding ports will be supported in future releases.
+	StreamWebsockets bool `toml:"stream_websockets,omitempty"`
 }
 
 // Multiple runtime Handlers in a map.
@@ -1726,7 +1734,15 @@ func (r *RuntimeHandler) Validate(name string) error {
 		logrus.Errorf("Unable to set minimum container memory for runtime handler %q: %v", name, err)
 	}
 
-	return r.ValidateNoSyncLog()
+	if err := r.ValidateNoSyncLog(); err != nil {
+		return fmt.Errorf("no sync log: %w", err)
+	}
+
+	if err := r.ValidateWebsocketStreaming(name); err != nil {
+		return fmt.Errorf("websocket streaming: %w", err)
+	}
+
+	return nil
 }
 
 func (r *RuntimeHandler) ValidateRuntimeVMBinaryPattern() bool {
@@ -1852,6 +1868,47 @@ func (r *RuntimeHandler) ValidateContainerMinMemory(name string) error {
 	return nil
 }
 
+// ValidateWebsocketStreaming can be used to verify if the runtime supports WebSocket streaming.
+func (r *RuntimeHandler) ValidateWebsocketStreaming(name string) error {
+	if r.RuntimeType != RuntimeTypePod {
+		if r.StreamWebsockets {
+			return fmt.Errorf(`only the 'runtime_type = "pod"' supports websocket streaming, not %q (runtime %q)`, r.RuntimeType, name)
+		}
+
+		return nil
+	}
+
+	// Requires at least conmon-rs v0.7.0
+	v, err := conmonrsClient.Version(r.MonitorPath)
+	if err != nil {
+		if errors.Is(err, conmonrsClient.ErrUnsupported) {
+			logrus.Debugf("Unable to verify pod runtime version: %v", err)
+
+			// Streaming server support got introduced in v0.7.0
+			if r.StreamWebsockets {
+				logrus.Warnf("Disabling streaming over websockets, it requires conmon-rs >= v0.7.0")
+
+				r.StreamWebsockets = false
+			}
+
+			return nil
+		}
+
+		return fmt.Errorf("get conmon-rs version: %w", err)
+	}
+
+	if v.Tag == "" {
+		v.Tag = "none"
+	}
+
+	logrus.Infof(
+		"Runtime handler %q is using conmon-rs version: %s, tag: %s, commit: %s, build: %s, target: %s, %s, %s",
+		name, v.Version, v.Tag, v.Commit, v.BuildDate, v.Target, v.RustVersion, v.CargoVersion,
+	)
+
+	return nil
+}
+
 // LoadRuntimeFeatures loads features for a given runtime handler using the "features"
 // sub-command output, where said output contains a JSON document called "Features
 // Structure" that describes the runtime handler's supported features.
@@ -1902,6 +1959,11 @@ func (r *RuntimeHandler) RuntimeSupportsMountFlag(flag string) bool {
 // RuntimeDefaultAnnotations returns the default annotations for this handler.
 func (r *RuntimeHandler) RuntimeDefaultAnnotations() map[string]string {
 	return r.DefaultAnnotations
+}
+
+// RuntimeStreamWebsockets returns the configured websocket streaming option for this handler.
+func (r *RuntimeHandler) RuntimeStreamWebsockets() bool {
+	return r.StreamWebsockets
 }
 
 func validateAllowedAndGenerateDisallowedAnnotations(allowed []string) (disallowed []string, _ error) {

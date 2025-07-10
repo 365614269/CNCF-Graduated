@@ -316,3 +316,33 @@ func (r *runtimePod) ProbeMonitor(ctx context.Context, c *Container) error {
 	// Not implemented
 	return nil
 }
+
+func (r *runtimePod) ServeExecContainer(ctx context.Context, c *Container, cmd []string, tty, stdin, stdout, stderr bool) (string, error) {
+	res, err := r.client.ServeExecContainer(ctx, &conmonClient.ServeExecContainerConfig{
+		ID:      c.ID(),
+		Command: cmd,
+		Tty:     tty,
+		Stdin:   stdin,
+		Stdout:  stdout,
+		Stderr:  stderr,
+	})
+	if err != nil {
+		return "", fmt.Errorf("call ServeExecContainer RPC: %w", err)
+	}
+
+	return res.URL, nil
+}
+
+func (r *runtimePod) ServeAttachContainer(ctx context.Context, c *Container, stdin, stdout, stderr bool) (string, error) {
+	res, err := r.client.ServeAttachContainer(ctx, &conmonClient.ServeAttachContainerConfig{
+		ID:     c.ID(),
+		Stdin:  stdin,
+		Stdout: stdout,
+		Stderr: stderr,
+	})
+	if err != nil {
+		return "", fmt.Errorf("call ServeAttachContainer RPC: %w", err)
+	}
+
+	return res.URL, nil
+}
