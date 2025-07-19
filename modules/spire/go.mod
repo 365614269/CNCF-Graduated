@@ -25,7 +25,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.31
 	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.5.1
 	github.com/aws/aws-sdk-go-v2/service/acmpca v1.40.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.232.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.233.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.43.0
 	github.com/aws/aws-sdk-go-v2/service/kms v1.41.0
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.39.0
@@ -83,7 +83,7 @@ require (
 	golang.org/x/sync v0.16.0
 	golang.org/x/sys v0.34.0
 	golang.org/x/time v0.12.0
-	google.golang.org/api v0.241.0
+	google.golang.org/api v0.242.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822
 	google.golang.org/grpc v1.73.0
 	google.golang.org/protobuf v1.36.6
