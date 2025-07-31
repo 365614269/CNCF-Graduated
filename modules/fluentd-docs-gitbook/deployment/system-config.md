@@ -178,6 +178,18 @@ Parses config values strictly. Invalid numerical or boolean values are not allow
 
 Force disable the shared socket which is for listening a same port across multiple worker processes. When the shared socket is enabled \(it's the default behavior\), a socket is always created to enable workers to communicate with the supervisor. On Windows, it consumes a dynamic \(a.k.a ephemeral\) TCP port. If you don't prefer it, set this option as `true`. When it's disabled, you may not use plugins that listen a port such as in\_forward, in\_http and in\_syslog.
 
+### `config_include_dir`
+
+| type | default | version |
+| :--- | :--- | :--- |
+| string | "/etc/fluent/conf.d" | 1.19.0 |
+
+Specifies the additional include directory which is enabled by default.
+If there is any configuration file under `config_include_dir` directory,
+it will be loaded without specifying `@include` directive.
+
+If you want to disable this auto-load feature, set `config_include_dir ""` explicitly.
+
 ### `enable_jit` (experimental)
 
 | type | default | version |
@@ -190,9 +202,9 @@ Enable JIT for worker processes. Internally, this configuration enables Ruby's `
 
 | type | default | version |
 | :--- | :---    | :---    |
-| bool | nil     | 1.14.0  |
+| bool | true    | 1.14.0  |
 
-Specifies whether measuring input metrics should be enabled or not.
+Specifies whether measuring input metrics should be enabled or not. Since v1.19.0, the default value is changed to `true`.
 
 ### `enable_size_metrics`
 
@@ -258,6 +270,37 @@ By default, Fluentd does not rotate log files. You need to specify `rotate_age` 
 NOTE: When enabling log rotation on Windows, log files are separated into `log-supervisor-0.log`, `log-0.log`, ..., `log-N.log` where `N` is `generation - 1` due to the system limitation. Windows does not permit delete and rename files simultaneously owned by another process.
 
 Please see also [Log Rotation Setting](logging.md#log-rotation-setting).
+
+#### `forced_stacktrace_level`
+
+| type | default | version |
+| :--- | :---    | :---    |
+| enum | "none"  | 1.19.0  |
+
+Specifies `none` or the log level e.g. `trace`, `debug`, `info`, `warn`, `error`, or `fatal`.
+
+If you set a log level for `forced_stacktrace_level`, log levels of stacktraces are forced to that level.
+
+Example:
+
+```
+<system>
+  log_level info # This is the default. You can omit this.
+  <log>
+    forced_stacktrace_level info
+  </log>
+</system>
+```
+
+This setting results in the following behavior:
+
+* All stacktraces initially with `info` level (`log_level`) or higher will be forcibly logged with `info` level (`forced_stacktrace_level`).
+
+Note that stacktraces that do not meet `log_level` are discarded in advance.
+Thanks to this, there's no concern that `trace` or `debug`-level stacktraces being excessively output as `info`-level logs.
+
+You can use this option to exclude all stacktraces from an alerting system if monitoring Fluentd's log files directly.
+(You don't need this feature if using [@FLUENT_LOG](logging.md#capture-fluentd-logs) because stacktraces are not routed into the `@FLUENT_LOG` label.)
 
 ### `<source_only_buffer>` section
 

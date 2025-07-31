@@ -2,7 +2,7 @@
 
 The `http_server` helper creates an HTTP server. This helper was introduced in v1.6.0.
 
-It supports [`async-http`](https://github.com/socketry/async-http)-based server to improve the performance. If `async-http` gem is not installed, this helper uses the standard [`webrick`](https://github.com/ruby/webrick) server instead.
+It supports [`async-http`](https://github.com/socketry/async-http)-based server to improve the performance.
 
 Here is an example:
 
@@ -95,6 +95,7 @@ Request supports these following methods:
 * `query`: returns query which is `query_string` parsed by `CGI.parse`
 * `body`: returns the request body
 * `path`: returns the request path
+* `headers`: returns `Protocol::HTTP::Headers` object to read the request headers (since v1.19.0)
 
 #### Response
 
