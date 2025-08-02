@@ -798,12 +798,14 @@ func (c *cluster) fetchSecretValue(selector v1.SecretKeySelector) (string, error
 func initClusterCephxStatus(c *clusterd.Context, cluster *cephv1.CephCluster) error {
 	uninitializedStatus := keyring.UninitializedCephxStatus()
 	cluster.Status.Cephx = &cephv1.ClusterCephxStatus{
+		OSD:           &uninitializedStatus,
 		RBDMirrorPeer: &uninitializedStatus,
 		Mgr:           &uninitializedStatus,
 		CSI: &cephv1.CephxStatusWithKeyCount{
 			CephxStatus: uninitializedStatus,
 		},
 		CrashCollector: &uninitializedStatus,
+		CephExporter:   &uninitializedStatus,
 	}
 
 	if err := reporting.UpdateStatus(c.Client, cluster); err != nil {

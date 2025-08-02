@@ -744,12 +744,16 @@ type LocalCephxStatus struct {
 type ClusterCephxStatus struct {
 	// Mgr represents the cephx key rotation status of the ceph manager daemon
 	Mgr *CephxStatus `json:"mgr,omitempty"`
+	// OSD shows the CephX key status of of OSDs
+	OSD *CephxStatus `json:"osd,omitempty"`
 	// RBDMirrorPeer represents the cephx key rotation status of the `rbd-mirror-peer` user
 	RBDMirrorPeer *CephxStatus `json:"rbdMirrorPeer,omitempty"`
 	// CSI shows the CephX key status for Ceph-CSI components.
 	CSI *CephxStatusWithKeyCount `json:"csi,omitempty"`
 	// Crash Collector represents the cephx key rotation status of the crash collector daemon
 	CrashCollector *CephxStatus `json:"crashCollector,omitempty"`
+	// Ceph Exporter represents the cephx key rotation status of the ceph exporter daemon
+	CephExporter *CephxStatus `json:"cephExporter,omitempty"`
 }
 
 // MonSpec represents the specification of the monitor

@@ -5058,6 +5058,19 @@ CephxStatus
 </tr>
 <tr>
 <td>
+<code>osd</code><br/>
+<em>
+<a href="#ceph.rook.io/v1.CephxStatus">
+CephxStatus
+</a>
+</em>
+</td>
+<td>
+<p>OSD shows the CephX key status of of OSDs</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>rbdMirrorPeer</code><br/>
 <em>
 <a href="#ceph.rook.io/v1.CephxStatus">
@@ -5093,6 +5106,19 @@ CephxStatus
 </td>
 <td>
 <p>Crash Collector represents the cephx key rotation status of the crash collector daemon</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>cephExporter</code><br/>
+<em>
+<a href="#ceph.rook.io/v1.CephxStatus">
+CephxStatus
+</a>
+</em>
+</td>
+<td>
+<p>Ceph Exporter represents the cephx key rotation status of the ceph exporter daemon</p>
 </td>
 </tr>
 </tbody>
