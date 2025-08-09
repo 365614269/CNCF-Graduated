@@ -9,7 +9,7 @@ require (
 	cloud.google.com/go/security v1.19.0
 	cloud.google.com/go/storage v1.56.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.2
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.10.1
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.11.0
 	github.com/Azure/azure-sdk-for-go/sdk/keyvault/azkeys v0.10.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
@@ -68,7 +68,7 @@ require (
 	github.com/prometheus/client_golang v1.23.0
 	github.com/shirou/gopsutil/v4 v4.25.7
 	github.com/sigstore/cosign/v2 v2.5.3
-	github.com/sigstore/rekor v1.3.10
+	github.com/sigstore/rekor v1.4.0
 	github.com/sigstore/sigstore v1.9.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spiffe/go-spiffe/v2 v2.5.0
@@ -77,11 +77,11 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/uber-go/tally/v4 v4.1.17
 	github.com/valyala/fastjson v1.6.4
-	golang.org/x/crypto v0.40.0
+	golang.org/x/crypto v0.41.0
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
 	golang.org/x/net v0.42.0
 	golang.org/x/sync v0.16.0
-	golang.org/x/sys v0.34.0
+	golang.org/x/sys v0.35.0
 	golang.org/x/time v0.12.0
 	google.golang.org/api v0.246.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250728155136-f173205681a0
@@ -180,7 +180,7 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gogo/googleapis v0.0.0-20180223154316-0cd9801be74a // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/mock v1.7.0-rc.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -304,8 +304,8 @@ require (
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/mod v0.26.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
-	golang.org/x/term v0.33.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
+	golang.org/x/term v0.34.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250721164621-a45f3dfb1074 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
