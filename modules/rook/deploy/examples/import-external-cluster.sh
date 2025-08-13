@@ -220,7 +220,7 @@ function importCsiRBDNodeSecret() {
       patch \
       secret \
       "rook-$CSI_RBD_NODE_SECRET_NAME" \
-      -p "{\"stringData\":{\"adminID\":\"$userID\",\"adminKey\":\"$CSI_CEPHFS_NODE_SECRET\"}}"
+      -p "{\"stringData\":{\"userID\":\"$userID\",\"userKey\":\"$CSI_CEPHFS_NODE_SECRET\"}}"
   fi
 }
 
@@ -241,7 +241,7 @@ function importCsiRBDProvisionerSecret() {
       patch \
       secret \
       "rook-$CSI_RBD_PROVISIONER_SECRET_NAME" \
-      -p "{\"stringData\":{\"adminID\":\"$userID\",\"adminKey\":\"$CSI_CEPHFS_NODE_SECRET\"}}"
+      -p "{\"stringData\":{\"userID\":\"$userID\",\"userKey\":\"$CSI_CEPHFS_NODE_SECRET\"}}"
   fi
 }
 
@@ -254,15 +254,15 @@ function importCsiCephFSNodeSecret() {
       generic \
       --type="kubernetes.io/rook" \
       "rook-""$CSI_CEPHFS_NODE_SECRET_NAME" \
-      --from-literal=adminID="$userID" \
-      --from-literal=adminKey="$CSI_CEPHFS_NODE_SECRET"
+      --from-literal=userID="$userID" \
+      --from-literal=userKey="$CSI_CEPHFS_NODE_SECRET"
   else
     echo "secret 'rook-$CSI_CEPHFS_NODE_SECRET_NAME' already exists"
       $KUBECTL -n "$NAMESPACE" \
       patch \
       secret \
       "rook-$CSI_CEPHFS_NODE_SECRET_NAME" \
-      -p "{\"stringData\":{\"adminID\":\"$userID\",\"adminKey\":\"$CSI_CEPHFS_NODE_SECRET\"}}"
+      -p "{\"stringData\":{\"userID\":\"$userID\",\"userKey\":\"$CSI_CEPHFS_NODE_SECRET\"}}"
     fi
 }
 
@@ -275,15 +275,15 @@ function importCsiCephFSProvisionerSecret() {
       generic \
       --type="kubernetes.io/rook" \
       "rook-""$CSI_CEPHFS_PROVISIONER_SECRET_NAME" \
-      --from-literal=adminID="$userID" \
-      --from-literal=adminKey="$CSI_CEPHFS_PROVISIONER_SECRET"
+      --from-literal=userID="$userID" \
+      --from-literal=userKey="$CSI_CEPHFS_PROVISIONER_SECRET"
   else
     echo "secret 'rook-$CSI_CEPHFS_PROVISIONER_SECRET_NAME' already exists"
     $KUBECTL -n "$NAMESPACE" \
       patch \
       secret \
       "rook-$CSI_CEPHFS_PROVISIONER_SECRET_NAME" \
-      -p "{\"stringData\":{\"adminID\":\"$userID\",\"adminKey\":\"$CSI_CEPHFS_NODE_SECRET\"}}"
+      -p "{\"stringData\":{\"userID\":\"$userID\",\"userKey\":\"$CSI_CEPHFS_NODE_SECRET\"}}"
   fi
 }
 
