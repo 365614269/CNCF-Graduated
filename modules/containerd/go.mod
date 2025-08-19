@@ -6,7 +6,7 @@ require (
 	dario.cat/mergo v1.0.2
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6
 	github.com/Microsoft/go-winio v0.6.2
-	github.com/Microsoft/hcsshim v0.13.1-0.20250728212919-1ee5fce7ed8f
+	github.com/Microsoft/hcsshim v0.14.0-rc.1
 	github.com/checkpoint-restore/checkpointctl v1.3.0
 	github.com/checkpoint-restore/go-criu/v7 v7.2.0
 	github.com/containerd/btrfs/v2 v2.0.0
@@ -79,7 +79,7 @@ require (
 	golang.org/x/sys v0.35.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a
 	google.golang.org/grpc v1.74.2
-	google.golang.org/protobuf v1.36.6
+	google.golang.org/protobuf v1.36.7
 	gopkg.in/inf.v0 v0.9.1
 	k8s.io/apimachinery v0.33.3
 	k8s.io/client-go v0.33.3
