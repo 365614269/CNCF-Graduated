@@ -82,7 +82,7 @@ services:
       - "5601:5601"
 ```
 
-The `logging` section \(check [Docker Compose documentation](https://docs.docker.com/compose/compose-file/compose-file-v3/#logging)\) of `web` container specifies [Docker Fluentd Logging Driver](https://docs.docker.com/engine/admin/logging/fluentd/) as a default container logging driver. All the logs from the `web` container will automatically be forwarded to `host:port` specified by `fluentd-address`.
+The `logging` section \(check [Docker Compose documentation](https://docs.docker.com/reference/compose-file/services/#logging)\) of `web` container specifies [Docker Fluentd Logging Driver](https://docs.docker.com/engine/admin/logging/fluentd/) as a default container logging driver. All the logs from the `web` container will automatically be forwarded to `host:port` specified by `fluentd-address`.
 
 ## Step 1: Create Fluentd Image with your Config + Plugin
 
@@ -93,6 +93,11 @@ Create `fluentd/Dockerfile` with the following content using the Fluentd [offici
 
 FROM fluent/fluentd:edge-debian
 USER root
+
+# To connect to docker.elastic.co/elasticsearch/elasticsearch:8.x, it requires elasticsearch v8 gem
+# Ref. https://github.com/elastic/elasticsearch-ruby/blob/main/README.md#compatibility
+RUN ["gem", "install", "elasticsearch", "--no-document", "--version", "8.19.0"]
+
 RUN ["gem", "install", "fluent-plugin-elasticsearch", "--no-document", "--version", "5.4.3"]
 USER fluent
 ```
