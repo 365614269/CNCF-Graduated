@@ -166,7 +166,7 @@ func (r *ReconcileCSI) reconcile(request reconcile.Request) (reconcile.Result, e
 		return opcontroller.ImmediateRetryResult, errors.Wrap(err, "failed to apply operator settings configmap")
 	}
 
-	enableCSIOperator, err = strconv.ParseBool(k8sutil.GetOperatorSetting("ROOK_USE_CSI_OPERATOR", "false"))
+	enableCSIOperator, err = strconv.ParseBool(k8sutil.GetOperatorSetting("ROOK_USE_CSI_OPERATOR", "true"))
 	if err != nil {
 		return reconcileResult, errors.Wrap(err, "unable to parse value for 'ROOK_USE_CSI_OPERATOR'")
 	}
@@ -280,6 +280,12 @@ func (r *ReconcileCSI) reconcile(request reconcile.Request) (reconcile.Result, e
 	}
 
 	if !disableCSI && !EnableCSIOperator() {
+		// delete CSI operator resources if CSI operator is disabled but CSI driver is enabled
+		err := r.deleteCSIOperatorResources()
+		if err != nil {
+			logger.Errorf("failed to delete CSI operator resources: %v", err)
+		}
+
 		err = r.validateAndConfigureDrivers(ownerInfo)
 		if err != nil {
 			return opcontroller.ImmediateRetryResult, errors.Wrap(err, "failed to configure ceph csi")
