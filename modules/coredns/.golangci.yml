@@ -9,10 +9,12 @@ linters:
   enable:
     - canonicalheader
     - copyloopvar
+    - durationcheck
     - govet
     - ineffassign
     - intrange
     - nolintlint
+    - prealloc
     - protogetter
     - staticcheck
     - thelper
