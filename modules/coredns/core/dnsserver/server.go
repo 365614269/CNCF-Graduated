@@ -4,6 +4,7 @@ package dnsserver
 import (
 	"context"
 	"fmt"
+	"maps"
 	"net"
 	"runtime"
 	"runtime/debug"
@@ -32,7 +33,10 @@ import (
 // the same address and the listener may be stopped for
 // graceful termination (POSIX only).
 type Server struct {
-	Addr string // Address we listen on
+	Addr         string        // Address we listen on
+	IdleTimeout  time.Duration // Idle timeout for TCP
+	ReadTimeout  time.Duration // Read timeout for TCP
+	WriteTimeout time.Duration // Write timeout for TCP
 
 	server [2]*dns.Server // 0 is a net.Listener, 1 is a net.PacketConn (a *UDPConn) in our case.
 	m      sync.Mutex     // protects the servers
@@ -44,9 +48,6 @@ type Server struct {
 	debug        bool                 // disable recover()
 	stacktrace   bool                 // enable stacktrace in recover error log
 	classChaos   bool                 // allow non-INET class queries
-	idleTimeout  time.Duration        // Idle timeout for TCP
-	readTimeout  time.Duration        // Read timeout for TCP
-	writeTimeout time.Duration        // Write timeout for TCP
 
 	tsigSecret map[string]string
 }
@@ -63,9 +64,9 @@ func NewServer(addr string, group []*Config) (*Server, error) {
 		Addr:         addr,
 		zones:        make(map[string][]*Config),
 		graceTimeout: 5 * time.Second,
-		idleTimeout:  10 * time.Second,
-		readTimeout:  3 * time.Second,
-		writeTimeout: 5 * time.Second,
+		IdleTimeout:  10 * time.Second,
+		ReadTimeout:  3 * time.Second,
+		WriteTimeout: 5 * time.Second,
 		tsigSecret:   make(map[string]string),
 	}
 
@@ -89,19 +90,17 @@ func NewServer(addr string, group []*Config) (*Server, error) {
 
 		// set timeouts
 		if site.ReadTimeout != 0 {
-			s.readTimeout = site.ReadTimeout
+			s.ReadTimeout = site.ReadTimeout
 		}
 		if site.WriteTimeout != 0 {
-			s.writeTimeout = site.WriteTimeout
+			s.WriteTimeout = site.WriteTimeout
 		}
 		if site.IdleTimeout != 0 {
-			s.idleTimeout = site.IdleTimeout
+			s.IdleTimeout = site.IdleTimeout
 		}
 
 		// copy tsig secrets
-		for key, secret := range site.TsigSecret {
-			s.tsigSecret[key] = secret
-		}
+		maps.Copy(s.tsigSecret, site.TsigSecret)
 
 		// compile custom plugin for everything
 		var stack plugin.Handler
@@ -152,10 +151,10 @@ func (s *Server) Serve(l net.Listener) error {
 		Net:           "tcp",
 		TsigSecret:    s.tsigSecret,
 		MaxTCPQueries: tcpMaxQueries,
-		ReadTimeout:   s.readTimeout,
-		WriteTimeout:  s.writeTimeout,
+		ReadTimeout:   s.ReadTimeout,
+		WriteTimeout:  s.WriteTimeout,
 		IdleTimeout: func() time.Duration {
-			return s.idleTimeout
+			return s.IdleTimeout
 		},
 		Handler: dns.HandlerFunc(func(w dns.ResponseWriter, r *dns.Msg) {
 			ctx := context.WithValue(context.Background(), Key{}, s)
