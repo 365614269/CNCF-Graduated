@@ -1,7 +1,7 @@
 ---
 title: "OpenMetrics 2.0"
 nav_title: "2.0"
-sort_rank: 2
+sort_rank: 3
 
 hide_in_nav: true
 
