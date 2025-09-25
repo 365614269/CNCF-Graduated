@@ -248,10 +248,12 @@ observations are a very rare use case for Prometheus histograms and summaries.)
 
 The _schema_ is a signed integer value with a size of 8 bits (short: int8). It
 defines the way bucket boundaries are calculated. The currently valid values
-are -53 and the range between and including -4 and +8. More schemas may be
-added in the future. -53 is a schema for so-called _custom bucket boundaries_
-or short _custom buckets_, while the other schema numbers represent the
-different standard exponential schemas (short: _standard schemas_).
+are -53 and the range between and including -4 and +8 (with a larger range
+between and including -9 and +52 being reserved, see below for details). More
+schemas may be added in the future. -53 is a schema for so-called _custom
+bucket boundaries_ or short _custom buckets_, while the other schema numbers
+represent the different standard exponential schemas (short: _standard
+schemas_).
 
 The standard schemas are mergeable with each other and are RECOMMENDED for
 general use cases. Larger schema numbers correspond to higher resolutions.
@@ -306,6 +308,28 @@ largest float representable as float64. Therefore, the schema numbers between
 (and including) -9 and +52 are reserved for future standard schemas (following
 the formulas for bucket boundaries above) and MUST NOT be used for any other
 schemas.
+
+Receivers of native histograms MAY, upon ingestion, reduce the schema and
+thereby the resolution of ingested histograms by merging buckets appropriately.
+Receivers MAY accept schemas between 9 and 52 if they reduce the schema upon
+ingestion to a valid number (i.e. between -4 and 8), following the formulas for
+bucket boundaries above.
+
+If, after this optional schema conversion, the schema is still unknown to the
+receiver, there are the following options:
+
+- If a scrape (including federation) contains one or more histograms with an
+  unknown schema, the entiry scrape MUST fail, following the Prometheus
+  practice of avoiding incomplete scrapes.
+- For any other ingestion paths (including replaying the WAL/WBL), the receiver
+  MAY ignore histograms with unknown schemas and SHOULD notify the user about
+  this omission in a suitable way.
+
+When a TSDB implementation reads histograms from its permanent storage
+(excluding replaying the WAL/WBL), similar guidelines apply: Schemas between 9
+and 52 MAY be converted to valid schemas. Otherwise, unknown schemas MUST
+return an error on retrieval, and the PromQL query that triggered the retrieval
+MUST fail.
 
 For schema -53, the bucket boundaries are set explicitly via _custom values_,
 described in detail in the [custom values section](#custom-values) below. This
@@ -1031,13 +1055,13 @@ The Prometheus scrape config offers two settings to address this need:
 Both settings accept zero as a valid value, which implies “no limit”. In case
 of the bucket limit, this means that the number of buckets are indeed not
 checked at all. In the case of the bucket factor, Prometheus will still ensure
-that a standard schema will not exceed the capabilities of the used
-storage backend. (TODO: This currently means the schema is at most +8, which is
-also the limit we allow in the exposition format. OTel allows higher
-exponential schemas, and Prometheus might therefore allow them in ingestion
-paths, too, but reduce the schema to +8 upon ingestion, or to whatever limit
-the current implementation requires. See
-https://github.com/prometheus/prometheus/issues/14168 for final clarification.)
+that a standard schema will not exceed the capabilities of the used storage
+backend. Prometheus currently stores histograms with standard exponential
+schemas of at most 8. However, it accepts exponential schemas greater than 8 up
+to the [reserved limit of 52](#schema) but reduces their resolution upon
+ingestion so that schema 8 is reached (or a lower one if required by the
+`native_histogram_bucket_limit` or `native_histogram_min_bucket_factor`
+settings).
 
 If both settings have a non-zero values, the schema is decreased sufficiently
 to satisfy both limits.
