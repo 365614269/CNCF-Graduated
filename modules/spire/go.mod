@@ -57,8 +57,8 @@ require (
 	github.com/hashicorp/go-metrics v0.5.4
 	github.com/hashicorp/go-plugin v1.7.0
 	github.com/hashicorp/hcl v1.0.1-vault-7
-	github.com/hashicorp/vault/api v1.21.0
-	github.com/hashicorp/vault/sdk v0.19.0
+	github.com/hashicorp/vault/api v1.22.0
+	github.com/hashicorp/vault/sdk v0.20.0
 	github.com/imdario/mergo v0.3.16
 	github.com/imkira/go-observer v1.0.3
 	github.com/jackc/pgx/v5 v5.7.6
@@ -88,7 +88,7 @@ require (
 	google.golang.org/api v0.251.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250929231259-57b25ae835d4
 	google.golang.org/grpc v1.75.1
-	google.golang.org/protobuf v1.36.9
+	google.golang.org/protobuf v1.36.10
 	k8s.io/api v0.34.1
 	k8s.io/apimachinery v0.34.1
 	k8s.io/client-go v0.34.1
