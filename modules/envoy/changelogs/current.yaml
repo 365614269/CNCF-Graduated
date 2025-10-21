@@ -24,10 +24,20 @@ minor_behavior_changes:
 
 bug_fixes:
 # *Changes expected to improve the state of the world and are unlikely to have negative effects*
+- area: http2
+  change: |
+    Fixed a bug where Envoy will leak memory if the HTTP2 stream is reset before the request headers are
+    sent. For example, if one upstream http filter send a local reply after the connection is established but
+    before the request headers are sent, the memory allocated for the stream will not be released.
 - area: lua
   change: |
     Fix a bug where Lua filters may result in Envoy crashes when setting response body to a
     larger payload (greater than the body buffer limit).
+- area: bootstrap
+  change: |
+    Fixed an issue where the custom
+    :ref:`header_prefix <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.header_prefix>`
+    will result in crash at startup.
 - area: connection pool
   change: |
     Fix a crash in the TCP connection pool that occurs during downstream connection teardown when large requests
@@ -38,6 +48,9 @@ removed_config_or_runtime:
 - area: jwt_authn
   change: |
     Removed runtime guard ``envoy.reloadable_features.jwt_fetcher_use_scheme_from_uri`` and legacy code paths.
+- area: tcp
+  change: |
+    Removed runtime guard ``envoy.reloadable_features.tcp_proxy_retry_on_different_event_loop`` and legacy code paths.
 - area: http
   change: |
     Removed runtime guard ``envoy.reloadable_features.http1_balsa_allow_cr_or_lf_at_request_start`` and legacy code paths.
@@ -49,6 +62,9 @@ removed_config_or_runtime:
     Removed runtime guard ``envoy.reloadable_features.original_src_fix_port_exhaustion`` and legacy code paths.
 
 new_features:
+- area: http
+  change: |
+    Added ``vhost_header`` to the RouteConfiguration, allowing use of a different header for vhost matching.
 - area: logging
   change: |
     Added support for not-equal operator for access log filter rules, in
