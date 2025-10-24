@@ -703,8 +703,15 @@ func scheduleMonitor(c *Cluster, mon *monConfig) (*apps.Deployment, error) {
 	// to modify the storage by instead running an innocuous command.
 	d.Spec.Template.Spec.InitContainers = []corev1.Container{}
 	d.Spec.Template.Spec.Containers[0].Image = c.rookImage
-	d.Spec.Template.Spec.Containers[0].Command = []string{"sleep"} // sleep responds to signals so we don't need to wrap it
-	d.Spec.Template.Spec.Containers[0].Args = []string{"3600"}
+	// As PID 1, sleep will not capture the SIGTERM signal, so use a bash
+	// trap to exit cleanly and quickly when the pod is deleted.
+	d.Spec.Template.Spec.Containers[0].Command = []string{
+		"/bin/bash",
+		"-c",
+		`trap 'exit' SIGTERM
+         while true; do sleep 1; done`,
+	}
+
 	// remove the startup and liveness probes on the canary pod
 	d.Spec.Template.Spec.Containers[0].StartupProbe = nil
 	d.Spec.Template.Spec.Containers[0].LivenessProbe = nil
@@ -886,13 +893,10 @@ func (c *Cluster) removeCanaryDeployments(labelSelector string) {
 		return
 	}
 
-	// Delete the canary mons, but don't wait for them to exit
+	// Delete the canary mons
 	for _, canary := range canaryDeployments.Items {
 		logger.Infof("cleaning up canary monitor deployment %q", canary.Name)
-		var gracePeriod int64
-		propagation := metav1.DeletePropagationForeground
-		options := &metav1.DeleteOptions{GracePeriodSeconds: &gracePeriod, PropagationPolicy: &propagation}
-		if err := c.context.Clientset.AppsV1().Deployments(c.Namespace).Delete(c.ClusterInfo.Context, canary.Name, *options); err != nil {
+		if err := k8sutil.DeleteDeployment(c.ClusterInfo.Context, c.context.Clientset, c.Namespace, canary.Name); err != nil {
 			logger.Warningf("failed to delete canary monitor deployment %q. %v", canary.Name, err)
 		}
 	}
