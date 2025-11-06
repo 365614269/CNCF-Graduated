@@ -103,7 +103,12 @@ func (ss *StatsServer) PopulateMetricDescriptors(includedKeys []string) map[stri
 			containerOomEventsTotal,
 		},
 		ProcessMetrics: {
+			containerFileDescriptors,
 			containerProcesses,
+			containerSockets,
+			containerThreads,
+			containerThreadsMax,
+			containerUlimitsSoft,
 		},
 		SpecMetrics: {
 			containerSpecCpuPeriod,
@@ -112,6 +117,7 @@ func (ss *StatsServer) PopulateMetricDescriptors(includedKeys []string) map[stri
 			containerSpecMemoryLimitBytes,
 			containerSpecMemoryReservationLimitBytes,
 			containerSpecMemorySwapLimitBytes,
+			containerStartTimeSeconds,
 		},
 	}
 
