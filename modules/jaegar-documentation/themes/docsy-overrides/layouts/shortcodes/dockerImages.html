@@ -1,0 +1,53 @@
+{{ $dockerImages := site.Data.download.docker }}
+{{ $latestV1       := site.Params.binariesLatest }}
+{{ $latestV2       := site.Params.binariesLatestV2 }}
+<table class="align-middle mw-100">
+  <thead>
+    <tr>
+      <th>Image</th>
+      <th>Major</th>
+      <th>Description</th>
+      <th>Since version</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range $dockerImages }}
+    {{ $org       := "jaegertracing" }}
+    {{ $image     := .image }}
+    {{ $major     := .major }}
+    {{ $fullImage := printf "%s/%s" $org $image }}
+    {{ $link      := printf "https://hub.docker.com/r/%s/%s" $org $image }}
+    {{ $since     := .since }}
+    {{ $latest    := cond (eq $major "v2") $latestV2 $latestV1}}
+    {{ $latestImg := .until | default $latest }}
+    <tr>
+      <td>
+        <a href="{{ $link }}">
+          {{- $image -}}
+        </a>
+      </td>
+      <td>
+        {{ $bg_kind := cond (eq $major "v2") "primary" "secondary" -}}
+        <span class="badge bg-{{ $bg_kind }}">{{ $major }}</span>
+      </td>
+      <td>
+        {{ if .until }}
+          <p class="text-danger fw-semibold mb-2">
+            Deprecated 💀💤❌. Latest available version is {{ $latestImg }}.
+          </p>
+        {{ end }}
+        <div class="mb-2">
+          {{ .description | markdownify }}
+        </div>
+        {{ if not .external }}
+        <code class="d-block mb-1">$ docker run cr.jaegertracing.io/{{ $fullImage }}:{{ $latestImg }} --help</code>
+        <code class="d-block">$ podman run cr.jaegertracing.io/{{ $fullImage }}:{{ $latestImg }} --help</code>
+        {{ end }}
+      </td>
+      <td>
+        {{ $since }}
+      </td>
+    </tr>
+    {{ end }}
+  </tbody>
+</table>
