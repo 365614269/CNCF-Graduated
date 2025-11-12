@@ -1,6 +1,6 @@
 module github.com/spiffe/spire
 
-go 1.25.3
+go 1.25.4
 
 require (
 	cloud.google.com/go/iam v1.5.2
@@ -82,7 +82,7 @@ require (
 	golang.org/x/crypto v0.43.0
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
 	golang.org/x/net v0.46.0
-	golang.org/x/sync v0.17.0
+	golang.org/x/sync v0.18.0
 	golang.org/x/sys v0.37.0
 	golang.org/x/time v0.14.0
 	google.golang.org/api v0.255.0
