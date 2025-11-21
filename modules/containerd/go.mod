@@ -75,17 +75,17 @@ require (
 	go.opentelemetry.io/otel/sdk v1.38.0
 	go.opentelemetry.io/otel/trace v1.38.0
 	go.uber.org/goleak v1.3.0
-	golang.org/x/mod v0.29.0
-	golang.org/x/sync v0.17.0
-	golang.org/x/sys v0.37.0
+	golang.org/x/mod v0.30.0
+	golang.org/x/sync v0.18.0
+	golang.org/x/sys v0.38.0
 	golang.org/x/time v0.14.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8
 	google.golang.org/grpc v1.77.0
 	google.golang.org/protobuf v1.36.10
 	gopkg.in/inf.v0 v0.9.1
-	k8s.io/apimachinery v0.34.1
-	k8s.io/client-go v0.34.1
-	k8s.io/cri-api v0.34.1
+	k8s.io/apimachinery v0.34.2
+	k8s.io/client-go v0.34.2
+	k8s.io/cri-api v0.34.2
 	k8s.io/klog/v2 v2.130.1
 	tags.cncf.io/container-device-interface v1.0.2-0.20251114135136-1b24d969689f
 )
@@ -150,7 +150,7 @@ require (
 	golang.org/x/text v0.30.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251022142026-3a174f9686a8 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.34.1 // indirect
+	k8s.io/api v0.34.2 // indirect
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
