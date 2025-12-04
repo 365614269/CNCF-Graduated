@@ -1,13 +1,13 @@
 ---
 title: Introduction
-linkTitle: 1.75 (latest)
+linkTitle: 1.75
 weight: -175
 children:
 - title: Features
   url: features
 sidebar_root_for: self
 aliases: [next-release]
-cascade: { robots: true }
+cascade: { robots: false }
 ---
 
 Welcome to Jaeger's documentation portal! Below, you'll find information for beginners and experienced Jaeger users.
