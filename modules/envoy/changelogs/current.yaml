@@ -21,6 +21,10 @@ behavior_changes:
     https://github.com/envoyproxy/envoy/issues/40918 for more details.
 - area: http
   change: |
+    Changing the default reset code from NO_ERROR to INTERNAL_ERROR. This behavioral change can be reverted by setting runtime
+    guard ``envoy.reloadable_features.reset_with_error`` to false.
+- area: http
+  change: |
     Added runtime flag ``envoy.reloadable_features.reject_early_connect_data`` to reject ``CONNECT`` requests
     that receive data before Envoy sent a ``200`` response to the client. While this is not a strictly compliant behavior
     it is very common as a latency reducing measure. As such the option is disabled by default.
@@ -82,11 +86,6 @@ minor_behavior_changes:
     Fixed HTTP ext_authz service to properly propagate headers (such as ``set-cookie``) back to clients. The
     filter now correctly uses ``allowed_client_headers`` for denied responses and ``allowed_client_headers_on_success``
     for successful authorization responses.
-- area: ext_authz
-  change: |
-    Fixed a bug where ``filter_enabled_metadata`` was not honored when the filter was marked with ``disabled: true``.
-    The filter is now instantiated when ``filter_enabled_metadata`` is configured, allowing it to check dynamic metadata
-    at runtime and enable itself conditionally.
 - area: quic
   change: |
     Switch to use QUICHE provided migration logic to handle port migration upon path degrading and migration to Server
@@ -230,6 +229,10 @@ new_features:
   change: |
     Support process-level rate limiting on access log emission by
     :ref:`ProcessRateLimitFilter <envoy_v3_api_msg_extensions.access_loggers.filters.process_ratelimit.v3.ProcessRateLimitFilter>`.
+- area: listener_filters
+  change: |
+    Added :ref:`Postgres Inspector <config_listener_filters_postgres_inspector>` listener filter for detecting
+    PostgreSQL connections, extracting metadata and supporting SNI-based routing for PostgreSQL traffic.
 - area: dynamic modules
   change: |
     Enhanced dynamic module ABIs to support headers addition and body size retrieval.
@@ -438,5 +441,8 @@ new_features:
     <envoy_v3_api_field_extensions.filters.network.ext_authz.v3.ExtAuthz.typed_metadata_context_namespaces>` in the
     ext-authz network filter. This allows passing connection metadata (such as proxy protocol TLV data) to the
     external authorization server for making authorization decisions.
+- area: attributes
+  change: |
+    added :ref:`attributes <arch_overview_attributes>` for looking up request or response headers bytes.
 
 deprecated:
