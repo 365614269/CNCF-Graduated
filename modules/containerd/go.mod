@@ -29,7 +29,7 @@ require (
 	github.com/containerd/typeurl/v2 v2.2.3
 	github.com/containerd/zfs/v2 v2.0.0
 	github.com/containernetworking/cni v1.3.0
-	github.com/containernetworking/plugins v1.8.0
+	github.com/containernetworking/plugins v1.9.0
 	github.com/coreos/go-systemd/v22 v22.6.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/distribution/reference v0.6.0
@@ -42,7 +42,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.0
-	github.com/intel/goresctrl v0.10.0
+	github.com/intel/goresctrl v0.11.0
 	github.com/klauspost/compress v1.18.2
 	github.com/mdlayher/vsock v1.2.1
 	github.com/moby/locker v1.0.1
@@ -87,7 +87,7 @@ require (
 	k8s.io/client-go v0.34.2
 	k8s.io/cri-api v0.34.2
 	k8s.io/klog/v2 v2.130.1
-	tags.cncf.io/container-device-interface v1.0.2-0.20251114135136-1b24d969689f
+	tags.cncf.io/container-device-interface v1.1.0
 )
 
 require (
@@ -130,7 +130,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
-	github.com/prometheus/procfs v0.16.1 // indirect
+	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.5 // indirect
 	github.com/smallstep/pkcs7 v0.1.1 // indirect
@@ -157,5 +157,5 @@ require (
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.0 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
-	tags.cncf.io/container-device-interface/specs-go v1.0.0 // indirect
+	tags.cncf.io/container-device-interface/specs-go v1.1.0 // indirect
 )
