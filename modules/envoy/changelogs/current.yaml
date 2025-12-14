@@ -90,6 +90,11 @@ minor_behavior_changes:
   change: |
     added immediate_responses_sent counter for ext proc in :ref:'FilterStats
     <envoy_v3_api_msg_extensions.filters.http.ext_proc.v3.ExternalProcessor.ExtProcFilterStats>'.
+- area: http
+  change: |
+    Now the retrying of async HTTP client calls will respect the set buffer limits and the retry will be ignored
+    if the buffer limit is exceeded. This behavior can be reverted by setting the runtime guard
+    ``envoy.reloadable_features.http_async_client_retry_respect_buffer_limits`` to ``false``.
 
 bug_fixes:
 # *Changes expected to improve the state of the world and are unlikely to have negative effects*
@@ -184,6 +189,9 @@ removed_config_or_runtime:
     Removed runtime guard ``envoy.reloadable_features.tcp_proxy_retry_on_different_event_loop`` and legacy code paths.
 - area: http
   change: |
+    Removed runtime guard ``envoy.reloadable_features.http1_balsa_delay_reset`` and legacy code paths.
+- area: http
+  change: |
     Removed runtime guard ``envoy.reloadable_features.http1_balsa_allow_cr_or_lf_at_request_start`` and legacy code paths.
 - area: quic
   change: |
@@ -191,6 +199,9 @@ removed_config_or_runtime:
 - area: http
   change: |
     Removed runtime guard ``envoy.reloadable_features.original_src_fix_port_exhaustion`` and legacy code paths.
+- area: http
+  change: |
+    Removed runtime guard ``envoy.reloadable_features.http2_propagate_reset_events`` and legacy code paths.
 - area: xds
   change: |
     Removed runtime guard ``envoy.reloadable_features.report_load_with_rq_issued`` and legacy code paths.
