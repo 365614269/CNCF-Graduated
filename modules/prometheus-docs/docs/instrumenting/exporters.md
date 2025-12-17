@@ -123,6 +123,7 @@ wide variety of JVM-based applications, for example [Kafka](http://kafka.apache.
    * [Pure Storage exporter](https://github.com/PureStorage-OpenConnect/pure-exporter)
    * [ScaleIO exporter](https://github.com/syepes/sio2prom)
    * [Tivoli Storage Manager/IBM Spectrum Protect exporter](https://github.com/treydock/tsm_exporter)
+   * [IBM Storage Scale metrics exporter](https://github.com/IBM/ibm-spectrum-scale-bridge-for-grafana)
 
 ### HTTP
    * [Apache exporter](https://github.com/Lusitaniae/apache_exporter)
@@ -174,6 +175,7 @@ wide variety of JVM-based applications, for example [Kafka](http://kafka.apache.
    * [Alibaba Cloudmonitor exporter](https://github.com/aylei/aliyun-exporter)
    * [AWS CloudWatch exporter](https://github.com/prometheus/cloudwatch_exporter) (**official**)
    * [Azure Monitor exporter](https://github.com/RobustPerception/azure_metrics_exporter)
+   * [CCF HuaTuo exporter](https://github.com/ccfos/huatuo)
    * [Cloud Foundry Firehose exporter](https://github.com/cloudfoundry-community/firehose_exporter)
    * [Collectd exporter](https://github.com/prometheus/collectd_exporter) (**official**)
    * [Google Stackdriver exporter](https://github.com/frodenas/stackdriver_exporter)
