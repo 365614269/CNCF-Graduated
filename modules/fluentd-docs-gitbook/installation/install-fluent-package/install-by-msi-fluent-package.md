@@ -14,8 +14,9 @@ You can also see [fluent-package-v5-vs-td-agent](../../quickstart/fluent-package
 ## How to install `fluent-package`
 
 {% hint style='danger' %}
-The following are deprecated td-agent (EOL) information:
+The following are deprecated (EOL) fluent-package and td-agent information:
 
+* About [Fluent Package (fluent-package) v5 (EOL)](https://www.fluentd.org/blog/schedule-for-fluent-package-5-eol), See [Install by .msi Package v5](./install-by-msi-fluent-package-v5.md).
 * About deprecated [Treasure Agent (td-agent) v4 (EOL)](https://www.fluentd.org/blog/schedule-for-td-agent-4-eol), see [Install by .msi Installer v4 (Windows)](../install-by-msi-td-agent-v4.md).
 * About deprecated [Treasure Agent (td-agent) 3 will not be maintained anymore](https://www.fluentd.org/blog/schedule-for-td-agent-3-eol), see [Install by msi Package  v3](../install-by-msi-td-agent-v3.md).
 * Do not directly upgrade from v3 to v5. Such a workflow is not supported. It causes a trouble. Upgrade in stages. (v3 to v4, then v4 to v5)
