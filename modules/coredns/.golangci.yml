@@ -11,6 +11,7 @@ linters:
     - copyloopvar
     - durationcheck
     - godoclint
+    - gosec
     - govet
     - ineffassign
     - intrange
@@ -39,7 +40,11 @@ linters:
       - path: _test\.go
         linters:
           - perfsprint
+          - gosec
   settings:
+    gosec:
+      excludes:
+        - G115
     govet:
       enable:
         - nilness

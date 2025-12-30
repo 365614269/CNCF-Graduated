@@ -195,7 +195,7 @@ Restart:
 
 // jitter returns a random duration between [0,n) * time.Millisecond
 func jitter(n int) time.Duration {
-	r := rand.Intn(n)
+	r := rand.Intn(n) // #nosec G404 -- non-cryptographic jitter to spread transfer attempts.
 	return time.Duration(r) * time.Millisecond
 }
 
