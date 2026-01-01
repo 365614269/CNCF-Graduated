@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/iam v1.5.3
 	cloud.google.com/go/kms v1.23.2
 	cloud.google.com/go/secretmanager v1.16.0
-	cloud.google.com/go/security v1.19.1
+	cloud.google.com/go/security v1.19.2
 	cloud.google.com/go/storage v1.58.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.20.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1
@@ -27,13 +27,13 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.0
 	github.com/aws/aws-sdk-go-v2/service/acmpca v1.46.2
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.62.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.278.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.279.0
 	github.com/aws/aws-sdk-go-v2/service/eks v1.76.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.53.1
 	github.com/aws/aws-sdk-go-v2/service/kms v1.49.0
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.50.0
 	github.com/aws/aws-sdk-go-v2/service/rolesanywhere v1.22.2
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.94.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.0
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.41.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.1
 	github.com/aws/smithy-go v1.24.0
@@ -44,15 +44,15 @@ require (
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa
 	github.com/go-jose/go-jose/v4 v4.1.3
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/godbus/dbus/v5 v5.2.1
+	github.com/godbus/dbus/v5 v5.2.2
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/gogo/status v1.1.1
 	github.com/google/btree v1.1.3
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-containerregistry v0.20.7
-	github.com/google/go-tpm v0.9.7
+	github.com/google/go-tpm v0.9.8
 	github.com/google/go-tpm-tools v0.4.7
-	github.com/googleapis/gax-go/v2 v2.15.0
+	github.com/googleapis/gax-go/v2 v2.16.0
 	github.com/gorilla/handlers v1.5.2
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/hashicorp/go-metrics v0.5.4
@@ -62,7 +62,7 @@ require (
 	github.com/hashicorp/vault/sdk v0.20.0
 	github.com/imdario/mergo v0.3.16
 	github.com/imkira/go-observer v1.0.3
-	github.com/jackc/pgx/v5 v5.7.6
+	github.com/jackc/pgx/v5 v5.8.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.32
@@ -87,8 +87,8 @@ require (
 	golang.org/x/sync v0.19.0
 	golang.org/x/sys v0.39.0
 	golang.org/x/time v0.14.0
-	google.golang.org/api v0.257.0
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217
+	google.golang.org/api v0.258.0
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251213004720-97cd9d5aeac2
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.11
 	k8s.io/api v0.34.2
@@ -106,8 +106,8 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/longrunning v0.7.0 // indirect
-	cloud.google.com/go/monitoring v1.24.2 // indirect
-	cloud.google.com/go/spanner v1.85.1 // indirect
+	cloud.google.com/go/monitoring v1.24.3 // indirect
+	cloud.google.com/go/spanner v1.86.1 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.2 // indirect
@@ -323,8 +323,8 @@ require (
 	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/term v0.38.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
-	google.golang.org/genproto v0.0.0-20250922171735-9219d122eba9 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20251111163417-95abcf5c77ba // indirect
+	google.golang.org/genproto v0.0.0-20251202230838-ff82c1b0f217 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
