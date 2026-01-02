@@ -65,11 +65,11 @@ require (
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lib/pq v1.10.9
-	github.com/mattn/go-sqlite3 v1.14.32
+	github.com/mattn/go-sqlite3 v1.14.33
 	github.com/mitchellh/cli v1.1.5
 	github.com/open-policy-agent/opa v1.12.1
 	github.com/prometheus/client_golang v1.23.2
-	github.com/shirou/gopsutil/v4 v4.25.11
+	github.com/shirou/gopsutil/v4 v4.25.12
 	github.com/sigstore/cosign/v2 v2.6.1
 	github.com/sigstore/rekor v1.4.3
 	github.com/sigstore/sigstore v1.10.3
