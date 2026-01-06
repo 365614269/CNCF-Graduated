@@ -3,6 +3,7 @@ package rewrite
 import (
 	"context"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/coredns/coredns/plugin"
@@ -154,5 +155,16 @@ func doTTLTests(t *testing.T, rules []Rule) {
 				break
 			}
 		}
+	}
+}
+
+func TestNewTTLRuleLargeRegex(t *testing.T) {
+	largeRegex := strings.Repeat("a", maxRegexpLen+1)
+	_, err := newTTLRule("stop", "regex", largeRegex, "300")
+	if err == nil {
+		t.Fatal("Expected error for large regex, got nil")
+	}
+	if !strings.Contains(err.Error(), "too long") {
+		t.Errorf("Expected 'too long' error, got: %v", err)
 	}
 }

@@ -1,6 +1,7 @@
 package rewrite
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/coredns/coredns/plugin/test"
@@ -68,5 +69,16 @@ func TestRCodeRewrite(t *testing.T) {
 	rcRule.response.RewriteResponse(request.Req, rr)
 	if request.Req.Rcode != dns.RcodeFormatError {
 		t.Fatalf("RCode rewrite did not apply changes, request=%#v, err=%v", request.Req, err)
+	}
+}
+
+func TestNewRCodeRuleLargeRegex(t *testing.T) {
+	largeRegex := strings.Repeat("a", maxRegexpLen+1)
+	_, err := newRCodeRule("stop", "regex", largeRegex, "SERVFAIL", "NXDOMAIN")
+	if err == nil {
+		t.Fatal("Expected error for large regex, got nil")
+	}
+	if !strings.Contains(err.Error(), "too long") {
+		t.Errorf("Expected 'too long' error, got: %v", err)
 	}
 }

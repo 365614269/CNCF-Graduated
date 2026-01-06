@@ -140,6 +140,9 @@ func newTTLRule(nextAction string, args ...string) (Rule, error) {
 				plugin.Name(args[1]).Normalize(),
 			}, nil
 		case RegexMatch:
+			if len(args[1]) > maxRegexpLen {
+				return nil, fmt.Errorf("regex pattern too long in a ttl rule: %d > %d", len(args[1]), maxRegexpLen)
+			}
 			regexPattern, err := regexp.Compile(args[1])
 			if err != nil {
 				return nil, fmt.Errorf("invalid regex pattern in a ttl rule: %s", args[1])

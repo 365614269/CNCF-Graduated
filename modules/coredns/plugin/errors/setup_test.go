@@ -2,6 +2,7 @@ package errors
 
 import (
 	"bytes"
+	"fmt"
 	golog "log"
 	"strings"
 	"testing"
@@ -248,5 +249,21 @@ func TestShowFirstOption(t *testing.T) {
 				t.Errorf("Expected log level %q, but got %q", tt.wantLogLevel, log)
 			}
 		})
+	}
+}
+
+func TestErrorsParseLargeRegex(t *testing.T) {
+	largeRegex := strings.Repeat("a", maxRegexpLen+1)
+	config := fmt.Sprintf(`errors {
+		consolidate 1m %s
+	}`, largeRegex)
+
+	c := caddy.NewTestController("dns", config)
+	_, err := errorsParse(c)
+	if err == nil {
+		t.Fatal("Expected error for large regex, got nil")
+	}
+	if !strings.Contains(err.Error(), "too long") {
+		t.Errorf("Expected 'too long' error, got: %v", err)
 	}
 }

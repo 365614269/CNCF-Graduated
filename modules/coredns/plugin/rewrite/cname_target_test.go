@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/coredns/coredns/plugin"
@@ -261,5 +262,16 @@ func TestCNAMETargetRewrite_upstreamFailurePaths(t *testing.T) {
 				t.Errorf("Expected answer to be %q, but got %q", "bad.target.", finalTarget)
 			}
 		})
+	}
+}
+
+func TestNewCNAMERuleLargeRegex(t *testing.T) {
+	largeRegex := strings.Repeat("a", maxRegexpLen+1)
+	_, err := newCNAMERule("stop", "regex", largeRegex, "replacement")
+	if err == nil {
+		t.Fatal("Expected error for large regex, got nil")
+	}
+	if !strings.Contains(err.Error(), "too long") {
+		t.Errorf("Expected 'too long' error, got: %v", err)
 	}
 }
