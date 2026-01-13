@@ -1013,8 +1013,34 @@ func (c *criContainer) GetSysctl() map[string]string {
 	return maps.Clone(c.spec.Linux.Sysctl)
 }
 
+func (c *criContainer) GetSeccompPolicy() *api.LinuxSeccomp {
+	if c.spec.Linux == nil || c.spec.Linux.Seccomp == nil {
+		return nil
+	}
+
+	return api.FromOCILinuxSeccomp(c.spec.Linux.Seccomp)
+}
+
 func (c *criContainer) GetPid() uint32 {
 	return c.pid
+}
+
+func (c *criContainer) GetRlimits() []*api.POSIXRlimit {
+	if c.spec == nil {
+		return nil
+	}
+
+	var rlimits []*api.POSIXRlimit
+
+	for _, l := range c.spec.Process.Rlimits {
+		rlimits = append(rlimits, &api.POSIXRlimit{
+			Type: l.Type,
+			Hard: l.Hard,
+			Soft: l.Soft,
+		})
+	}
+
+	return rlimits
 }
 
 //
