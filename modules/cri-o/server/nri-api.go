@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"maps"
+	"slices"
 
 	"github.com/containerd/nri/pkg/api"
 	nrigen "github.com/containerd/nri/pkg/runtime-tools/generate"
@@ -809,6 +810,39 @@ func (c *criContainer) GetRdt() *api.LinuxRdt {
 		Schemata:         api.RepeatedString(spec.Linux.IntelRdt.Schemata),
 		EnableMonitoring: api.Bool(spec.Linux.IntelRdt.EnableMonitoring),
 	}
+}
+
+func (c *criContainer) GetUser() *api.User {
+	spec := c.GetSpec()
+
+	if spec.Process == nil {
+		return nil
+	}
+
+	return &api.User{
+		Uid:            spec.Process.User.UID,
+		Gid:            spec.Process.User.GID,
+		AdditionalGids: slices.Clone(spec.Process.User.AdditionalGids),
+	}
+}
+
+func (c *criContainer) GetRlimits() []*api.POSIXRlimit {
+	spec := c.GetSpec()
+	if spec.Process == nil {
+		return nil
+	}
+
+	rlimits := make([]*api.POSIXRlimit, 0, len(spec.Process.Rlimits))
+
+	for _, l := range spec.Process.Rlimits {
+		rlimits = append(rlimits, &api.POSIXRlimit{
+			Type: l.Type,
+			Hard: l.Hard,
+			Soft: l.Soft,
+		})
+	}
+
+	return rlimits
 }
 
 func (c *criContainer) GetSpec() *rspec.Spec {
