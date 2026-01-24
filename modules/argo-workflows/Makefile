@@ -161,7 +161,7 @@ TOOL_SWAGGER                := $(GOPATH)/bin/swagger
 TOOL_GOIMPORTS              := $(GOPATH)/bin/goimports
 TOOL_GOLANGCI_LINT          := $(GOPATH)/bin/golangci-lint
 TOOL_GOTESTSUM              := $(GOPATH)/bin/gotestsum
-TOOL_SNIPDOC                := $(HOME)/.local/bin/snipdoc
+TOOL_EMBEDDOC               := hack/embeddoc/embeddoc
 
 # npm bin -g will do this on later npms than we have
 NVM_BIN                     ?= $(shell npm config get prefix)/bin
@@ -441,7 +441,7 @@ endif
 $(TOOL_GOIMPORTS): Makefile
 # update this in Nix when upgrading it here
 ifneq ($(USE_NIX), true)
-	go install golang.org/x/tools/cmd/goimports@v0.1.7
+	go install golang.org/x/tools/cmd/goimports@v0.35.0
 endif
 $(TOOL_GOTESTSUM): Makefile
 # update this in Nix when upgrading it here
@@ -449,11 +449,8 @@ ifneq ($(USE_NIX), true)
 	go install gotest.tools/gotestsum@v1.12.3
 endif
 
-$(TOOL_SNIPDOC): Makefile
-# update this in Nix when upgrading it here
-ifneq ($(USE_NIX), true)
-	./hack/install-snipdoc.sh $(TOOL_SNIPDOC) v0.1.12
-endif
+$(TOOL_EMBEDDOC): hack/embeddoc/main.go hack/embeddoc/go.mod
+	cd hack/embeddoc && go build -o embeddoc .
 
 $(TOOL_CLANG_FORMAT):
 ifeq (, $(shell which clang-format))
@@ -465,8 +462,8 @@ else
 endif
 endif
 
-# go-to-protobuf fails with mysterious errors on code that doesn't compile, hence lint-go as a dependency here
-pkg/apis/workflow/v1alpha1/generated.proto: $(TOOL_GO_TO_PROTOBUF) $(PROTO_BINARIES) $(TYPES) $(GOPATH)/src/github.com/gogo/protobuf lint-go
+# go-to-protobuf fails with mysterious errors on code that doesn't compile
+pkg/apis/workflow/v1alpha1/generated.proto: $(TOOL_GO_TO_PROTOBUF) $(PROTO_BINARIES) $(TYPES) $(GOPATH)/src/github.com/gogo/protobuf
 	# These files are generated on a v3/ folder by the tool. Link them to the root folder
 	[ -e ./v3 ] || ln -s . v3
 	# Format proto files. Formatting changes generated code, so we do it here, rather that at lint time.
@@ -586,7 +583,7 @@ lint-ui: ui/dist/app/index.html
 
 # for local we have a faster target that prints to stdout, does not use json, and can cache because it has no coverage
 .PHONY: test
-test: ui/dist/app/index.html util/telemetry/metrics_list.go util/telemetry/attributes.go $(TOOL_GOTESTSUM) $(JSON_TEST_OUTPUT) ## Run tests
+test: ui/dist/app/index.html $(TOOL_GOTESTSUM) $(JSON_TEST_OUTPUT) ## Run tests
 	go build ./...
 	env KUBECONFIG=/dev/null $(call gotest,./...,unit,-p 20)
 	# marker file, based on it's modification time, we know how long ago this target was run
@@ -730,22 +727,12 @@ clean: ## Clean the directory of build files
 	rm -Rf test/reports test-results node_modules vendor v2 v3 argoexec-linux-amd64 dist/* ui/dist
 
 # Build telemetry files
+# Telemetry Go files generated via go generate, run as part of codegen.
 TELEMETRY_BUILDER := $(shell find util/telemetry/builder -type f -name '*.go')
+
 docs/metrics.md: $(TELEMETRY_BUILDER) util/telemetry/builder/values.yaml
 	@echo Rebuilding $@
 	go run ./util/telemetry/builder --metricsDocs $@
-
-util/telemetry/metrics_list.go: $(TELEMETRY_BUILDER) util/telemetry/builder/values.yaml
-	@echo Rebuilding $@
-	go run ./util/telemetry/builder --metricsListGo $@
-
-util/telemetry/attributes.go: $(TELEMETRY_BUILDER) util/telemetry/builder/values.yaml
-	@echo Rebuilding $@
-	go run ./util/telemetry/builder --attributesGo $@
-
-util/telemetry/metrics_helpers.go: $(TELEMETRY_BUILDER) util/telemetry/builder/values.yaml
-	@echo Rebuilding $@
-	go run ./util/telemetry/builder --metricsHelpersGo $@
 
 # swagger
 pkg/apis/workflow/v1alpha1/openapi_generated.go: $(TOOL_OPENAPI_GEN) $(TYPES)
@@ -827,8 +814,8 @@ docs/workflow-controller-configmap.md: config/*.go hack/docs/workflow-controller
 docs/cli/argo.md: $(CLI_PKG_FILES) go.sum ui/dist/app/index.html hack/docs/cli.go
 	go run ./hack/docs cli
 
-docs/go-sdk-guide.md: $(TOOL_SNIPDOC)
-	$(TOOL_SNIPDOC) run
+docs/go-sdk-guide.md: $(TOOL_EMBEDDOC)
+	$(TOOL_EMBEDDOC)
 
 $(TOOL_MDSPELL): Makefile
 # update this in Nix when upgrading it here
