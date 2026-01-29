@@ -65,11 +65,11 @@ require (
 	go.opentelemetry.io/otel/metric v1.39.0
 	go.opentelemetry.io/otel/sdk v1.39.0
 	go.opentelemetry.io/otel/sdk/metric v1.39.0
-	go.uber.org/mock v0.5.2
+	go.uber.org/mock v0.6.0
 	golang.org/x/crypto v0.46.0
 	golang.org/x/oauth2 v0.33.0
 	golang.org/x/sync v0.19.0
-	golang.org/x/time v0.11.0
+	golang.org/x/time v0.14.0
 	google.golang.org/api v0.236.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260126211449-d11affda4bed
 	google.golang.org/grpc v1.72.2
