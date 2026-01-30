@@ -21,8 +21,10 @@ linters:
     - containedctx
     - durationcheck
     - errcheck
+    - errorlint
     - exptostd
     - gocheckcompilerdirectives
+    - gocritic
     - gosec
     - govet
     - iface
