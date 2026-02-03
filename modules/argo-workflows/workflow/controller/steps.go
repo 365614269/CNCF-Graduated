@@ -458,11 +458,10 @@ func (woc *wfOperationCtx) resolveReferences(ctx context.Context, stepGroup []wf
 			// If we got an error, it might be because our "when" clause contains a task-expansion parameter (e.g. {{item}}).
 			// Since we don't perform task-expansion until later and task-expansion parameters won't get resolved here,
 			// we continue execution as normal
-			if newStep.ShouldExpand() {
-				proceed = true
-			} else {
+			if !newStep.ShouldExpand() {
 				return err
 			}
+			proceed = true
 		}
 		if !proceed {
 			// We can simply return this WorkflowStep; the fact that it won't execute will be reconciled later on in execution
@@ -499,15 +498,13 @@ func (woc *wfOperationCtx) resolveReferences(ctx context.Context, stepGroup []wf
 	var wg sync.WaitGroup
 	for i, step := range stepGroup {
 		parallelStepNum <- step.Name
-		wg.Add(1)
-		go func(i int, step wfv1.WorkflowStep) {
-			defer wg.Done()
+		wg.Go(func() {
 			if err := resolveStepReferences(i, step, newStepGroup); err != nil {
 				woc.log.WithFields(logging.Fields{"stepName": step.Name}).WithError(err).Error(ctx, "Failed to resolve references")
 				errCh <- err
 			}
 			<-parallelStepNum
-		}(i, step)
+		})
 	}
 	wg.Wait()
 
