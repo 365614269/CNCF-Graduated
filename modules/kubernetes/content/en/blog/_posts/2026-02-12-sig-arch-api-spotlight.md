@@ -1,11 +1,12 @@
 ---
 layout: blog
 title: "Spotlight on SIG Architecture: API Governance"
-slug: sig-architecture-api
-date: 2026-12-31 # placeholder
-draft: true
+slug: sig-architecture-api-spotlight
+canonicalUrl: https://www.kubernetes.dev/blog/2026/02/12/sig-architecture-api
+date: 2026-02-12
+draft: false
 author: >
-  [Frederico Muñoz](https://github.com/fsmunoz) (SAS Institute)"
+  [Frederico Muñoz](https://github.com/fsmunoz) (SAS Institute)
 ---
 
 _This is the fifth interview of a SIG Architecture Spotlight series that covers the different
