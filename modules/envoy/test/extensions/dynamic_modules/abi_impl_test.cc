@@ -30,6 +30,13 @@ TEST(CommonAbiImplTest, SchedulerCommitEnvoyBug) {
       "not implemented in this context");
 }
 
+// Test that the weak symbol stub for signal_init_complete triggers an ENVOY_BUG when called.
+TEST(CommonAbiImplTest, SignalInitCompleteEnvoyBug) {
+  EXPECT_ENVOY_BUG(
+      { envoy_dynamic_module_callback_bootstrap_extension_config_signal_init_complete(nullptr); },
+      "not implemented in this context");
+}
+
 // Test that the weak symbol stub for http_callout triggers an ENVOY_BUG when called.
 TEST(CommonAbiImplTest, HttpCalloutEnvoyBug) {
   uint64_t callout_id = 0;
@@ -141,6 +148,43 @@ TEST(CommonAbiImplTest, TimerEnabledEnvoyBug) {
 TEST(CommonAbiImplTest, TimerDeleteEnvoyBug) {
   EXPECT_ENVOY_BUG(
       { envoy_dynamic_module_callback_bootstrap_extension_timer_delete(nullptr); },
+      "not implemented in this context");
+}
+
+// =====================================================================
+// Bootstrap extension admin handler weak symbol stub tests
+// =====================================================================
+
+// Test that the weak symbol stub for register_admin_handler triggers an ENVOY_BUG when called.
+TEST(CommonAbiImplTest, RegisterAdminHandlerEnvoyBug) {
+  envoy_dynamic_module_type_module_buffer path = {"/test", 5};
+  envoy_dynamic_module_type_module_buffer help = {"help", 4};
+  EXPECT_ENVOY_BUG(
+      {
+        auto result = envoy_dynamic_module_callback_bootstrap_extension_register_admin_handler(
+            nullptr, path, help, true, false);
+        EXPECT_FALSE(result);
+      },
+      "not implemented in this context");
+}
+
+// Test that the weak symbol stub for remove_admin_handler triggers an ENVOY_BUG when called.
+TEST(CommonAbiImplTest, RemoveAdminHandlerEnvoyBug) {
+  envoy_dynamic_module_type_module_buffer path = {"/test", 5};
+  EXPECT_ENVOY_BUG(
+      {
+        auto result =
+            envoy_dynamic_module_callback_bootstrap_extension_remove_admin_handler(nullptr, path);
+        EXPECT_FALSE(result);
+      },
+      "not implemented in this context");
+}
+
+// Test that the weak symbol stub for admin_set_response triggers an ENVOY_BUG when called.
+TEST(CommonAbiImplTest, AdminSetResponseEnvoyBug) {
+  envoy_dynamic_module_type_module_buffer body = {"response", 8};
+  EXPECT_ENVOY_BUG(
+      { envoy_dynamic_module_callback_bootstrap_extension_admin_set_response(nullptr, body); },
       "not implemented in this context");
 }
 

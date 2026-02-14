@@ -92,12 +92,46 @@ TEST_P(DynamicModulesBootstrapIntegrationTest, FunctionRegistryRust) {
       initializeWithBootstrapExtension(testDataDir("rust"), "bootstrap_function_registry_test"));
 }
 
+// This test verifies that Envoy automatically registers an init target for every bootstrap
+// extension and that the module can signal readiness to unblock startup.
+TEST_P(DynamicModulesBootstrapIntegrationTest, InitTargetRust) {
+  EXPECT_LOG_CONTAINS_ALL_OF(
+      Envoy::ExpectedLogMessages({{"info", "Init target signaled complete during config creation"},
+                                  {"info", "Bootstrap init target test completed successfully!"}}),
+      initializeWithBootstrapExtension(testDataDir("rust"), "bootstrap_init_target_test"));
+}
+
 // This test verifies that the Rust bootstrap extension timer API works correctly.
 // A timer is created during config_new, armed with a short delay, and on_timer_fired logs success.
 TEST_P(DynamicModulesBootstrapIntegrationTest, TimerRust) {
   EXPECT_LOG_CONTAINS(
       "info", "Bootstrap timer test completed successfully!",
       initializeWithBootstrapExtension(testDataDir("rust"), "bootstrap_timer_test"));
+}
+
+// This test verifies that the Rust bootstrap extension can register a custom admin HTTP endpoint
+// and respond to admin requests.
+TEST_P(DynamicModulesBootstrapIntegrationTest, AdminHandlerRust) {
+  EXPECT_LOG_CONTAINS(
+      "info", "Admin handler registered: true",
+      initializeWithBootstrapExtension(testDataDir("rust"), "bootstrap_admin_handler_test"));
+
+  // Make an admin request to the registered endpoint.
+  BufferingStreamDecoderPtr response =
+      IntegrationUtil::makeSingleRequest(lookupPort("admin"), "GET", "/dynamic_module_admin_test",
+                                         "", Http::CodecType::HTTP1, version_);
+  EXPECT_TRUE(response->complete());
+  EXPECT_EQ("200", response->headers().getStatusValue());
+  EXPECT_THAT(response->body(), testing::HasSubstr("Hello from dynamic module admin handler!"));
+
+  // Verify the admin request was logged.
+  EXPECT_LOG_CONTAINS("info", "Admin request received: GET", {
+    response = IntegrationUtil::makeSingleRequest(lookupPort("admin"), "GET",
+                                                  "/dynamic_module_admin_test?foo=bar", "",
+                                                  Http::CodecType::HTTP1, version_);
+    EXPECT_TRUE(response->complete());
+    EXPECT_EQ("200", response->headers().getStatusValue());
+  });
 }
 
 } // namespace DynamicModules
