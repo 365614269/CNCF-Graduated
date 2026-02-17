@@ -2,7 +2,7 @@ module github.com/coredns/coredns
 
 // Note this minimum version requirement. CoreDNS supports the last two
 // Go versions. This follows the upstream Go project support.
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
@@ -18,7 +18,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.41.1
 	github.com/coredns/caddy v1.1.4-0.20250930002214-15135a999495
 	github.com/dnstap/golang-dnstap v0.4.0
-	github.com/expr-lang/expr v1.17.7
+	github.com/expr-lang/expr v1.17.8
 	github.com/farsightsec/golang-framestream v0.3.0
 	github.com/go-logr/logr v1.4.3
 	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645
@@ -35,13 +35,13 @@ require (
 	github.com/prometheus/common v0.67.5
 	github.com/quic-go/quic-go v0.59.0
 	github.com/stretchr/testify v1.11.1
-	go.etcd.io/etcd/api/v3 v3.6.7
-	go.etcd.io/etcd/client/v3 v3.6.7
+	go.etcd.io/etcd/api/v3 v3.6.8
+	go.etcd.io/etcd/client/v3 v3.6.8
 	go.uber.org/automaxprocs v1.6.0
-	golang.org/x/crypto v0.47.0
+	golang.org/x/crypto v0.48.0
 	golang.org/x/sys v0.41.0
 	google.golang.org/api v0.266.0
-	google.golang.org/grpc v1.78.0
+	google.golang.org/grpc v1.79.1
 	google.golang.org/protobuf v1.36.11
 	k8s.io/api v0.34.3
 	k8s.io/apimachinery v0.34.3
@@ -51,8 +51,8 @@ require (
 )
 
 require (
-	github.com/pires/go-proxyproto v0.8.1
-	golang.org/x/net v0.49.0
+	github.com/pires/go-proxyproto v0.11.0
+	golang.org/x/net v0.50.0
 )
 
 require (
@@ -165,7 +165,7 @@ require (
 	github.com/trailofbits/go-mutexasserts v0.0.0-20250514102930-c1f3d2e37561 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.6.7 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.6.8 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/collector/component v1.39.0 // indirect
 	go.opentelemetry.io/collector/featuregate v1.46.0 // indirect
@@ -185,13 +185,13 @@ require (
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
-	golang.org/x/mod v0.31.0 // indirect
+	golang.org/x/mod v0.32.0 // indirect
 	golang.org/x/oauth2 v0.35.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/term v0.39.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/term v0.40.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	golang.org/x/tools v0.40.0 // indirect
+	golang.org/x/tools v0.41.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260128011058-8636f8732409 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260203192932-546029d2fa20 // indirect

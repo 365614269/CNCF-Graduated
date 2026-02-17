@@ -18,14 +18,14 @@ type databaseSemaphore struct {
 	shortDBKey   string
 	nextWorkflow NextWorkflow
 	logger       loggerFn
-	info         syncdb.DBInfo
+	info         syncdb.Info
 	queries      syncdb.SyncQueries
 	isMutex      bool
 }
 
 var _ semaphore = &databaseSemaphore{}
 
-func newDatabaseSemaphore(ctx context.Context, name string, dbKey string, nextWorkflow NextWorkflow, info syncdb.DBInfo, syncLimitCacheTTL time.Duration) (*databaseSemaphore, error) {
+func newDatabaseSemaphore(ctx context.Context, name string, dbKey string, nextWorkflow NextWorkflow, info syncdb.Info, syncLimitCacheTTL time.Duration) (*databaseSemaphore, error) {
 	logger := syncLogger{
 		name:     name,
 		lockType: lockTypeSemaphore,
@@ -54,10 +54,6 @@ func (s *databaseSemaphore) longDBKey() string {
 		return "mtx/" + s.shortDBKey
 	}
 	return "sem/" + s.shortDBKey
-}
-
-func (s *databaseSemaphore) getName() string {
-	return s.name
 }
 
 func (s *databaseSemaphore) getLimitFromDB(ctx context.Context, _ string) (int, error) {

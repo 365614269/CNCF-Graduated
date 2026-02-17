@@ -67,7 +67,7 @@ func NewServerCommand() *cobra.Command {
 		Example: fmt.Sprintf(`
 See %s`, help.ArgoServer()),
 		RunE: func(c *cobra.Command, args []string) error {
-			ctx, logger, err := cmdutil.CmdContextWithLogger(c, logLevel, logFormat)
+			ctx, logger, err := cmdutil.ContextWithLogger(c, logLevel, logFormat)
 			if err != nil {
 				return err
 			}
@@ -137,7 +137,6 @@ See %s`, help.ArgoServer()),
 						return err
 					}
 				}
-
 			} else {
 				logger.Warn(ctx, "You are running in insecure mode. Learn how to enable transport layer security: https://argo-workflows.readthedocs.io/en/latest/tls/")
 			}
@@ -222,7 +221,7 @@ See %s`, help.ArgoServer()),
 	viper.SetEnvPrefix("ARGO")
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "_"))
 	// bind flags to env vars (https://github.com/spf13/viper/tree/v1.17.0#working-with-flags)
-	ctx, logger, err := cmdutil.CmdContextWithLogger(&command, logLevel, logFormat)
+	ctx, logger, err := cmdutil.ContextWithLogger(&command, logLevel, logFormat)
 	if err != nil {
 		logging.InitLogger().WithError(err).WithFatal().Error(ctx, "Failed to create server logger")
 	}
