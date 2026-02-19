@@ -110,7 +110,9 @@ Strings MUST only consist of valid UTF-8 characters and MAY be zero length. NULL
 
 Labels are key-value pairs consisting of strings.
 
-Label names beginning with two underscores are RESERVED and MUST NOT be used unless specified by this standard. Label names SHOULD follow the restrictions in the ABNF section under the `label-name` section. Label names MAY be any quoted escaped UTF-8 string as described in the ABNF section. Be aware that exposing UTF-8 metrics is still experimental and may reduce usability.
+Label names beginning with two underscores are RESERVED and MUST NOT be used unless specified by this standard. Such Label names MAY be used in place of TYPE and UNIT metadata in cases where MetricFamilies' metadata might otherwise be conflicting, such as metric federation cases.
+
+Label names SHOULD follow the restrictions in the ABNF section under the `label-name` section. Label names MAY be any quoted escaped UTF-8 string as described in the ABNF section. Be aware that exposing UTF-8 metrics may reduce usability.
 
 Empty label values SHOULD be treated as if the label was not present.
 
@@ -126,7 +128,9 @@ Each MetricPoint consists of a set of values, depending on the MetricFamily type
 
 Exemplars are references to data outside of the MetricSet. A common use case are IDs of program traces.
 
-Exemplars MUST consist of a LabelSet and a value, and SHOULD have a timestamp. They MAY each be different from the MetricPoints' LabelSet and timestamp.
+Exemplars MUST consist of a LabelSet and a value, and MUST have a timestamp. They MAY each be different from the MetricPoints' LabelSet and timestamp.
+
+The Exemplar's timestamp SHOULD be close to the point in time when the referenced data was created, but doesn't have to be exact. For example if getting an exact timestamp is costly, it is acceptable to use some external source or synthetic clock.
 
 While there's no [hard limit](#size-limits) specified, Exemplar's LabelSet SHOULD NOT be used to transport large data like tracing span details or other event logging.
 
@@ -436,7 +440,7 @@ metric-type =/ info / summary / unknown
 sample = metricname-and-labels SP number [SP timestamp] [SP start-timestamp] [exemplar] LF
 sample =/ metricname-and-labels SP "{" composite-value "}" [SP timestamp] [SP start-timestamp] *exemplar LF
 
-exemplar = SP HASH SP labels-in-braces SP number [SP timestamp]
+exemplar = SP HASH SP labels-in-braces SP number SP timestamp
 
 metricname-and-labels = metricname [labels-in-braces] / name-and-labels-in-braces
 labels-in-braces = "{" [label *(COMMA label)] "}"
@@ -896,7 +900,7 @@ An example with a Metric with no labels, and a MetricPoint with a timestamp and 
 
 ```openmetrics-add-eof
 # TYPE foo counter
-foo_total 17.0 1520879607.789 st@1520430000.123 # {trace_id="KOO5S4vxi0o"} 0.67
+foo_total 17.0 1520879607.789 st@1520430000.123 # {trace_id="KOO5S4vxi0o"} 0.67 1520879606.1
 ```
 
 ##### StateSet
