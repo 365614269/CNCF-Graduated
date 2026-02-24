@@ -28,6 +28,12 @@ behavior_changes:
     :ref:`enforce_rsa_key_usage <envoy_v3_api_field_extensions.transport_sockets.tls.v3.UpstreamTlsContext.enforce_rsa_key_usage>`
     to true by default. The handshake will fail if the keyUsage extension is present and incompatible with the TLS usage. In
     the next version of Envoy, this option will be removed and the enforcing behavior will always be used.
+- area: ext_proc
+  change: |
+    The processing_effect_lib has been moved from :ref:`extensions/filters/http/ext_proc namespace
+    <envoy_v3_api_msg_extensions.filters.http.ext_proc.v3.ExternalProcessor>` to
+    extensions/filters/common/processing_effect namespace. All path references within the Envoy
+    codebase have been updated.
 
 minor_behavior_changes:
 # *Changes that may cause incompatibilities for some users, but should not for most*
@@ -273,6 +279,13 @@ new_features:
 - area: mcp_router
   change: |
     Added support for MCP logging method ``logging/setLevel``.
+- area: upstream
+  change: |
+    Coalesced load balancer rebuilds during EDS batch host updates. When multiple priorities change in a
+    single batch, each LB level (LoadBalancerBase, ZoneAwareLoadBalancerBase, EdfLoadBalancerBase,
+    ThreadAwareLoadBalancerBase) now defers expensive per-priority recalculations to a single pass after
+    the batch completes, reducing CPU spikes on large clusters. This behavior can be reverted by setting
+    the runtime guard ``envoy.reloadable_features.coalesce_lb_rebuilds_on_batch_update`` to ``false``.
 - area: cel
   change: |
     Added functionality to reevaluate CEL expressions that attempt to read response path data on the
@@ -447,5 +460,8 @@ new_features:
   change: |
     Added the MCP JSON REST Bridge HTTP filter configuration to transcode MCP JSON-RPC requests into
     standard JSON-REST HTTP requests.
+- area: mcp_router
+  change: |
+    Added SSE response support for MCP ``prompts/list`` fanout aggregation.
 
 deprecated:

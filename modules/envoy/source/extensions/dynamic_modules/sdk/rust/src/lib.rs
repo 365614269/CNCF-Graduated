@@ -8,9 +8,11 @@ pub mod access_log;
 pub mod buffer;
 pub mod cert_validator;
 pub mod matcher;
+pub mod utility;
 pub use buffer::{EnvoyBuffer, EnvoyMutBuffer};
 use mockall::predicate::*;
 use mockall::*;
+pub use utility::{read_whole_request_body, read_whole_response_body};
 
 #[cfg(test)]
 #[path = "./lib_test.rs"]
