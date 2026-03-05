@@ -542,6 +542,11 @@ TEST_F(DynamicModulesLoadBalancerTest, AbiCallbacksWithNullPointers) {
   envoy_dynamic_module_type_envoy_buffer header_result = {nullptr, 0};
   EXPECT_FALSE(envoy_dynamic_module_callback_lb_context_get_downstream_header(
       nullptr, header_key, &header_result, 0, nullptr));
+
+  // Test retry-awareness context callbacks with null.
+  EXPECT_EQ(envoy_dynamic_module_callback_lb_context_get_host_selection_retry_count(nullptr), 0);
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_context_should_select_another_host(nullptr, nullptr, 0, 0));
 }
 
 TEST_F(DynamicModulesLoadBalancerTest, AbiCallbacksWithInvalidPriority) {
@@ -759,6 +764,99 @@ TEST_F(DynamicModulesLoadBalancerTest, AbiCallbacksHostStatsAndLocality) {
   EXPECT_EQ(absl::string_view(region.ptr, region.length), "us-east");
 }
 
+TEST_F(DynamicModulesLoadBalancerTest, HostHealthByAddressSuccess) {
+  // Set up a cross-priority host map containing the test hosts.
+  auto host_map = std::make_shared<Upstream::HostMap>();
+  host_map->insert({"10.0.0.1:8080", host1_});
+  host_map->insert({"10.0.0.2:8080", host2_});
+  host_map->insert({"10.0.0.3:8080", host3_});
+  ON_CALL(priority_set_, crossPriorityHostMap()).WillByDefault(Return(host_map));
+
+  envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
+      config;
+  config.mutable_dynamic_module_config()->set_name("lb_round_robin");
+  config.set_lb_policy_name("test_lb");
+
+  Factory factory;
+  auto lb_config_or_error = factory.loadConfig(factory_context_, config);
+  ASSERT_TRUE(lb_config_or_error.ok());
+
+  auto thread_aware_lb =
+      factory.create(OptRef<const Upstream::LoadBalancerConfig>(*lb_config_or_error.value()),
+                     cluster_info_, priority_set_, runtime_, random_, time_source_);
+  ASSERT_NE(thread_aware_lb, nullptr);
+  ASSERT_TRUE(thread_aware_lb->initialize().ok());
+
+  Upstream::LoadBalancerParams params{priority_set_, nullptr};
+  auto lb = thread_aware_lb->factory()->create(params);
+  ASSERT_NE(lb, nullptr);
+
+  auto* lb_ptr = static_cast<DynamicModuleLoadBalancer*>(lb.get());
+
+  // Lookup healthy host by address.
+  envoy_dynamic_module_type_host_health health = envoy_dynamic_module_type_host_health_Unhealthy;
+  envoy_dynamic_module_type_module_buffer addr1 = {"10.0.0.1:8080", 13};
+  EXPECT_TRUE(envoy_dynamic_module_callback_lb_get_host_health_by_address(lb_ptr, addr1, &health));
+  EXPECT_EQ(health, envoy_dynamic_module_type_host_health_Healthy);
+
+  // Lookup another healthy host.
+  envoy_dynamic_module_type_module_buffer addr2 = {"10.0.0.2:8080", 13};
+  EXPECT_TRUE(envoy_dynamic_module_callback_lb_get_host_health_by_address(lb_ptr, addr2, &health));
+  EXPECT_EQ(health, envoy_dynamic_module_type_host_health_Healthy);
+
+  // Lookup degraded host.
+  envoy_dynamic_module_type_module_buffer addr3 = {"10.0.0.3:8080", 13};
+  EXPECT_TRUE(envoy_dynamic_module_callback_lb_get_host_health_by_address(lb_ptr, addr3, &health));
+  EXPECT_EQ(health, envoy_dynamic_module_type_host_health_Degraded);
+
+  // Lookup non-existent address.
+  envoy_dynamic_module_type_module_buffer bad_addr = {"1.2.3.4:9999", 12};
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_get_host_health_by_address(lb_ptr, bad_addr, &health));
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, HostHealthByAddressNullInputs) {
+  envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
+      config;
+  config.mutable_dynamic_module_config()->set_name("lb_round_robin");
+  config.set_lb_policy_name("test_lb");
+
+  Factory factory;
+  auto lb_config_or_error = factory.loadConfig(factory_context_, config);
+  ASSERT_TRUE(lb_config_or_error.ok());
+
+  auto thread_aware_lb =
+      factory.create(OptRef<const Upstream::LoadBalancerConfig>(*lb_config_or_error.value()),
+                     cluster_info_, priority_set_, runtime_, random_, time_source_);
+  ASSERT_NE(thread_aware_lb, nullptr);
+  ASSERT_TRUE(thread_aware_lb->initialize().ok());
+
+  Upstream::LoadBalancerParams params{priority_set_, nullptr};
+  auto lb = thread_aware_lb->factory()->create(params);
+  ASSERT_NE(lb, nullptr);
+
+  auto* lb_ptr = static_cast<DynamicModuleLoadBalancer*>(lb.get());
+
+  // Null lb_envoy_ptr.
+  envoy_dynamic_module_type_host_health health = envoy_dynamic_module_type_host_health_Healthy;
+  envoy_dynamic_module_type_module_buffer addr = {"10.0.0.1:8080", 13};
+  EXPECT_FALSE(envoy_dynamic_module_callback_lb_get_host_health_by_address(nullptr, addr, &health));
+  EXPECT_EQ(health, envoy_dynamic_module_type_host_health_Unhealthy);
+
+  // Null result pointer.
+  EXPECT_FALSE(envoy_dynamic_module_callback_lb_get_host_health_by_address(lb_ptr, addr, nullptr));
+
+  // Null address pointer.
+  envoy_dynamic_module_type_module_buffer null_addr = {nullptr, 0};
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_get_host_health_by_address(lb_ptr, null_addr, &health));
+
+  // Null host map (default mock returns nullptr).
+  envoy_dynamic_module_type_module_buffer valid_addr = {"10.0.0.1:8080", 13};
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_get_host_health_by_address(lb_ptr, valid_addr, &health));
+}
+
 TEST_F(DynamicModulesLoadBalancerTest, ContextCallbacksSuccessfulCases) {
   envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
       config;
@@ -878,6 +976,126 @@ TEST_F(DynamicModulesLoadBalancerTest, ContextCallbacksHeaderOutOfBounds) {
   envoy_dynamic_module_type_envoy_buffer result = {nullptr, 0};
   EXPECT_FALSE(envoy_dynamic_module_callback_lb_context_get_downstream_header(
       context_ptr, key, &result, 999, nullptr));
+}
+
+// =============================================================================
+// Retry Awareness Tests
+// =============================================================================
+
+TEST_F(DynamicModulesLoadBalancerTest, HostSelectionRetryCount) {
+  NiceMock<Upstream::MockLoadBalancerContext> context;
+  ON_CALL(context, hostSelectionRetryCount()).WillByDefault(Return(3));
+
+  auto* context_ptr = static_cast<Upstream::LoadBalancerContext*>(&context);
+
+  EXPECT_EQ(envoy_dynamic_module_callback_lb_context_get_host_selection_retry_count(context_ptr),
+            3);
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, HostSelectionRetryCountZero) {
+  NiceMock<Upstream::MockLoadBalancerContext> context;
+  ON_CALL(context, hostSelectionRetryCount()).WillByDefault(Return(0));
+
+  auto* context_ptr = static_cast<Upstream::LoadBalancerContext*>(&context);
+
+  EXPECT_EQ(envoy_dynamic_module_callback_lb_context_get_host_selection_retry_count(context_ptr),
+            0);
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, ShouldSelectAnotherHostAccepted) {
+  envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
+      config;
+  config.mutable_dynamic_module_config()->set_name("lb_round_robin");
+  config.set_lb_policy_name("test_lb");
+
+  Factory factory;
+  auto lb_config_or_error = factory.loadConfig(factory_context_, config);
+  ASSERT_TRUE(lb_config_or_error.ok());
+
+  auto thread_aware_lb =
+      factory.create(OptRef<const Upstream::LoadBalancerConfig>(*lb_config_or_error.value()),
+                     cluster_info_, priority_set_, runtime_, random_, time_source_);
+  ASSERT_NE(thread_aware_lb, nullptr);
+  ASSERT_TRUE(thread_aware_lb->initialize().ok());
+
+  Upstream::LoadBalancerParams params{priority_set_, nullptr};
+  auto lb = thread_aware_lb->factory()->create(params);
+  ASSERT_NE(lb, nullptr);
+
+  auto* lb_ptr = static_cast<DynamicModuleLoadBalancer*>(lb.get());
+
+  NiceMock<Upstream::MockLoadBalancerContext> context;
+  ON_CALL(context, shouldSelectAnotherHost(_)).WillByDefault(Return(false));
+  auto* context_ptr = static_cast<Upstream::LoadBalancerContext*>(&context);
+
+  // Host should be accepted (shouldSelectAnotherHost returns false).
+  EXPECT_FALSE(envoy_dynamic_module_callback_lb_context_should_select_another_host(
+      lb_ptr, context_ptr, 0, 0));
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, ShouldSelectAnotherHostRejected) {
+  envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
+      config;
+  config.mutable_dynamic_module_config()->set_name("lb_round_robin");
+  config.set_lb_policy_name("test_lb");
+
+  Factory factory;
+  auto lb_config_or_error = factory.loadConfig(factory_context_, config);
+  ASSERT_TRUE(lb_config_or_error.ok());
+
+  auto thread_aware_lb =
+      factory.create(OptRef<const Upstream::LoadBalancerConfig>(*lb_config_or_error.value()),
+                     cluster_info_, priority_set_, runtime_, random_, time_source_);
+  ASSERT_NE(thread_aware_lb, nullptr);
+  ASSERT_TRUE(thread_aware_lb->initialize().ok());
+
+  Upstream::LoadBalancerParams params{priority_set_, nullptr};
+  auto lb = thread_aware_lb->factory()->create(params);
+  ASSERT_NE(lb, nullptr);
+
+  auto* lb_ptr = static_cast<DynamicModuleLoadBalancer*>(lb.get());
+
+  NiceMock<Upstream::MockLoadBalancerContext> context;
+  ON_CALL(context, shouldSelectAnotherHost(_)).WillByDefault(Return(true));
+  auto* context_ptr = static_cast<Upstream::LoadBalancerContext*>(&context);
+
+  // Host should be rejected (shouldSelectAnotherHost returns true).
+  EXPECT_TRUE(envoy_dynamic_module_callback_lb_context_should_select_another_host(
+      lb_ptr, context_ptr, 0, 0));
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, ShouldSelectAnotherHostInvalidPriority) {
+  envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
+      config;
+  config.mutable_dynamic_module_config()->set_name("lb_round_robin");
+  config.set_lb_policy_name("test_lb");
+
+  Factory factory;
+  auto lb_config_or_error = factory.loadConfig(factory_context_, config);
+  ASSERT_TRUE(lb_config_or_error.ok());
+
+  auto thread_aware_lb =
+      factory.create(OptRef<const Upstream::LoadBalancerConfig>(*lb_config_or_error.value()),
+                     cluster_info_, priority_set_, runtime_, random_, time_source_);
+  ASSERT_NE(thread_aware_lb, nullptr);
+  ASSERT_TRUE(thread_aware_lb->initialize().ok());
+
+  Upstream::LoadBalancerParams params{priority_set_, nullptr};
+  auto lb = thread_aware_lb->factory()->create(params);
+  ASSERT_NE(lb, nullptr);
+
+  auto* lb_ptr = static_cast<DynamicModuleLoadBalancer*>(lb.get());
+
+  NiceMock<Upstream::MockLoadBalancerContext> context;
+  auto* context_ptr = static_cast<Upstream::LoadBalancerContext*>(&context);
+
+  // Invalid priority returns false.
+  EXPECT_FALSE(envoy_dynamic_module_callback_lb_context_should_select_another_host(
+      lb_ptr, context_ptr, 999, 0));
+
+  // Invalid host index returns false.
+  EXPECT_FALSE(envoy_dynamic_module_callback_lb_context_should_select_another_host(
+      lb_ptr, context_ptr, 0, 999));
 }
 
 // =============================================================================

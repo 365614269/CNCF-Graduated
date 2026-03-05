@@ -183,6 +183,41 @@ envoy_dynamic_module_type_host_health envoy_dynamic_module_callback_lb_get_host_
   return envoy_dynamic_module_type_host_health_Unhealthy;
 }
 
+bool envoy_dynamic_module_callback_lb_get_host_health_by_address(
+    envoy_dynamic_module_type_lb_envoy_ptr lb_envoy_ptr,
+    envoy_dynamic_module_type_module_buffer address,
+    envoy_dynamic_module_type_host_health* result) {
+  if (result == nullptr) {
+    return false;
+  }
+  *result = envoy_dynamic_module_type_host_health_Unhealthy;
+
+  if (lb_envoy_ptr == nullptr || address.ptr == nullptr) {
+    return false;
+  }
+  const auto host_map = getLb(lb_envoy_ptr)->prioritySet().crossPriorityHostMap();
+  if (host_map == nullptr) {
+    return false;
+  }
+  std::string address_str(address.ptr, address.length);
+  const auto it = host_map->find(address_str);
+  if (it == host_map->end()) {
+    return false;
+  }
+  switch (it->second->coarseHealth()) {
+  case Envoy::Upstream::Host::Health::Unhealthy:
+    *result = envoy_dynamic_module_type_host_health_Unhealthy;
+    break;
+  case Envoy::Upstream::Host::Health::Degraded:
+    *result = envoy_dynamic_module_type_host_health_Degraded;
+    break;
+  case Envoy::Upstream::Host::Health::Healthy:
+    *result = envoy_dynamic_module_type_host_health_Healthy;
+    break;
+  }
+  return true;
+}
+
 bool envoy_dynamic_module_callback_lb_get_host_address(
     envoy_dynamic_module_type_lb_envoy_ptr lb_envoy_ptr, uint32_t priority, size_t index,
     envoy_dynamic_module_type_envoy_buffer* result) {
@@ -373,6 +408,32 @@ bool envoy_dynamic_module_callback_lb_context_get_downstream_header(
   const auto value = values[index]->value().getStringView();
   *result_buffer = {.ptr = const_cast<char*>(value.data()), .length = value.size()};
   return true;
+}
+
+uint32_t envoy_dynamic_module_callback_lb_context_get_host_selection_retry_count(
+    envoy_dynamic_module_type_lb_context_envoy_ptr context_envoy_ptr) {
+  if (context_envoy_ptr == nullptr) {
+    return 0;
+  }
+  return getContext(context_envoy_ptr)->hostSelectionRetryCount();
+}
+
+bool envoy_dynamic_module_callback_lb_context_should_select_another_host(
+    envoy_dynamic_module_type_lb_envoy_ptr lb_envoy_ptr,
+    envoy_dynamic_module_type_lb_context_envoy_ptr context_envoy_ptr, uint32_t priority,
+    size_t index) {
+  if (lb_envoy_ptr == nullptr || context_envoy_ptr == nullptr) {
+    return false;
+  }
+  const auto& host_sets = getLb(lb_envoy_ptr)->prioritySet().hostSetsPerPriority();
+  if (priority >= host_sets.size()) {
+    return false;
+  }
+  const auto& hosts = host_sets[priority]->hosts();
+  if (index >= hosts.size()) {
+    return false;
+  }
+  return getContext(context_envoy_ptr)->shouldSelectAnotherHost(*hosts[index]);
 }
 
 bool envoy_dynamic_module_callback_lb_set_host_data(
