@@ -547,6 +547,14 @@ TEST_F(DynamicModulesLoadBalancerTest, AbiCallbacksWithNullPointers) {
   EXPECT_EQ(envoy_dynamic_module_callback_lb_context_get_host_selection_retry_count(nullptr), 0);
   EXPECT_FALSE(
       envoy_dynamic_module_callback_lb_context_should_select_another_host(nullptr, nullptr, 0, 0));
+
+  // Test override host context callback with null.
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_context_get_override_host(nullptr, nullptr, nullptr));
+
+  // Test member update host address callback with null.
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_get_member_update_host_address(nullptr, 0, true, &result));
 }
 
 TEST_F(DynamicModulesLoadBalancerTest, AbiCallbacksWithInvalidPriority) {
@@ -1099,6 +1107,73 @@ TEST_F(DynamicModulesLoadBalancerTest, ShouldSelectAnotherHostInvalidPriority) {
 }
 
 // =============================================================================
+// Override Host Selection Tests
+// =============================================================================
+
+TEST_F(DynamicModulesLoadBalancerTest, OverrideHostPresent) {
+  NiceMock<Upstream::MockLoadBalancerContext> context;
+  ON_CALL(context, overrideHostToSelect())
+      .WillByDefault(Return(
+          absl::optional<Upstream::LoadBalancerContext::OverrideHost>({"10.0.0.1:8080", true})));
+
+  auto* context_ptr = static_cast<Upstream::LoadBalancerContext*>(&context);
+
+  envoy_dynamic_module_type_envoy_buffer address = {nullptr, 0};
+  bool strict = false;
+  EXPECT_TRUE(
+      envoy_dynamic_module_callback_lb_context_get_override_host(context_ptr, &address, &strict));
+  EXPECT_EQ(absl::string_view(address.ptr, address.length), "10.0.0.1:8080");
+  EXPECT_TRUE(strict);
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, OverrideHostPresentNonStrict) {
+  NiceMock<Upstream::MockLoadBalancerContext> context;
+  ON_CALL(context, overrideHostToSelect())
+      .WillByDefault(Return(
+          absl::optional<Upstream::LoadBalancerContext::OverrideHost>({"10.0.0.2:9090", false})));
+
+  auto* context_ptr = static_cast<Upstream::LoadBalancerContext*>(&context);
+
+  envoy_dynamic_module_type_envoy_buffer address = {nullptr, 0};
+  bool strict = true;
+  EXPECT_TRUE(
+      envoy_dynamic_module_callback_lb_context_get_override_host(context_ptr, &address, &strict));
+  EXPECT_EQ(absl::string_view(address.ptr, address.length), "10.0.0.2:9090");
+  EXPECT_FALSE(strict);
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, OverrideHostNotSet) {
+  NiceMock<Upstream::MockLoadBalancerContext> context;
+  ON_CALL(context, overrideHostToSelect()).WillByDefault(Return(absl::nullopt));
+
+  auto* context_ptr = static_cast<Upstream::LoadBalancerContext*>(&context);
+
+  envoy_dynamic_module_type_envoy_buffer address = {nullptr, 0};
+  bool strict = false;
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_context_get_override_host(context_ptr, &address, &strict));
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, OverrideHostNullOutputs) {
+  NiceMock<Upstream::MockLoadBalancerContext> context;
+  ON_CALL(context, overrideHostToSelect())
+      .WillByDefault(Return(
+          absl::optional<Upstream::LoadBalancerContext::OverrideHost>({"10.0.0.1:8080", true})));
+
+  auto* context_ptr = static_cast<Upstream::LoadBalancerContext*>(&context);
+
+  // Null address output.
+  bool strict = false;
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_context_get_override_host(context_ptr, nullptr, &strict));
+
+  // Null strict output.
+  envoy_dynamic_module_type_envoy_buffer address = {nullptr, 0};
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_context_get_override_host(context_ptr, &address, nullptr));
+}
+
+// =============================================================================
 // Per-Host Data Storage Tests
 // =============================================================================
 
@@ -1451,6 +1526,144 @@ TEST_F(DynamicModulesLoadBalancerTest, CallbacksTestModuleExercisesNewCallbacks)
 
   auto response = lb->chooseHost(&context);
   EXPECT_NE(response.host, nullptr);
+}
+
+// =============================================================================
+// Host Membership Update Tests
+// =============================================================================
+
+TEST_F(DynamicModulesLoadBalancerTest, HostMembershipUpdateNotifiesModule) {
+  envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
+      config;
+  config.mutable_dynamic_module_config()->set_name("lb_callbacks_test");
+  config.set_lb_policy_name("test_lb");
+
+  Factory factory;
+  auto lb_config_or_error = factory.loadConfig(factory_context_, config);
+  ASSERT_TRUE(lb_config_or_error.ok());
+
+  auto thread_aware_lb =
+      factory.create(OptRef<const Upstream::LoadBalancerConfig>(*lb_config_or_error.value()),
+                     cluster_info_, priority_set_, runtime_, random_, time_source_);
+  ASSERT_NE(thread_aware_lb, nullptr);
+  ASSERT_TRUE(thread_aware_lb->initialize().ok());
+
+  Upstream::LoadBalancerParams params{priority_set_, nullptr};
+  auto lb = thread_aware_lb->factory()->create(params);
+  ASSERT_NE(lb, nullptr);
+
+  // Trigger a host membership update with hosts added and removed.
+  auto new_host = std::make_shared<NiceMock<Upstream::MockHost>>();
+  auto new_addr = Network::Utility::parseInternetAddressNoThrow("10.0.0.4", 8080, false);
+  ON_CALL(*new_host, address()).WillByDefault(Return(new_addr));
+
+  Upstream::HostVector hosts_added = {new_host};
+  Upstream::HostVector hosts_removed = {host3_};
+
+  priority_set_.runUpdateCallbacks(0, hosts_added, hosts_removed);
+
+  // Verify the LB still works after the update.
+  auto response = lb->chooseHost(nullptr);
+  EXPECT_NE(response.host, nullptr);
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, HostMembershipUpdateEmptyVectors) {
+  envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
+      config;
+  config.mutable_dynamic_module_config()->set_name("lb_round_robin");
+  config.set_lb_policy_name("test_lb");
+
+  Factory factory;
+  auto lb_config_or_error = factory.loadConfig(factory_context_, config);
+  ASSERT_TRUE(lb_config_or_error.ok());
+
+  auto thread_aware_lb =
+      factory.create(OptRef<const Upstream::LoadBalancerConfig>(*lb_config_or_error.value()),
+                     cluster_info_, priority_set_, runtime_, random_, time_source_);
+  ASSERT_NE(thread_aware_lb, nullptr);
+  ASSERT_TRUE(thread_aware_lb->initialize().ok());
+
+  Upstream::LoadBalancerParams params{priority_set_, nullptr};
+  auto lb = thread_aware_lb->factory()->create(params);
+  ASSERT_NE(lb, nullptr);
+
+  // Trigger an update with empty vectors (no hosts added or removed).
+  Upstream::HostVector empty_added;
+  Upstream::HostVector empty_removed;
+  priority_set_.runUpdateCallbacks(0, empty_added, empty_removed);
+
+  // Verify the LB still works after the no-op update.
+  auto response = lb->chooseHost(nullptr);
+  EXPECT_NE(response.host, nullptr);
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, HostMembershipUpdateCallbackAddress) {
+  envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
+      config;
+  config.mutable_dynamic_module_config()->set_name("lb_round_robin");
+  config.set_lb_policy_name("test_lb");
+
+  Factory factory;
+  auto lb_config_or_error = factory.loadConfig(factory_context_, config);
+  ASSERT_TRUE(lb_config_or_error.ok());
+
+  auto thread_aware_lb =
+      factory.create(OptRef<const Upstream::LoadBalancerConfig>(*lb_config_or_error.value()),
+                     cluster_info_, priority_set_, runtime_, random_, time_source_);
+  ASSERT_NE(thread_aware_lb, nullptr);
+  ASSERT_TRUE(thread_aware_lb->initialize().ok());
+
+  Upstream::LoadBalancerParams params{priority_set_, nullptr};
+  auto lb = thread_aware_lb->factory()->create(params);
+  ASSERT_NE(lb, nullptr);
+  auto* lb_ptr = static_cast<DynamicModuleLoadBalancer*>(lb.get());
+
+  // Verify host pointers are null when not in callback.
+  EXPECT_EQ(lb_ptr->hostsAdded(), nullptr);
+  EXPECT_EQ(lb_ptr->hostsRemoved(), nullptr);
+
+  // Verify the callback to get addresses returns false when not in an update callback.
+  envoy_dynamic_module_type_envoy_buffer result = {nullptr, 0};
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_get_member_update_host_address(lb_ptr, 0, true, &result));
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_get_member_update_host_address(lb_ptr, 0, false, &result));
+
+  // Verify null pointer handling.
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_get_member_update_host_address(nullptr, 0, true, &result));
+  EXPECT_FALSE(
+      envoy_dynamic_module_callback_lb_get_member_update_host_address(lb_ptr, 0, true, nullptr));
+}
+
+TEST_F(DynamicModulesLoadBalancerTest, LbNewFailDoesNotRegisterCallback) {
+  envoy::extensions::load_balancing_policies::dynamic_modules::v3::DynamicModulesLoadBalancerConfig
+      config;
+  config.mutable_dynamic_module_config()->set_name("lb_new_fail");
+  config.set_lb_policy_name("test_lb");
+
+  Factory factory;
+  auto lb_config_or_error = factory.loadConfig(factory_context_, config);
+  ASSERT_TRUE(lb_config_or_error.ok());
+
+  auto thread_aware_lb =
+      factory.create(OptRef<const Upstream::LoadBalancerConfig>(*lb_config_or_error.value()),
+                     cluster_info_, priority_set_, runtime_, random_, time_source_);
+  ASSERT_NE(thread_aware_lb, nullptr);
+  ASSERT_TRUE(thread_aware_lb->initialize().ok());
+
+  Upstream::LoadBalancerParams params{priority_set_, nullptr};
+  auto lb = thread_aware_lb->factory()->create(params);
+  ASSERT_NE(lb, nullptr);
+
+  // Triggering an update should be safe even when on_lb_new returned null.
+  Upstream::HostVector empty_added;
+  Upstream::HostVector empty_removed;
+  priority_set_.runUpdateCallbacks(0, empty_added, empty_removed);
+
+  // chooseHost should return null since the module failed to initialize.
+  auto response = lb->chooseHost(nullptr);
+  EXPECT_EQ(response.host, nullptr);
 }
 
 } // namespace

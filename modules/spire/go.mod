@@ -27,7 +27,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.0
 	github.com/aws/aws-sdk-go-v2/service/acmpca v1.46.2
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.64.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.292.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.293.0
 	github.com/aws/aws-sdk-go-v2/service/eks v1.80.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.53.1
 	github.com/aws/aws-sdk-go-v2/service/kms v1.50.0
@@ -49,7 +49,7 @@ require (
 	github.com/gogo/status v1.1.1
 	github.com/google/btree v1.1.3
 	github.com/google/go-cmp v0.7.0
-	github.com/google/go-containerregistry v0.21.1
+	github.com/google/go-containerregistry v0.21.2
 	github.com/google/go-tpm v0.9.8
 	github.com/google/go-tpm-tools v0.4.7
 	github.com/googleapis/gax-go/v2 v2.17.0
@@ -96,7 +96,7 @@ require (
 	k8s.io/client-go v0.35.2
 	k8s.io/kube-aggregator v0.35.2
 	k8s.io/mount-utils v0.35.2
-	sigs.k8s.io/controller-runtime v0.23.1
+	sigs.k8s.io/controller-runtime v0.23.3
 )
 
 require (

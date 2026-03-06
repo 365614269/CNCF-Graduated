@@ -436,6 +436,23 @@ bool envoy_dynamic_module_callback_lb_context_should_select_another_host(
   return getContext(context_envoy_ptr)->shouldSelectAnotherHost(*hosts[index]);
 }
 
+bool envoy_dynamic_module_callback_lb_context_get_override_host(
+    envoy_dynamic_module_type_lb_context_envoy_ptr context_envoy_ptr,
+    envoy_dynamic_module_type_envoy_buffer* address, bool* strict) {
+  if (context_envoy_ptr == nullptr || address == nullptr || strict == nullptr) {
+    return false;
+  }
+  auto override_host = getContext(context_envoy_ptr)->overrideHostToSelect();
+  if (!override_host.has_value()) {
+    return false;
+  }
+  auto host_address = override_host.value().first;
+  address->ptr = const_cast<char*>(host_address.data());
+  address->length = host_address.size();
+  *strict = override_host.value().second;
+  return true;
+}
+
 bool envoy_dynamic_module_callback_lb_set_host_data(
     envoy_dynamic_module_type_lb_envoy_ptr lb_envoy_ptr, uint32_t priority, size_t index,
     uintptr_t data) {
@@ -586,6 +603,29 @@ uint32_t envoy_dynamic_module_callback_lb_get_locality_weight(
     return 0;
   }
   return (*weights)[locality_index];
+}
+
+bool envoy_dynamic_module_callback_lb_get_member_update_host_address(
+    envoy_dynamic_module_type_lb_envoy_ptr lb_envoy_ptr, size_t index, bool is_added,
+    envoy_dynamic_module_type_envoy_buffer* result) {
+  if (lb_envoy_ptr == nullptr || result == nullptr) {
+    if (result != nullptr) {
+      result->ptr = nullptr;
+      result->length = 0;
+    }
+    return false;
+  }
+  const auto* hosts =
+      is_added ? getLb(lb_envoy_ptr)->hostsAdded() : getLb(lb_envoy_ptr)->hostsRemoved();
+  if (hosts == nullptr || index >= hosts->size()) {
+    result->ptr = nullptr;
+    result->length = 0;
+    return false;
+  }
+  const auto& address_str = (*hosts)[index]->address()->asStringView();
+  result->ptr = address_str.data();
+  result->length = address_str.size();
+  return true;
 }
 
 } // extern "C"

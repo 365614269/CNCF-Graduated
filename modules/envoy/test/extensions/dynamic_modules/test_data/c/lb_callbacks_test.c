@@ -226,6 +226,13 @@ bool envoy_dynamic_module_on_lb_choose_host(
     bool should_retry = envoy_dynamic_module_callback_lb_context_should_select_another_host(
         lb_envoy_ptr, context_envoy_ptr, 0, 0);
     (void)should_retry;
+
+    // Test override host.
+    envoy_dynamic_module_type_envoy_buffer override_addr = {NULL, 0};
+    bool strict = false;
+    bool has_override = envoy_dynamic_module_callback_lb_context_get_override_host(
+        context_envoy_ptr, &override_addr, &strict);
+    (void)has_override;
   }
 
   if (healthy_count == 0) {
@@ -237,6 +244,35 @@ bool envoy_dynamic_module_on_lb_choose_host(
   *result_priority = 0;
   *result_index = (uint32_t)index;
   return true;
+}
+
+void envoy_dynamic_module_on_lb_on_host_membership_update(
+    envoy_dynamic_module_type_lb_envoy_ptr lb_envoy_ptr,
+    envoy_dynamic_module_type_lb_module_ptr lb_module_ptr, size_t num_hosts_added,
+    size_t num_hosts_removed) {
+  (void)lb_module_ptr;
+
+  // Test accessing added host addresses.
+  for (size_t i = 0; i < num_hosts_added; i++) {
+    envoy_dynamic_module_type_envoy_buffer addr = {NULL, 0};
+    bool found = envoy_dynamic_module_callback_lb_get_member_update_host_address(
+        lb_envoy_ptr, i, true, &addr);
+    (void)found;
+  }
+
+  // Test accessing removed host addresses.
+  for (size_t i = 0; i < num_hosts_removed; i++) {
+    envoy_dynamic_module_type_envoy_buffer addr = {NULL, 0};
+    bool found = envoy_dynamic_module_callback_lb_get_member_update_host_address(
+        lb_envoy_ptr, i, false, &addr);
+    (void)found;
+  }
+
+  // Test out-of-bounds index.
+  envoy_dynamic_module_type_envoy_buffer oob_result = {NULL, 0};
+  bool oob = envoy_dynamic_module_callback_lb_get_member_update_host_address(
+      lb_envoy_ptr, num_hosts_added, true, &oob_result);
+  (void)oob;
 }
 
 void envoy_dynamic_module_on_lb_destroy(envoy_dynamic_module_type_lb_module_ptr lb_module_ptr) {

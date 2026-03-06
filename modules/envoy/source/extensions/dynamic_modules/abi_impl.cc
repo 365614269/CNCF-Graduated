@@ -560,6 +560,14 @@ __attribute__((weak)) bool envoy_dynamic_module_callback_lb_context_should_selec
   return false;
 }
 
+__attribute__((weak)) bool envoy_dynamic_module_callback_lb_context_get_override_host(
+    envoy_dynamic_module_type_lb_context_envoy_ptr, envoy_dynamic_module_type_envoy_buffer*,
+    bool*) {
+  IS_ENVOY_BUG("envoy_dynamic_module_callback_lb_context_get_override_host: "
+               "not implemented in this context");
+  return false;
+}
+
 __attribute__((weak)) bool
 envoy_dynamic_module_callback_lb_set_host_data(envoy_dynamic_module_type_lb_envoy_ptr, uint32_t,
                                                size_t, uintptr_t) {
@@ -636,6 +644,18 @@ __attribute__((weak)) uint32_t envoy_dynamic_module_callback_lb_get_locality_wei
   IS_ENVOY_BUG("envoy_dynamic_module_callback_lb_get_locality_weight: "
                "not implemented in this context");
   return 0;
+}
+
+__attribute__((weak)) bool envoy_dynamic_module_callback_lb_get_member_update_host_address(
+    envoy_dynamic_module_type_lb_envoy_ptr, size_t, bool,
+    envoy_dynamic_module_type_envoy_buffer* result) {
+  IS_ENVOY_BUG("envoy_dynamic_module_callback_lb_get_member_update_host_address: "
+               "not implemented in this context");
+  if (result != nullptr) {
+    result->ptr = nullptr;
+    result->length = 0;
+  }
+  return false;
 }
 
 // ---------------------- Matcher callbacks ------------------------
