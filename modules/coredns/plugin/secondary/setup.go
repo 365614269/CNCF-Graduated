@@ -10,6 +10,7 @@ import (
 	clog "github.com/coredns/coredns/plugin/pkg/log"
 	"github.com/coredns/coredns/plugin/pkg/parse"
 	"github.com/coredns/coredns/plugin/pkg/upstream"
+	"github.com/coredns/coredns/plugin/transfer"
 )
 
 var log = clog.NewWithPlugin("secondary")
@@ -21,6 +22,17 @@ func setup(c *caddy.Controller) error {
 	if err != nil {
 		return plugin.Error("secondary", err)
 	}
+
+	s := &Secondary{file.File{Zones: zones}}
+	var x *transfer.Transfer
+	c.OnStartup(func() error {
+		t := dnsserver.GetConfig(c).Handler("transfer")
+		if t != nil {
+			x = t.(*transfer.Transfer)
+			s.Xfer = x // if found this must be OK.
+		}
+		return nil
+	})
 
 	// Add startup functions to retrieve the zone and keep it up to date.
 	for i := range zones.Names {
@@ -36,7 +48,7 @@ func setup(c *caddy.Controller) error {
 						dur := time.Millisecond * 250
 						max := time.Second * 10
 						for {
-							err := z.TransferIn()
+							err := z.TransferIn(x)
 							if err == nil {
 								break
 							}
@@ -52,7 +64,7 @@ func setup(c *caddy.Controller) error {
 							default:
 							}
 						}
-						z.Update(updateShutdown)
+						z.Update(updateShutdown, x)
 					}()
 				})
 				return nil
@@ -65,7 +77,8 @@ func setup(c *caddy.Controller) error {
 	}
 
 	dnsserver.GetConfig(c).AddPlugin(func(next plugin.Handler) plugin.Handler {
-		return Secondary{file.File{Next: next, Zones: zones}}
+		s.Next = next
+		return s
 	})
 
 	return nil
