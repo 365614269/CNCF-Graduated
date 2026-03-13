@@ -83,6 +83,12 @@ happens.
 This feature gate is opt-in for now, and we plan to enable it by default once the implementation is
 stable across both controllers.
 
+{{% alert color="info" title="Note" %}}
+When enabling `CancelHealthCheckOnNewRevision` for helm-controller, enabling
+`DefaultToRetryOnFailure` together is recommended. HelmReleases are more prone to get
+stuck after the cancellation when using the default retry configuration (no retries).
+{{% /alert %}}
+
 ## Ecosystem News
 
 ### Flux Operator Web UI
