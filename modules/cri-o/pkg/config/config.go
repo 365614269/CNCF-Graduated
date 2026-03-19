@@ -30,7 +30,6 @@ import (
 	"go.podman.io/storage"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/utils/cpuset"
-	"k8s.io/utils/ptr"
 	"tags.cncf.io/container-device-interface/pkg/cdi"
 
 	"github.com/cri-o/cri-o/internal/config/apparmor"
@@ -424,6 +423,12 @@ type RuntimeConfig struct {
 
 	// DecryptionKeysPath is the path where keys for image decryption are stored.
 	DecryptionKeysPath string `toml:"decryption_keys_path"`
+
+	// AdditionalArtifactStores is a list of additional read-only artifact stores.
+	// Note that CRI-O expects an "artifacts/" subdirectory within each configured
+	// path (mirroring the main store convention). For example, if configured with
+	// "/mnt/nfs", the artifacts should be placed in "/mnt/nfs/artifacts/".
+	AdditionalArtifactStores []string `toml:"additional_artifact_stores"`
 
 	// Conmon is the path to conmon binary, used for managing the runtime.
 	// This option is currently deprecated, and will be replaced with RuntimeHandler.MonitorConfig.Path.
@@ -836,10 +841,10 @@ type tomlConfig struct {
 // SetSystemContext configures the SystemContext used by containers/image library.
 func (t *tomlConfig) SetSystemContext(c *Config) {
 	c.SystemContext.BigFilesTemporaryDir = c.BigFilesTemporaryDir
-	c.SystemContext.ShortNameMode = ptr.To(types.ShortNameModeEnforcing)
+	c.SystemContext.ShortNameMode = new(types.ShortNameModeEnforcing)
 
 	if c.ShortNameMode == "disabled" {
-		c.SystemContext.ShortNameMode = ptr.To(types.ShortNameModeDisabled)
+		c.SystemContext.ShortNameMode = new(types.ShortNameModeDisabled)
 	}
 }
 
@@ -1331,6 +1336,12 @@ func (c *RootConfig) CleanShutdownSupportedFileName() string {
 // execution checks. It returns an `error` on validation failure, otherwise
 // `nil`.
 func (c *RuntimeConfig) Validate(systemContext *types.SystemContext, onExecution bool) error {
+	for _, p := range c.AdditionalArtifactStores {
+		if !filepath.IsAbs(p) {
+			return fmt.Errorf("additional_artifact_stores entry must be absolute: %q", p)
+		}
+	}
+
 	if err := c.ulimitsConfig.LoadUlimits(c.DefaultUlimits); err != nil {
 		return err
 	}
@@ -2055,7 +2066,7 @@ func (r *RuntimeHandler) ValidateContainerMinMemory(name string) error {
 
 	memorySize, err := units.RAMInBytes(r.ContainerMinMemory)
 	if err != nil {
-		err = fmt.Errorf("unable to set runtime memory to %q: %w. Setting to %q instead", r.ContainerMinMemory, err, defaultContainerMinMemory)
+		err = fmt.Errorf("unable to set runtime memory to %q: %w. Setting to %d instead", r.ContainerMinMemory, err, defaultContainerMinMemory)
 		// Fallback to default value if something is wrong with the configured value.
 		r.ContainerMinMemory = units.BytesSize(defaultContainerMinMemory)
 

@@ -35,7 +35,6 @@ import (
 	"go.podman.io/storage"
 	"go.podman.io/storage/pkg/reexec"
 	crierrors "k8s.io/cri-api/pkg/errors"
-	"k8s.io/utils/ptr"
 
 	"github.com/cri-o/cri-o/internal/log"
 	"github.com/cri-o/cri-o/internal/ociartifact"
@@ -121,6 +120,10 @@ type ImageCopyOptions struct {
 	ProgressInterval time.Duration
 	Progress         chan types.ProgressProperties `json:"-"`
 	CgroupPull       CgroupPullConfiguration
+
+	// AdditionalArtifactStores is a list of paths to additional read-only
+	// artifact stores. Used in the OCI artifact fallback pull path.
+	AdditionalArtifactStores []string
 }
 
 // ImageServer wraps up various CRI-related activities into a reusable
@@ -870,7 +873,7 @@ func pullImageImplementation(ctx context.Context, lookup *imageLookupService, st
 	if shouldTryArtifact(err) {
 		log.Infof(ctx, "Falling back to pull %s as an OCI artifact: %v", imageName, err)
 
-		artifactStore, artifactErr := ociartifact.NewStore(store.GraphRoot(), &srcSystemContext)
+		artifactStore, artifactErr := ociartifact.NewStore(store.GraphRoot(), options.AdditionalArtifactStores, &srcSystemContext)
 		if artifactErr != nil {
 			return RegistryImageReference{}, fmt.Errorf("unable to pull image or OCI artifact: create store err: %w", artifactErr)
 		}
@@ -881,7 +884,7 @@ func pullImageImplementation(ctx context.Context, lookup *imageLookupService, st
 			// Disable retries to avoid blocking pod operations for
 			// (timeout * MaxRetries) on network failures. Rely on
 			// Kubelet retries instead.
-			MaxRetries:       ptr.To(uint(0)),
+			MaxRetries:       new(uint(0)),
 			RemoveSignatures: true, // signature is not supported for OCI layout dest
 		})
 		if artifactErr != nil {
