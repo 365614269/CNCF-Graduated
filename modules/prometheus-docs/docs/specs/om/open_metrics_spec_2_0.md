@@ -371,7 +371,7 @@ Quantiles are a map from a quantile to a value. An example is a quantile 0.95 wi
 
 Unknown SHOULD NOT be used. Unknown MAY be used when it is impossible to determine the types of individual metrics from 3rd party systems.
 
-A Sample in a metric with the Unknown Type MUST have a Number value.
+A Sample in a metric with the Unknown Type MUST have a Number or CompositeValue value.
 
 ## Text Format
 
@@ -419,6 +419,11 @@ sample = value [SP timestamp] [SP start-timestamp] *exemplar LF
 
 value = number / "{" composite-value "}"
 
+timestamp = realnumber
+
+; Lowercase st @ timestamp
+start-timestamp = %d115.116 "@" timestamp
+
 exemplar = SP HASH SP labels-in-braces SP number SP timestamp
 
 metricname-and-labels = metricname [labels-in-braces] / name-and-labels-in-braces
@@ -427,19 +432,25 @@ name-and-labels-in-braces = "{" metricname-utf8 *(COMMA label) "}"
 
 label = label-key EQ DQUOTE escaped-string DQUOTE
 
+; Number value
 number = realnumber
 ; Case insensitive
 number =/ [SIGN] ("inf" / "infinity")
 number =/ "nan"
 
-timestamp = realnumber
-
-; Not 100% sure this captures all float corner cases.
+; Real floats
+; Not 100% sure this captures all float corner cases
 ; Leading 0s explicitly okay
 realnumber = [SIGN] 1*DIGIT
 realnumber =/ [SIGN] 1*DIGIT ["." *DIGIT] [ "e" [SIGN] 1*DIGIT ]
 realnumber =/ [SIGN] *DIGIT "." 1*DIGIT [ "e" [SIGN] 1*DIGIT ]
 
+; Integers
+; Leading 0s explicitly okay
+integer = [SIGN] 1*"0" / [SIGN] positive-integer
+non-negative-integer = ["+"] 1*"0" / ["+"] positive-integer
+positive-integer = *"0" positive-digit *DIGIT
+positive-digit = "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9"
 
 ; RFC 5234 is case insensitive.
 ; Uppercase
@@ -485,21 +496,32 @@ escaped-char =/ BS normal-char
 ; Any unicode character, except newline, double quote, and backslash
 normal-char = %x00-09 / %x0B-21 / %x23-5B / %x5D-D7FF / %xE000-10FFFF
 
-; Lowercase st @ timestamp
-start-timestamp = %d115.116 "@" timestamp
-
 ; Composite values
-composite-value = histogram-value / summary-value
+composite-value = histogram-value / gauge-histogram-value / summary-value
 
 ; Histograms
 histogram-value = h-count "," h-sum "," histogram-buckets
+gauge-histogram-value = gh-count "," gh-sum "," histogram-buckets
 
 ; count:x
 h-count = %d99.111.117.110.116 ":" number
+; gcount:x
+gh-count = %d103 h-count
 ; sum:f allows real numbers and +-Inf and NaN
 h-sum = %d115.117.109 ":" number
+; gsum:x
+gh-sum = %d103 h-sum
 
 histogram-buckets = classic-buckets / native-buckets [ "," classic-buckets ]
+
+; bucket:[...,+Inf:v] The +Inf bucket is required.
+classic-buckets = %d98.117.99.107.101.116 ":" "[" [ ch-le-counts "," ] ch-pos-inf-bucket "]"
+ch-le-counts = (ch-neg-inf-bucket / ch-le-bucket) *("," ch-le-bucket)
+ch-pos-inf-bucket = "+" %d73.110.102 ":" number
+ch-neg-inf-bucket = "-" %d73.110.102 ":" number
+ch-le-bucket = realnumber ":" number
+
+; schema:3,zero_threshold:1e-128,zero_count:2,negative_spans:[1:1],negative_buckets:[2],positive_spanes:[-3:1,2:2],positive_buckets:[3,1,0]
 native-buckets = nh-schema "," nh-zero-threshold "," nh-zero-count [ "," nh-negative-spans "," nh-negative-buckets ] [ "," nh-positive-spans "," nh-positive-buckets ]
 
 ; schema:i
@@ -508,11 +530,11 @@ nh-schema = %d115.99.104.101.109.97 ":" integer
 nh-zero-threshold = %d122.101.114.111 "_" %d116.104.114.101.115.104.111.108.100 ":" realnumber
 ; zero_count:x
 nh-zero-count = %d122.101.114.111 "_" %d99.111.117.110.116 ":" number
-; negative_spans:[1:2,3:4] and negative_spans:[]
+; negative_spans:[1:2,3:4] and positive_spans:[-3:1,2:2]
 nh-negative-spans = %d110.101.103.97.116.105.118.101 "_" %d115.112.97.110.115 ":" "[" [nh-spans] "]"
 nh-positive-spans = %d112.111.115.105.116.105.118.101 "_" %d115.112.97.110.115 ":" "[" [nh-spans] "]"
-; Spans can start from any index, even negative, however subsequent spans
-; can only advance the index, not decrease it.
+; Spans hold offset and length. The offset can start from any index, even
+; negative, however subsequent spans can only advance the index, not decrease it.
 nh-spans = nh-start-span *("," nh-span)
 nh-start-span = integer ":" positive-integer
 nh-span = non-negative-integer ":" positive-integer
@@ -522,19 +544,6 @@ nh-negative-buckets = %d110.101.103.97.116.105.118.101 "_" %d98.117.99.107.101.1
 nh-positive-buckets = %d112.111.115.105.116.105.118.101 "_" %d98.117.99.107.101.116.115 ":" "[" [nh-buckets] "]"
 
 nh-buckets = number *("," number)
-
-integer = [SIGN] 1*"0" / [SIGN] positive-integer
-non-negative-integer = ["+"] 1*"0" / ["+"] positive-integer
-; Leading 0s explicitly okay.
-positive-integer = *"0" positive-digit *DIGIT
-positive-digit = "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9"
-
-; bucket:[...,+Inf:v]  The +Inf bucket is required.
-classic-buckets = %d98.117.99.107.101.116 ":" "[" [ ch-le-counts "," ] ch-pos-inf-bucket "]"
-ch-le-counts = (ch-neg-inf-bucket / ch-le-bucket) *("," ch-le-bucket)
-ch-pos-inf-bucket = "+" %d73.110.102 ":" number
-ch-neg-inf-bucket = "-" %d73.110.102 ":" number
-ch-le-bucket = realnumber ":" number
 
 ; Summary
 
@@ -583,7 +592,7 @@ process_cpu_seconds_total 4.20072246e+06
 # HELP acme_http_request_seconds Latency histogram of all of ACME's HTTP requests.
 acme_http_request_seconds{path="/api/v1",method="GET"} {count:2,sum:1.2e2,schema:0,zero_threshold:1e-4,zero_count:0,positive_spans:[1:2],positive_buckets:[1,1],bucket:[0.5:1,1:2,+Inf:2]} st@1605301325.0
 # TYPE acme_http_request_seconds:rate5m gaugehistogram
-acme_http_request_seconds:rate5m{path="/api/v1",method="GET"} {count:0.01,sum:2.0,schema:0,zero_threshold:1e-4,zero_count:0.0,positive_spans:[1:2],positive_buckets:[0.005,0.005]} st@1605301325.0
+acme_http_request_seconds:rate5m{path="/api/v1",method="GET"} {gcount:0.01,gsum:2.0,schema:0,zero_threshold:1e-4,zero_count:0.0,positive_spans:[1:2],positive_buckets:[0.005,0.005]}
 # TYPE "foodb.read.errors" counter
 # HELP "foodb.read.errors" The number of errors in the read path for fooDb.
 {"foodb.read.errors","service.name"="my_service"} 3482
@@ -613,9 +622,12 @@ Complete example:
 
 #### Escaping
 
-Where the ABNF notes escaping, the following escaping MUST be applied Line feed, `\n` (0x0A) -> literally `\\n` (Bytecode 0x5c 0x6e) Double quotes -> `\\"` (Bytecode 0x5c 0x22) Backslash -> `\\\\` (Bytecode 0x5c 0x5c)
+Where the ABNF notes escaping, the following escaping MUST be applied:
+* Line feed, `\n` (0x0A) -> literally `\n` (Bytecode 0x5c 0x6e)
+* Double quotes -> `\"` (Bytecode 0x5c 0x22)
+* Backslash -> `\\` (Bytecode 0x5c 0x5c)
 
-A double backslash SHOULD be used to represent a backslash character. A single backslash SHOULD NOT be used for undefined escape sequences. As an example, `\\\\a` is equivalent and preferable to `\\a`.
+A double backslash SHOULD be used to represent a backslash character. A single backslash SHOULD NOT be used for undefined escape sequences. As an example, `\\a` is equivalent and preferable to `\a`.
 
 Escaping MUST also be applied to quoted UTF-8 strings.
 
@@ -635,55 +647,57 @@ Timestamps SHOULD NOT use exponential float rendering for timestamps if nanoseco
 
 ### MetricFamily
 
-There MUST NOT be an explicit separator between MetricFamilies. The next MetricFamily MUST be signalled with either metadata or a new sample metric name which cannot be part of the previous MetricFamily.
+There MUST NOT be an explicit separator between MetricFamilies. The next MetricFamily MUST be signalled with either metadata or a new Metric name for a new MetricFamily.
 
 MetricFamilies MUST NOT be interleaved.
 
 #### MetricFamily metadata
 
-There are four pieces of metadata: The MetricFamily name, TYPE, UNIT and HELP. An example of the metadata for a counter Metric called foo is:
+There are four pieces of metadata: The MetricFamily name, TYPE, UNIT and HELP. An example of the metadata for a counter Metric called `foo_total` is:
 
 ```openmetrics-add-eof
-# TYPE foo counter
+# TYPE foo_total counter
 ```
 
-If no TYPE is exposed, the MetricFamily MUST be of Type Unknown.
+If no TYPE is exposed, the MetricFamily MUST be interpreted as Type Unknown.
 
-If a unit is specified it MUST be provided in a UNIT metadata line. In addition, an underscore and the unit SHOULD be the suffix of the MetricFamily name.
+If a unit is specified it MUST be provided in a UNIT metadata line. In addition, an underscore and the unit SHOULD be the suffix (or infix before `_total` for Counters) of the MetricFamily name.
 
-Be aware that exposing metrics without the unit being a suffix of the MetricFamily name directly to end-users may reduce the usability due to confusion about what the metric's unit is.
+Be aware that exposing metrics without the unit being a suffix (or infix) of the MetricFamily name directly to end-users may reduce the usability due to confusion about what the metric's unit is.
 
 A valid example for a foo_seconds metric with a unit of "seconds":
 
 ```openmetrics-add-eof
-# TYPE foo_seconds counter
-# UNIT foo_seconds seconds
+# TYPE foo_seconds_total counter
+# UNIT foo_seconds_total seconds
 ```
 
-A valid, but discouraged example, where the unit is not a suffix on the name:
+A valid, but discouraged example, where the unit is not a suffix nor infix on the name:
 
 ```openmetrics-add-eof
-# TYPE foo counter
-# UNIT foo seconds
+# TYPE foo_total counter
+# UNIT foo_total seconds
 ```
 
 It is also valid to have:
 
 ```openmetrics-add-eof
-# TYPE foo_seconds counter
+# TYPE foo_seconds_total counter
 ```
 
 If the unit is known it SHOULD be provided.
 
 The value of a UNIT or HELP line MAY be empty. This MUST be treated as if no metadata line for the MetricFamily existed.
 
+Full example:
+
 ```openmetrics-add-eof
-# TYPE foo_seconds counter
-# UNIT foo_seconds seconds
-# HELP foo_seconds Some text and \n some \" escaping
+# TYPE foo_seconds_total counter
+# UNIT foo_seconds_total seconds
+# HELP foo_seconds_total Some text and \n some \" escaping
 ```
 
-See the UTF-8 Quoting section for circumstances where the metric name MUST be enclosed in double quotes.
+See the [UTF-8 Quoting](#utf-8-quoting) section for circumstances where the metric name MUST be enclosed in double quotes.
 
 There MUST NOT be more than one of each type of metadata line for a MetricFamily. The ordering SHOULD be TYPE, UNIT, HELP.
 
@@ -711,7 +725,7 @@ Label values MAY be any valid UTF-8 value, so escaping MUST be applied as per th
 bar_seconds_count{a="x",b="escaping\" example \n "} 0
 ```
 
-Metric names and label names MAY also be any valid UTF-8 value, and under certain circumstances they MUST be quoted and escaped per the ABNF. See the UTF-8 Quoting section for specifics.
+Metric names and label names MAY also be any valid UTF-8 value, and under certain circumstances they MUST be quoted and escaped per the ABNF. See the [UTF-8 Quoting](#utf-8-quoting) section for specifics.
 
 ```openmetrics-add-eof
 {"\"bar\".seconds.count","b\\"="escaping\" example \n "} 0
@@ -720,6 +734,8 @@ Metric names and label names MAY also be any valid UTF-8 value, and under certai
 ### Metric types
 
 #### Gauge
+
+The Sample's value MUST be a Number.
 
 There are no recommended suffixes for the MetricFamily name for a MetricFamily of Type Gauge.
 
@@ -768,6 +784,8 @@ foo 18.0 456
 
 #### Counter
 
+The Sample's value MUST be a Number.
+
 If present, the Sample's Start Timestamp MUST be inlined with the Sample with a `st@` prefix. If the value's timestamp is present, the Start Timestamp MUST be added right after it. If exemplar is present, the Start Timestamp MUST be added before it.
 
 An example with a Metric with no labels, and a Sample with no timestamp and no Start Timestamp:
@@ -798,7 +816,7 @@ An example with a Metric with no labels, and a Sample with a timestamp and a Sta
 foo_total 17.0 1520879607.789 st@1520430000.123
 ```
 
-An example with a Metric with no labels, and a Sample without the `_total` suffix and with a timestamp and a start timestamp:
+An example with a Metric with no labels, and without the `_total` suffix and a Sample with a Timestamp and a Start Timestamp:
 
 ```openmetrics-add-eof
 # TYPE foo counter
@@ -923,14 +941,14 @@ If present the Sample's Start Timestamp MUST be inlined with the Sample with a `
 
 The quantiles MUST be sorted in increasing order of the quantile.
 
-An example of a Metric with no labels and a Sample with Sum, Count and Start Timestamp values:
+An example of a Metric with no labels and a Sample with Sum, Count and Start Timestamp:
 
 ```openmetrics-add-eof
 # TYPE foo summary
 foo {count:17,sum:324789.3,quantile:[]} st@1520430000.123
 ```
 
-An example of a Metric with no labels and a Sample with two quantiles and Start Timestamp values:
+An example of a Metric with no labels and a Sample with two quantiles and Start Timestamp:
 
 ```openmetrics-add-eof
 # TYPE foo summary
@@ -967,6 +985,8 @@ If there are no negative Native Buckets, then the fields `negative_spans` and `n
 If there are negative (and/or positive) Native Buckets, then the fields `negative_spans`, `negative_buckets` (and/or `positive_spans`, `positive_buckets`) MUST be present in this order after the `zero_count` field.
 
 Native Bucket values MUST be ordered by their index, and their values MUST be placed in the `negative_buckets` (and/or `positive_buckets`) fields.
+
+> NOTE: Bucket values are absolute counts, as opposed to some implementations that store bucket values as deltas relative to the preceding bucket.
 
 Native Buckets that have a value of 0 SHOULD NOT be present.
 
@@ -1042,40 +1062,46 @@ foo {count:17,sum:324789.3,schema:0,zero_threshold:1e-4,zero_count:0,positive_sp
 
 #### GaugeHistogram with Classic Buckets
 
-The Sample's value MUST be a CompositeValue.
+GaugeHistogram Samples with Classic Buckets follow the same syntax as Histogram Samples with Classic Buckets, except that the Count and Sum are exposed as the fields `gcount` and `gsum` and GaugeHistograms do not have Start Timestamp.
 
-The CompositeValue MUST include the Gcount, Gsum and Classic Bucket values as the fields `count`, `sum`, `bucket`, in this order.
-
-Classic Buckets MUST be sorted in number increasing order of their threshold.
-
-An example of a Metric with no labels, and one Sample value with no Exemplar with no Exemplars in the buckets:
+An example of a Metric with no labels, and one Sample value with no Timestamp, and no Exemplars:
 
 ```openmetrics-add-eof
 # TYPE foo gaugehistogram
-foo {count:42,sum:3289.3,bucket:[0.01:20,0.1:25,1:34,+Inf:42]}
+foo {gcount:42,gsum:3289.3,bucket:[0.01:20,0.1:25,1:34,+Inf:42]}
 ```
 
 #### GaugeHistogram with Native Buckets
 
-GaugeHistogram Samples with Native Buckets follow the same syntax as Histogram Samples with Native Buckets.
+GaugeHistogram Samples with Native Buckets follow the same syntax as Histogram Samples with Native Buckets, except that the Count and Sum are exposed as the fields `gcount` and `gsum` and GaugeHistograms do not have Start Timestamp.
+
+An example of a Metric with no labels, and one Sample value with no Timestamp, and no Exemplars:
 
 ```openmetrics-add-eof
 # TYPE acme_http_request_seconds gaugehistogram
-acme_http_request_seconds{path="/api/v1",method="GET"} {count:59,sum:1.2e2,schema:7,zero_threshold:1e-4,zero_count:0,negative_spans:[1:2],negative_buckets:[5,7],positive_spans:[-1:2,3:4],positive_buckets:[5,7,10,9,8,8]} st@1520430000.123
+acme_http_request_seconds{path="/api/v1",method="GET"} {gcount:59,gsum:1.2e2,schema:7,zero_threshold:1e-4,zero_count:0,negative_spans:[1:2],negative_buckets:[5,7],positive_spans:[-1:2,3:4],positive_buckets:[5,7,10,9,8,8]}
 ```
 
 #### GaugeHistogram with both Classic and Native buckets
 
-GaugeHistogram Samples with both Classic and Native Buckets follow the same syntax as Histogram Samples with both Classic and Native Buckets.
+GaugeHistogram Samples with both Classic and Native Buckets follow the same syntax as Histogram Samples with both Classic and Native Buckets, except that the Count and Sum are exposed as the fields `gcount` and `gsum` and GaugeHistograms do not have Start Timestamp.
 
 #### Unknown
 
+The Sample's value MUST be a Number or a CompositeValue.
+
 There are no recommended suffixes for the MetricFamily name for a MetricFamily of Type Unknown.
 
-An example with a Metric with no labels and a Sample with no timestamp:
+An example with a Metric with no labels and a Sample with no Timestamp:
 
 ```openmetrics-add-eof
 # TYPE foo unknown
+foo 42.23
+```
+
+An example with a Metric without MetricFamily metadata and a Sample with no Timestamp:
+
+```openmetrics-add-eof
 foo 42.23
 ```
 
@@ -1095,17 +1121,17 @@ How ingestors discover which exposers exist, and vice-versa, is out of scope for
 
 ### Extensions and Improvements
 
-This first version of OpenMetrics is based upon well established and de facto standard Prometheus text format 0.0.4, deliberately without adding major syntactic or semantic extensions, or optimisations on top of it. For example no attempt has been made to make the text representation of Histogram buckets more compact, relying on compression in the underlying stack to deal with their repetitive nature.
+This second version of OpenMetrics is based upon the well-established de facto standard [Prometheus exposition formats](https://prometheus.io/docs/instrumenting/exposition_formats/) such as the Prometheus text format 0.0.4, Prometheus Protobuf format, and OpenMetrics 1.0.
 
-This is a deliberate choice, so that the standard can take advantage of the adoption and momentum of the existing user base. This ensures a relatively easy transition from the Prometheus text format 0.0.4.
+This version introduces major changes to the first version to improve reliability, performance, compatibility with the Prometheus Protobuf format and the OpenTelemetry data model and naming conventions. At the same time, the format retains the ability to expose telemetry in a simple way and to be human-readable. This format is close enough to the previous version, the Prometheus query language, and the data model so as to ease the transition.
 
-It also ensures that there is a basic standard which is easy to implement. This can be built upon in future versions of the standard. The intention is that future versions of the standard will always require support for this 1.0 version, both syntactically and semantically.
+It also ensures that there is a basic standard which is easy to implement. This can be built upon in future versions of the standard. The intention is that future minor versions of the standard will always require support for this 2.0 version, both syntactically and semantically.
 
-We want to allow monitoring systems to get usable information from an OpenMetrics exposition without undue burden. If one were to strip away all metadata and structure and just look at an OpenMetrics exposition as an unordered set of samples that should be usable on its own. As such, there are also no opaque binary types, such as sketches or t-digests which could not be expressed as a mix of gauges and counters as they would require custom parsing and handling.
+We want to allow monitoring systems to get usable information from an OpenMetrics exposition without undue burden. If one were to strip away all metadata and structure and just look at an OpenMetrics exposition as an unordered set of samples, it should be usable on its own.
 
-This principle is applied consistently throughout the standard. For example it is encouraged that a MetricFamily's unit is duplicated in the name so that the unit is available for systems that don't understand the unit metadata.
+This principle is applied consistently throughout the standard. For example, it is encouraged that a MetricFamily's unit is duplicated in the name so that the unit is available for systems that don't understand the unit metadata. However, as opposed to the previous version, duplicating the unit name and adding the `_total` suffix for counters is not enforced anymore to foster compatibility with OpenTelemetry.
 
-The "le" label is a normal label value, rather than getting its own special syntax, so that ingestors don't have to add special histogram handling code to ingest them. As a further example, there are no composite data types. For example, there is no geolocation type for latitude/longitude as this can be done with separate gauge metrics.
+Each line exposed via this format is self-contained in the sense that the information derived from it is complete and can be put into storage in a meaningful way. This is achieved by the introduction of composite types and moving the Start Timestamp (formerly Created value) in-line. These are major changes from the first version, made necessary by the introduction of native histograms in Prometheus and the performance of parsing the `_created` lines in the previous version.
 
 ### Units and Base Units
 
