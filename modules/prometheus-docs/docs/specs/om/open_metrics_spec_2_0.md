@@ -130,7 +130,9 @@ Metric values in OpenMetrics MUST be either Number or CompositeValue.
 
 ##### Number
 
-Number value MUST be either floating point or integer. Note that ingestors of the format MAY only support float64. The non-real values NaN, +Inf and -Inf MUST be supported. NaN value MUST NOT be considered a missing value, but it MAY be used to signal a division by zero.
+Number value MUST be either floating point or integer.
+
+Note that ingestors of the format MAY only support float64, for example Go's `float64` which is an IEEE 754-2008 double-precision (binary64) floating-point number with approximately 15–17 significant decimal digits of precision. The non-real values NaN, +Inf and -Inf MUST be supported. NaN value MUST NOT be considered a missing value, but it MAY be used to signal a division by zero or any other mathematical operation that yields an undefined or indeterminate result.
 
 Booleans MUST be represented as a Number value where `1` is true and `0` is false.
 
@@ -149,6 +151,12 @@ Other MetricFamily Types MUST use Numbers.
 #### Timestamps
 
 Timestamps MUST be Unix Epoch in seconds. Timestamps SHOULD be floating point to represent sub-second precision, for example milliseconds or microseconds. Negative timestamps MAY be used.
+
+There are few places in this standard that use Timestamps:
+
+* Exemplar's Timestamp
+* Sample's Timestamp
+* Sample's Start Timestamp
 
 #### Strings
 
@@ -184,9 +192,11 @@ Ingestors MAY truncate the Exemplar's LabelSet or discard Exemplars. When trunca
 
 #### Sample
 
-A Sample is a single data point within a Metric. It MUST have a Value, MAY have a Timestamp. It MAY include Exemplars and MAY have a start timestamp, depending on the MetricFamily Type.
+A Sample is a single data point within a Metric. It MUST have a Value, MAY have a Timestamp. It MAY include Exemplars and MAY have a Start Timestamp, depending on the MetricFamily Type.
 
-Samples SHOULD NOT have explicit timestamps.
+Samples SHOULD NOT have Timestamps. See [Exposing Timestamps](#exposing-timestamps) for why this is not recommended. If present, a Sample's Timestamp specifies when the value was observed.
+
+If present, a Sample's Start Timestamp SHOULD specify when the measurement period started. This can help ingestors discern between new metrics and long-running ones it did not see before and detect counter resets even when the counter value has not decreased between ingestions.
 
 #### Metric
 
@@ -228,7 +238,7 @@ Type specifies the MetricFamily type. Valid values are "unknown", "gauge", "coun
 
 ##### Unit
 
-Unit specifies MetricFamily units. If non-empty, it SHOULD be a suffix of the MetricFamily name separated by an underscore. Further type specific suffixes come after the unit suffix. Exposing metrics without the unit being a suffix of the MetricFamily name directly to end-users may reduce the usability due to confusion about what the metric's unit is.
+Unit specifies MetricFamily units. If non-empty, it SHOULD be a suffix of the MetricFamily name separated by an underscore. Further type specific suffixes come after the unit suffix. Exposing metrics without the unit being a suffix of the MetricFamily name directly to end-users may reduce the usability due to confusion about what the metric's unit is. For recommended unit values see [Units and Base Units](#units-and-base-units).
 
 ##### Help
 
@@ -260,9 +270,9 @@ Counters measure discrete events. Common examples are the number of HTTP request
 
 The MetricFamily name for Counters SHOULD end in `_total`. Exposing metrics without a `_total` suffix may reduce the usability due to confusion about what the metric's Type is.
 
-A Sample in a Metric with the Type Counter SHOULD have a Timestamp value called Start Timestamp. This can help ingestors discern between new metrics and long-running ones it did not see before.
+A Sample in a Metric with the Type Counter SHOULD have a Start Timestamp.
 
-A Sample in a Metric with the Type Counter MUST have a Number value which is non-NaN. The value MUST be monotonically non-decreasing over time, unless it is reset to 0, and start from 0. The value MAY reset its value to 0. If present, the corresponding Start Timestamp MUST also be set to the timestamp of the reset.
+A Sample in a Metric with the Type Counter MUST have a Number value which is non-NaN. The value MUST be monotonically non-decreasing over time, unless it is reset to 0, and start from 0. The value MAY reset its value to 0. If present, the corresponding Start Timestamp MUST also be set to the approximate reset time.
 
 A Sample in a Metric with the type Counter MAY have exemplars.
 
@@ -312,7 +322,7 @@ A Histogram SHOULD NOT include NaN measurements as including NaN in the Sum will
 
 If a Histogram includes +Inf or -Inf measurement, then +Inf or -Inf MUST be counted in Count and MUST be added to the Sum, potentially resulting in +Inf, -Inf or NaN in the Sum, the latter for example in case of adding +Inf to -Inf. Note that in this case the Sum of finite measurements is masked until the next reset of the Histogram.
 
-A Histogram Sample SHOULD have a Start Timestamp. This can help ingestors discern between new metrics and long-running ones it did not see before.
+A Histogram Sample SHOULD have a Start Timestamp.
 
 If the Histogram Metric has Samples with Classic Buckets, the Histogram's Metric's LabelSet MUST NOT have a "le" label name, because in case the Samples are stored as classic histogram series with the `_bucket` suffix, then the "le" label in the Histogram will conflict with the "le" label generated from the bucket thresholds.
 
@@ -324,7 +334,7 @@ A Histogram Sample MAY have exemplars. The values of exemplars in a Histogram Sa
 
 Every Classic Bucket MUST have a threshold. Classic Bucket thresholds within a Sample MUST be unique. Classic Bucket thresholds MAY be negative.
 
-A Classic Bucket MUST count the number of measured values less than or equal to its threshold, including measured values that are also counted in lower buckets. This allows monitoring systems to drop any non-+Inf bucket for performance or anti-denial-of-service reasons in a way that loses granularity but is still a valid Histogram.
+A Classic Bucket MUST count the number of measured values less than or equal to its threshold, including measured values that are also counted in lower buckets. This allows monitoring systems to drop any bucket other than the +Inf bucket for performance or anti-denial-of-service reasons in a way that loses granularity but is still a valid Histogram.
 
 As an example, for a metric representing request latency in seconds with Classic Buckets and thresholds 1, 2, 3, and +Inf, it follows that value_1 <= value_2 <= value_3 <= value_+Inf. If ten requests took one second each, the values of the 1, 2, 3, and +Inf buckets will be all equal to 10.
 
@@ -380,9 +390,9 @@ GaugeHistograms measure current distributions. Common examples are how long item
 
 A GaugeHistogram Sample MUST contain Gcount, Gsum values.
 
-The GCount value MUST be equal to the number of measurements currently in the GaugeHistogram. The GCount is a gauge semantically. The GCount SHOULD be an integer. The GCount SHOULD NOT be -Inf, +Inf, NAN, or negative.
+The Gcount value MUST be equal to the number of measurements currently in the GaugeHistogram. The Gcount is a gauge semantically. The Gcount SHOULD be an integer. The Gcount SHOULD NOT be -Inf, +Inf, NAN, or negative.
 
-Float and negative GCount is allowed to make it possible to expose results of arithmetic operations on GaugeHistograms, such as the rate of change of a Histogram over time.
+Float and negative Gcount is allowed to make it possible to expose results of arithmetic operations on GaugeHistograms, such as the rate of change of a Histogram over time.
 
 The Gsum value MUST be equal to the sum of all the measured values currently in the GaugeHistogram. The Gsum is a gauge semantically.
 
@@ -414,7 +424,7 @@ A Summary Sample MUST contain a Count, Sum and a set of quantiles.
 
 Semantically, Count and Sum values are counters so MUST NOT be NaN or negative. Count MUST be an integer.
 
-A Summary SHOULD have a Timestamp value called Start Timestamp. This can help ingestors discern between new metrics and long-running ones it did not see before.
+A Summary SHOULD have a Start Timestamp.
 
 Start Timestamp MUST NOT be based on the collection period of quantile values.
 
@@ -436,7 +446,7 @@ Partial or invalid expositions MUST be considered erroneous in their entirety.
 
 ### Protocol Negotiation
 
-All ingestor implementations MUST be able to ingest data secured with TLS 1.2 or later. All exposers SHOULD be able to emit data secured with TLS 1.2 or later. Ingestor implementations SHOULD be able to ingest data from HTTP without TLS. All implementations SHOULD use TLS to transmit data.
+All ingestor implementations MUST be able to ingest data secured with TLS 1.2 or later, and SHOULD support TLS 1.3 or later. All exposers SHOULD be able to emit data secured with TLS 1.3 or later. Ingestor implementations SHOULD be able to ingest data from HTTP without TLS. All implementations SHOULD use TLS to transmit data.
 
 Negotiation of what version of the OpenMetrics format to use is out-of-band. For example for pull-based exposition over HTTP standard HTTP content type negotiation is used, and MUST default to the oldest version of the standard (i.e. 1.0.0) if no newer version is requested.
 
@@ -681,6 +691,17 @@ There MUST NOT be an explicit separator between MetricFamilies. The next MetricF
 
 MetricFamilies MUST NOT be interleaved.
 
+The same MetricFamily's Name and Metric's Name SHOULD have the same quoting.
+
+An example that would violate this:
+
+```openmetrics-add-eof
+# TYPE "read_errors" counter
+# HELP read_errors The number of errors in the read path for fooDb.
+{"read_errors","service.name"="my_service"} 3482
+read_errors{"service.name"="my_service2"} 123
+```
+
 #### MetricFamily metadata
 
 There are four pieces of metadata: The MetricFamily name, TYPE, UNIT and HELP. An example of the metadata for a counter Metric called `foo_total` is:
@@ -695,7 +716,7 @@ If a unit is specified it MUST be provided in a UNIT metadata line. In addition,
 
 Be aware that exposing metrics without the unit being a suffix (or infix) of the MetricFamily name directly to end-users may reduce the usability due to confusion about what the metric's unit is.
 
-A valid example for a foo_seconds metric with a unit of "seconds":
+A valid example for a `foo_seconds_total` metric with a unit of "seconds":
 
 ```openmetrics-add-eof
 # TYPE foo_seconds_total counter
@@ -717,7 +738,7 @@ It is also valid to have:
 
 If the unit is known it SHOULD be provided.
 
-The value of a UNIT or HELP line MAY be empty. This MUST be treated as if no metadata line for the MetricFamily existed.
+A UNIT or HELP metadata line MAY have an empty value string before the newline. This MUST be treated as if the metadata line were not present.
 
 Full example:
 
@@ -732,6 +753,19 @@ See the [UTF-8 Quoting](#utf-8-quoting) section for circumstances where the metr
 There MUST NOT be more than one of each type of metadata line for a MetricFamily. The ordering SHOULD be TYPE, UNIT, HELP.
 
 Aside from this metadata and the EOF line at the end of the message, you MUST NOT expose lines beginning with a #.
+
+##### Unknown metadata
+
+Ingestors MUST support Metric Families without metadata lines.
+
+A valid, but discouraged example, for `foo_seconds_total` counter and a set of unrelated, unknown type metrics without metadata lines:
+
+```openmetrics-add-eof
+# TYPE foo_seconds_total counter
+foo_seconds_total 1
+foo_milliseconds_total 2
+foo_count 3
+```
 
 #### Metric
 
@@ -1157,7 +1191,20 @@ We want to allow monitoring systems to get usable information from an OpenMetric
 
 This principle is applied consistently throughout the standard. For example, it is encouraged that a MetricFamily's unit is duplicated in the name so that the unit is available for systems that don't understand the unit metadata. However, as opposed to the previous version, duplicating the unit name and adding the `_total` suffix for counters is not enforced anymore to foster compatibility with OpenTelemetry.
 
+Another change from the previous version is that the Metric name is now required to strictly match its MetricFamily name. In OpenMetrics 1.0, the MetricFamily name was the Metric name without type-specific suffixes such as `_total` or `_bucket`. This change improves parser reliability by making the association between a Metric and its MetricFamily unambiguous.
+
 Each line exposed via this format is self-contained in the sense that the information derived from it is complete and can be put into storage in a meaningful way. This is achieved by the introduction of composite types and moving the Start Timestamp (formerly Created value) in-line. These are major changes from the first version, made necessary by the introduction of native histograms in Prometheus and the performance of parsing the `_created` lines in the previous version.
+
+A summary of notable changes from OpenMetrics 1.0:
+
+- Start Timestamp moved inline with `st@` notation, replacing separate `_created` samples.
+- Metric name must exactly match its MetricFamily name; implicit suffix stripping is removed.
+- `_total` suffix for Counters and unit suffixes changed from MUST to SHOULD.
+- Histogram, GaugeHistogram, and Summary values consolidated into a single CompositeValue line; Count and Sum are now required.
+- Native Histograms with exponential bucket schemas introduced.
+- UTF-8 metric and label names allowed with quoting.
+- Exemplar timestamps are now mandatory; multiple exemplars per sample are allowed.
+- Protobuf format specification removed.
 
 ### Units and Base Units
 
@@ -1440,7 +1487,7 @@ If all targets of a particular type are exposing the same set of time series, th
 
 Implementors MAY choose to offer authentication, authorization, and accounting; if they so choose, this SHOULD be handled outside of OpenMetrics.
 
-All exposer implementations SHOULD be able to secure their HTTP traffic with TLS 1.2 or later. If an exposer implementation does not support encryption, operators SHOULD use reverse proxies, firewalling, and/or ACLs where feasible.
+All exposer implementations SHOULD be able to secure their HTTP traffic with TLS 1.3 or later. If an exposer implementation does not support encryption, operators SHOULD use reverse proxies, firewalling, and/or ACLs where feasible.
 
 Metric exposition should be independent of production services exposed to end users; as such, having a /metrics endpoint on ports like TCP/80, TCP/443, TCP/8080, and TCP/8443 is generally discouraged for publicly exposed services using OpenMetrics.
 
