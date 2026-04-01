@@ -2,12 +2,16 @@
 title: kubectl config view
 content_type: tool-reference
 weight: 30
+description: >-
+  展示合并的 kubeconfig 配置或指定的 kubeconfig 文件
 ---
 <!--
 title: kubectl config view
 content_type: tool-reference
 weight: 30
 auto_generated: true
+description: >-
+  Display merged kubeconfig settings or a specified kubeconfig file
 -->
 
 ## {{% heading "synopsis" %}}
