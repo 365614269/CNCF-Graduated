@@ -3,7 +3,7 @@ title: kubectl config get-users
 content_type: tool-reference
 weight: 30
 description: >-
-  展示 kubeconfig 中定义的用户
+  显示 kubeconfig 中定义的用户
 ---
 <!--
 title: kubectl config get-users

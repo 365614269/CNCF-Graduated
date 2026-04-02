@@ -114,8 +114,8 @@ github.com/containerd/cgroups/v3/cgroup2/stats
 # github.com/containerd/console v1.0.5
 ## explicit; go 1.13
 github.com/containerd/console
-# github.com/containerd/containerd/api v1.11.0-beta.0
-## explicit; go 1.23.0
+# github.com/containerd/containerd/api v1.11.0-beta.0 => ./api
+## explicit; go 1.24.0
 github.com/containerd/containerd/api/events
 github.com/containerd/containerd/api/runtime/sandbox/v1
 github.com/containerd/containerd/api/runtime/task/v2
@@ -167,6 +167,12 @@ github.com/containerd/fifo
 # github.com/containerd/go-cni v1.1.13
 ## explicit; go 1.21
 github.com/containerd/go-cni
+# github.com/containerd/go-dmverity v0.0.0-20260106143538-e097b6cc4a33
+## explicit; go 1.24.3
+github.com/containerd/go-dmverity/pkg/dm
+github.com/containerd/go-dmverity/pkg/keyring
+github.com/containerd/go-dmverity/pkg/utils
+github.com/containerd/go-dmverity/pkg/verity
 # github.com/containerd/go-runc v1.1.0
 ## explicit; go 1.18
 github.com/containerd/go-runc
@@ -197,8 +203,8 @@ github.com/containerd/nri/types/v1
 ## explicit; go 1.21
 github.com/containerd/otelttrpc
 github.com/containerd/otelttrpc/internal
-# github.com/containerd/platforms v1.0.0-rc.3
-## explicit; go 1.21
+# github.com/containerd/platforms v1.0.0-rc.4
+## explicit; go 1.24
 github.com/containerd/platforms
 # github.com/containerd/plugin v1.0.0
 ## explicit; go 1.20
@@ -454,11 +460,10 @@ github.com/opencontainers/runtime-tools/validate/capabilities
 github.com/opencontainers/selinux/go-selinux
 github.com/opencontainers/selinux/go-selinux/label
 github.com/opencontainers/selinux/pkg/pwalkdir
-# github.com/pelletier/go-toml/v2 v2.2.4
+# github.com/pelletier/go-toml/v2 v2.3.0
 ## explicit; go 1.21.0
 github.com/pelletier/go-toml/v2
 github.com/pelletier/go-toml/v2/internal/characters
-github.com/pelletier/go-toml/v2/internal/danger
 github.com/pelletier/go-toml/v2/internal/tracker
 github.com/pelletier/go-toml/v2/unstable
 # github.com/petermattis/goid v0.0.0-20240813172612-4fcff4a6cae7
@@ -985,3 +990,4 @@ tags.cncf.io/container-device-interface/pkg/parser
 # tags.cncf.io/container-device-interface/specs-go v1.1.0
 ## explicit; go 1.19
 tags.cncf.io/container-device-interface/specs-go
+# github.com/containerd/containerd/api => ./api

@@ -3,7 +3,7 @@ title: kubectl config unset
 content_type: tool-reference
 weight: 30
 description: >-
-  取消 kubeconfig 文件中的单个值
+  去除 kubeconfig 文件中的某个值的设置
 ---
 <!--
 title: kubectl config unset
@@ -32,8 +32,13 @@ kubectl config unset PROPERTY_NAME
 ## {{% heading "examples" %}}
 
 <!--
+```
 # Unset the current-context
+kubectl config unset current-context
+  
 # Unset namespace in foo context
+kubectl config unset contexts.foo.namespace
+```
 -->
 ```shell
 # 去除 current-context 设置

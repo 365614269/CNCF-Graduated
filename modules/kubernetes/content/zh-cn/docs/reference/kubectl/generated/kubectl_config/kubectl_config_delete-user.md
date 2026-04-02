@@ -3,7 +3,7 @@ title: kubectl config delete-user
 content_type: tool-reference
 weight: 30
 description: >-
-  从 kubeconfig 文件中删除指定的用户。
+  从 kubeconfig 中删除指定的用户
 ---
 <!--
 title: kubectl config delete-user
