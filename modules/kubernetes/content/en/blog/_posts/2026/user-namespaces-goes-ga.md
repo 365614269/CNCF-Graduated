@@ -91,7 +91,7 @@ If you're interested in user namespaces or want to contribute, here
 are some useful links:
 
 - [User Namespaces documentation](/docs/concepts/workloads/pods/user-namespaces/)
-- [KEP-127: Support User Namespaces](https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/127-user-namespaces)
+- [KEP-127: Support User Namespaces](https://kep.k8s.io/127)
 - [SIG Node](https://github.com/kubernetes/community/tree/master/sig-node)
 
 ## Acknowledgments
