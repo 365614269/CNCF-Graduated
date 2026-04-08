@@ -1151,7 +1151,7 @@ When the kubelet restarts, the container statuses are managed differently based 
   the containers `ready` value, after a kubelet restart, to be false.
 
   This legacy behavior was the default for a long time, but caused issue for people using Kubernetes,
-  especially in large scale deployments. Althought the feature gate allows reverting to this legacy
+  especially in large scale deployments. Although the feature gate allows reverting to this legacy
   behavior temporarily, the Kubernetes project recommends that you file a bug report if you encounter problems.
   The `ChangeContainerStatusOnKubeletRestart`
   [feature gate](/docs/reference/command-line-tools-reference/feature-gates/#ChangeContainerStatusOnKubeletRestart)
