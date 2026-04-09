@@ -878,13 +878,18 @@ header. The Kubernetes API implements a variation on HTTP content type negotiati
 As a client, you can provide an `Accept` header with the desired media type,
 along with parameters that indicate you want only metadata.
 For example: `Accept: application/json;as=PartialObjectMetadata;g=meta.k8s.io;v=v1`
-for JSON.
+for JSON for a specific object and: 
+`Accept: application/json;as=PartialObjectMetadataList;g=meta.k8s.io;v=v1` for a list.
+
+{{< note >}}
+`as=PartialObjectMetadata` should be used in specific resource requests, and `as=PartialObjectMetadataList` should be used for lists.
+{{< /note >}}
 
 For example, to list all of the pods in a cluster, across all namespaces, but returning only the metadata for each pod:
 
 ```http
 GET /api/v1/pods
-Accept: application/json;as=PartialObjectMetadata;g=meta.k8s.io;v=v1
+Accept: application/json;as=PartialObjectMetadataList;g=meta.k8s.io;v=v1
 ---
 200 OK
 Content-Type: application/json
