@@ -451,6 +451,17 @@ egress traffic. This policy does not change the ingress isolation behavior of an
 此策略可以确保即使没有被其他任何 NetworkPolicy 选择的 Pod 也不会被允许流出流量。
 此策略不会更改任何 Pod 的入站流量隔离行为。
 
+{{< caution >}}
+<!--
+A default deny-all egress policy also blocks DNS traffic. If your workloads need DNS
+resolution, you must add a separate NetworkPolicy that allows egress to your
+cluster's DNS service.
+-->
+默认的拒绝所有出站流量策略也会阻止 DNS 流量。
+如果你的工作负载需要进行 DNS 解析，就必须额外添加一条 NetworkPolicy，
+允许出站流量访问集群的 DNS 服务。
+{{< /caution >}}
+
 <!--
 ### Allow all egress traffic
 -->
