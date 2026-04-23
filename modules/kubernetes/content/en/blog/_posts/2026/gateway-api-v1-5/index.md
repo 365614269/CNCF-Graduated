@@ -447,11 +447,12 @@ of Gateway API.
 To try out the API, follow the [Getting Started Guide](https://gateway-api.sigs.k8s.io/guides/).
 
 As of this writing, seven implementations are already fully conformant with Gateway API v1.5. In alphabetical order:
-- [NGINX Gateway Fabric](https://github.com/nginx/nginx-gateway-fabric/releases/tag/v2.5.0)
+- [Agentgateway](https://github.com/agentgateway/agentgateway/releases/tag/v1.0.0)
 - [Airlock Microgateway](https://github.com/airlock/microgateway/releases/tag/5.0.0)
 - [GKE Gateway](https://docs.cloud.google.com/kubernetes-engine/docs/concepts/gateway-api)
 - [HAProxy Ingress](https://github.com/jcmoraisjr/haproxy-ingress/releases/tag/v0.17.0-alpha.1)
 - [kgateway](https://github.com/kgateway-dev/kgateway/releases/tag/v2.3.0-beta.3)
+- [NGINX Gateway Fabric](https://github.com/nginx/nginx-gateway-fabric/releases/tag/v2.5.0)
 - [Traefik Proxy](https://github.com/traefik/traefik/releases/tag/v3.7.0-rc.1)
 
 ## Get involved
