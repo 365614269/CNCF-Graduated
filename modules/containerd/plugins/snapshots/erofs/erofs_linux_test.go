@@ -426,8 +426,10 @@ func TestCreateErofsMount(t *testing.T) {
 
 		assert.Equal(t, "erofs", m.Type)
 		assert.Equal(t, layerBlob, m.Source)
-		// X-containerd.dmverity=off overrides auto-detection when metadata exists
-		assert.Contains(t, m.Options, "X-containerd.dmverity=off")
+		// mode "off" skips dm-verity entirely - no dm-verity option in mount options
+		for _, opt := range m.Options {
+			assert.NotContains(t, opt, "X-containerd.dmverity=")
+		}
 	})
 }
 
@@ -663,7 +665,7 @@ func TestApplyDmverityPolicy(t *testing.T) {
 		assert.Empty(t, opt)
 	})
 
-	t.Run("mode off returns dmverity=off when metadata exists", func(t *testing.T) {
+	t.Run("mode off returns empty string when metadata exists", func(t *testing.T) {
 		createDmverityMetadata(t, layerBlob)
 
 		s := &snapshotter{
@@ -672,10 +674,10 @@ func TestApplyDmverityPolicy(t *testing.T) {
 
 		opt, err := s.applyDmverityPolicy(layerBlob)
 		require.NoError(t, err)
-		assert.Equal(t, "X-containerd.dmverity=off", opt)
+		assert.Empty(t, opt)
 	})
 
-	t.Run("mode on returns dmverity=on when metadata exists", func(t *testing.T) {
+	t.Run("mode on returns metadata path when metadata exists", func(t *testing.T) {
 		createDmverityMetadata(t, layerBlob)
 
 		s := &snapshotter{
@@ -684,10 +686,11 @@ func TestApplyDmverityPolicy(t *testing.T) {
 
 		opt, err := s.applyDmverityPolicy(layerBlob)
 		require.NoError(t, err)
-		assert.Equal(t, "X-containerd.dmverity=on", opt)
+		expectedPath := layerBlob + ".dmverity"
+		assert.Equal(t, "X-containerd.dmverity="+expectedPath, opt)
 	})
 
-	t.Run("mode auto returns empty string when metadata exists", func(t *testing.T) {
+	t.Run("mode auto returns metadata path when metadata exists", func(t *testing.T) {
 		createDmverityMetadata(t, layerBlob)
 
 		s := &snapshotter{
@@ -696,6 +699,7 @@ func TestApplyDmverityPolicy(t *testing.T) {
 
 		opt, err := s.applyDmverityPolicy(layerBlob)
 		require.NoError(t, err)
-		assert.Empty(t, opt) // auto mode doesn't add explicit option
+		expectedPath := layerBlob + ".dmverity"
+		assert.Equal(t, "X-containerd.dmverity="+expectedPath, opt)
 	})
 }

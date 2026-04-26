@@ -283,10 +283,24 @@ func (s *snapshotter) mountFsMeta(snap storage.Snapshot, id int) (mount.Mount, b
 }
 
 // applyDmverityPolicy validates and applies dm-verity policy for a layer.
-// Returns the X-containerd.dmverity option if needed, or empty string otherwise.
+// Returns the X-containerd.dmverity mount option with the plain metadata path
+// if dm-verity is applicable, or empty string if dm-verity should not be used.
+// The mount handler and lower runtimes can use the path to read the .dmverity file
+// and get the root hash and other metadata.
 func (s *snapshotter) applyDmverityPolicy(layerBlob string) (string, error) {
+	// If mode is "off", skip dm-verity entirely.
+	if s.dmverityMode == "off" {
+		return "", nil
+	}
+
 	metadataPath := dmverity.MetadataPath(layerBlob)
 	_, metadataErr := os.Stat(metadataPath)
+
+	// Handle stat errors: distinguish between "not found" and other errors
+	// (e.g., I/O errors) to avoid silently bypassing dm-verity.
+	if metadataErr != nil && !os.IsNotExist(metadataErr) {
+		return "", fmt.Errorf("failed to access dm-verity metadata %s: %w", metadataPath, metadataErr)
+	}
 	metadataExists := metadataErr == nil
 
 	// Validate dmverityMode policy: mode "on" requires .dmverity metadata to exist
@@ -297,12 +311,10 @@ func (s *snapshotter) applyDmverityPolicy(layerBlob string) (string, error) {
 			"or set dmverity_mode to 'auto' to allow layers without dm-verity metadata", layerBlob)
 	}
 
-	// Only return option if metadata exists and we need to override the default "auto" behavior
-	// This keeps standard EROFS mounts (without dm-verity) unchanged
-	if metadataExists && s.dmverityMode != "auto" {
-		// Mode "off": disables dm-verity even though metadata exists
-		// Mode "on": explicitly enables dm-verity (though "auto" would do the same)
-		return fmt.Sprintf("X-containerd.dmverity=%s", s.dmverityMode), nil
+	// If metadata exists, return the metadata path to a mount option.
+	// The format is: X-containerd.dmverity=<metadata-path>
+	if metadataExists {
+		return fmt.Sprintf("X-containerd.dmverity=%s", metadataPath), nil
 	}
 
 	return "", nil
