@@ -87,7 +87,7 @@ kubelet_memory_qos_node_memory_low_bytes 2.147483648e+09
 ### Kernel version check
 
 On kernels older than 5.9, `memory.high` throttling can trigger the
-[kernel livelock](https://lore.kernel.org/all/20200710012662.GA29679@chep.ntu.edu.tw/) issue. The bug was fixed
+[kernel livelock](https://lore.kernel.org/all/a4e23b59e9ef499b575ae73a8120ee089b7d3373.1594640214.git.chris@chrisdown.name/) issue. The bug was fixed
 in kernel 5.9. In v1.36, when the feature gate is enabled, the kubelet checks the
 kernel version at startup and logs a warning if it is below 5.9. The feature
 continues to work — this is informational, not a hard block.
@@ -109,10 +109,10 @@ With the default `memoryReservationPolicy: None`, no `memory.min` or
 <table>
     <tr>
         <th>QoS Class</th>
-        <th>memory.min</th>
-        <th>memory.low</th>
-        <th>memory.high</th>
-        <th>memory.max</th>
+        <th><tt>memory.min</tt></th>
+        <th><tt>memory.low</tt></th>
+        <th><tt>memory.high</tt></th>
+        <th><tt>memory.max</tt></th>
     </tr>
     <tr>
         <td><b>Guaranteed</b></td>
@@ -186,7 +186,7 @@ memoryReservationPolicy: None  # This is the default
 
 ## How can I learn more?
 
-- [KEP-2570: Memory QoS](https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/2570-memory-qos)
+- [KEP-2570: Memory QoS](https://kep.k8s.io/2570)
 - [Pod Quality of Service Classes](/docs/concepts/workloads/pods/pod-qos/)
 - [Managing Resources for Containers](/docs/concepts/configuration/manage-resources-containers/)
 - [Kubernetes cgroups v2 support](/docs/concepts/architecture/cgroups/)
