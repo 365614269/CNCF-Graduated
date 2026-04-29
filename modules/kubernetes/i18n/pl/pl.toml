@@ -167,6 +167,9 @@ other = "Najnowsza wersja"
 [docs_version_other_heading]
 other = "Starsze wersje"
 
+[docs_version_release_information]
+other = "informacje o wydaniu"
+
 [end_of_life]
 other = "Zakończenie wsparcia:"
 
@@ -506,6 +509,9 @@ other = "Poprawki:"
 
 [release_actively_supported]
 other = "Aktywnie wspierane"
+
+[release_announcement_blog]
+other = "Blog z informacjami o nowych wydaniach"
 
 # The following text is displayed when JavaScript isn't available.
 [release_binary_alternate_links]
