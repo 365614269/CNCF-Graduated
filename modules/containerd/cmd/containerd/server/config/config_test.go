@@ -29,7 +29,9 @@ import (
 	"github.com/pelletier/go-toml/v2"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/containerd/containerd/v2/defaults"
 	"github.com/containerd/containerd/v2/version"
 	"github.com/containerd/log/logtest"
 )
@@ -178,6 +180,144 @@ disabled_plugins = ["io.containerd.v1.xyz"]
 	assert.Equal(t, 2, out.Version)
 	assert.Equal(t, "/var/lib/containerd", out.Root)
 	assert.Equal(t, []string{"io.containerd.v1.xyz"}, out.DisabledPlugins)
+}
+
+func TestLoadConfigWithV3GRPCImportsMergeSparseKeys(t *testing.T) {
+	const (
+		rootAddress   = "/tmp/root-containerd.sock"
+		importAddress = "/tmp/import-containerd.sock"
+		maxRecvSize   = 67108864
+		maxSendSize   = 33554432
+	)
+
+	var (
+		rootAddressConfig = fmt.Sprintf(`
+version = 3
+imports = ["data2.toml"]
+
+[grpc]
+  address = %q
+`, rootAddress)
+
+		rootMaxSendConfig = fmt.Sprintf(`
+version = 3
+imports = ["data2.toml"]
+
+[grpc]
+  max_send_message_size = %d
+`, maxSendSize)
+
+		rootAddressMaxSendConfig = fmt.Sprintf(`
+version = 3
+imports = ["data2.toml"]
+
+[grpc]
+  address = %q
+  max_send_message_size = %d
+`, rootAddress, maxSendSize)
+
+		importAddressConfig = fmt.Sprintf(`
+version = 3
+
+[grpc]
+  address = %q
+`, importAddress)
+
+		importMaxRecvConfig = fmt.Sprintf(`
+version = 3
+
+[grpc]
+  max_recv_message_size = %d
+`, maxRecvSize)
+
+		importMaxSendConfig = fmt.Sprintf(`
+version = 3
+
+[grpc]
+  max_send_message_size = %d
+`, maxSendSize)
+	)
+
+	tests := []struct {
+		name             string
+		rootConfig       string
+		importConfig     string
+		wantAddress      string
+		wantMaxRecvSize  int
+		wantMaxSendSize  int
+		wantTTRPCAddress string
+	}{
+		{
+			name:             "import without address key does not overwrite root address",
+			rootConfig:       rootAddressConfig,
+			importConfig:     importMaxSendConfig,
+			wantAddress:      rootAddress,
+			wantMaxRecvSize:  defaults.DefaultMaxRecvMsgSize,
+			wantMaxSendSize:  maxSendSize,
+			wantTTRPCAddress: rootAddress + ".ttrpc",
+		},
+		{
+			name:             "import address key is merged into root grpc config",
+			rootConfig:       rootMaxSendConfig,
+			importConfig:     importAddressConfig,
+			wantAddress:      importAddress,
+			wantMaxRecvSize:  defaults.DefaultMaxRecvMsgSize,
+			wantMaxSendSize:  maxSendSize,
+			wantTTRPCAddress: importAddress + ".ttrpc",
+		},
+		{
+			name:             "import address key overwrites root address",
+			rootConfig:       rootAddressMaxSendConfig,
+			importConfig:     importAddressConfig,
+			wantAddress:      importAddress,
+			wantMaxRecvSize:  defaults.DefaultMaxRecvMsgSize,
+			wantMaxSendSize:  maxSendSize,
+			wantTTRPCAddress: importAddress + ".ttrpc",
+		},
+		{
+			name:            "default address is kept when root and import omit address key",
+			rootConfig:      rootMaxSendConfig,
+			importConfig:    importMaxRecvConfig,
+			wantAddress:     defaults.DefaultAddress,
+			wantMaxRecvSize: maxRecvSize,
+			wantMaxSendSize: maxSendSize,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tempDir := t.TempDir()
+
+			err := os.WriteFile(filepath.Join(tempDir, "data1.toml"), []byte(tc.rootConfig), 0o600)
+			require.NoError(t, err)
+
+			err = os.WriteFile(filepath.Join(tempDir, "data2.toml"), []byte(tc.importConfig), 0o600)
+			require.NoError(t, err)
+
+			out := Config{
+				Version: version.ConfigVersion,
+				Plugins: map[string]any{
+					"io.containerd.server.v1.grpc": map[string]any{
+						"address":               defaults.DefaultAddress,
+						"max_recv_message_size": defaults.DefaultMaxRecvMsgSize,
+						"max_send_message_size": defaults.DefaultMaxSendMsgSize,
+					},
+				},
+			}
+			err = LoadConfig(context.Background(), filepath.Join(tempDir, "data1.toml"), &out)
+			require.NoError(t, err)
+
+			grpcPlugin := out.Plugins["io.containerd.server.v1.grpc"].(map[string]any)
+			require.Equal(t, tc.wantAddress, grpcPlugin["address"])
+			require.Equal(t, tc.wantMaxRecvSize, grpcPlugin["max_recv_message_size"])
+			require.Equal(t, tc.wantMaxSendSize, grpcPlugin["max_send_message_size"])
+
+			if tc.wantTTRPCAddress != "" {
+				ttrpcPlugin := out.Plugins["io.containerd.server.v1.ttrpc"].(map[string]any)
+				require.Equal(t, tc.wantTTRPCAddress, ttrpcPlugin["address"])
+			}
+		})
+	}
 }
 
 func TestLoadConfigWithCircularImports(t *testing.T) {

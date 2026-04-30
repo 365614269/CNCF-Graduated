@@ -249,24 +249,52 @@ func serviceMigrate(ctx context.Context, c *Config) error {
 	grpcMaxSend := c.GRPC.MaxSendMsgSize
 	grpcHasLegacy := grpcAddress != "" || grpcUID != 0 || grpcGID != 0 || grpcMaxRecv != 0 || grpcMaxSend != 0
 	if grpcHasLegacy && c.Plugins["io.containerd.server.v1.grpc"] == nil {
-		c.Plugins["io.containerd.server.v1.grpc"] = map[string]any{
-			"address":               grpcAddress,
-			"uid":                   grpcUID,
-			"gid":                   grpcGID,
-			"max_recv_message_size": grpcMaxRecv,
-			"max_send_message_size": grpcMaxSend,
+		grpcConfig := map[string]any{}
+		if grpcAddress != "" {
+			grpcConfig["address"] = grpcAddress
+			// Preserve legacy socket ownership semantics. In v3 configs, uid/gid
+			// default to 0 and cannot be distinguished from an explicit 0.
+			grpcConfig["uid"] = grpcUID
+			grpcConfig["gid"] = grpcGID
+		} else {
+			if grpcUID != 0 {
+				grpcConfig["uid"] = grpcUID
+			}
+			if grpcGID != 0 {
+				grpcConfig["gid"] = grpcGID
+			}
 		}
+		if grpcMaxRecv != 0 {
+			grpcConfig["max_recv_message_size"] = grpcMaxRecv
+		}
+		if grpcMaxSend != 0 {
+			grpcConfig["max_send_message_size"] = grpcMaxSend
+		}
+		c.Plugins["io.containerd.server.v1.grpc"] = grpcConfig
 	}
 	if c.GRPC.TCPAddress != "" && c.Plugins["io.containerd.server.v1.grpc-tcp"] == nil {
-		c.Plugins["io.containerd.server.v1.grpc-tcp"] = map[string]any{
-			"address":               c.GRPC.TCPAddress,
-			"tls_ca":                c.GRPC.TCPTLSCA,
-			"tls_cert":              c.GRPC.TCPTLSCert,
-			"tls_key":               c.GRPC.TCPTLSKey,
-			"tls_common_name":       c.GRPC.TCPTLSCName,
-			"max_recv_message_size": grpcMaxRecv,
-			"max_send_message_size": grpcMaxSend,
+		grpcTCPConfig := map[string]any{
+			"address": c.GRPC.TCPAddress,
 		}
+		if c.GRPC.TCPTLSCA != "" {
+			grpcTCPConfig["tls_ca"] = c.GRPC.TCPTLSCA
+		}
+		if c.GRPC.TCPTLSCert != "" {
+			grpcTCPConfig["tls_cert"] = c.GRPC.TCPTLSCert
+		}
+		if c.GRPC.TCPTLSKey != "" {
+			grpcTCPConfig["tls_key"] = c.GRPC.TCPTLSKey
+		}
+		if c.GRPC.TCPTLSCName != "" {
+			grpcTCPConfig["tls_common_name"] = c.GRPC.TCPTLSCName
+		}
+		if grpcMaxRecv != 0 {
+			grpcTCPConfig["max_recv_message_size"] = grpcMaxRecv
+		}
+		if grpcMaxSend != 0 {
+			grpcTCPConfig["max_send_message_size"] = grpcMaxSend
+		}
+		c.Plugins["io.containerd.server.v1.grpc-tcp"] = grpcTCPConfig
 	}
 	if grpcHasLegacy || c.GRPC.TCPAddress != "" {
 		c.GRPC = GRPCConfig{}
