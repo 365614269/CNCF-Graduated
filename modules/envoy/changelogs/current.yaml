@@ -21,6 +21,11 @@ minor_behavior_changes:
     on the five methods that write to the per-request ``strValue`` scratch buffer
     (``getStringValue``, ``getDynamicMetadata``, ``getStringFilterState``, ``getStringProperty``,
     ``getSecret``).
+- area: stats
+  change: |
+    Optimized prometheus stats endpoint. Users should see a roughly 30-40% latency improvement in calls to the endpoint
+    for cases where the scrape results in lots of cluster stats.
+    There should be no visible changes to users, or incompatibilities.
 
 bug_fixes:
 # *Changes expected to improve the state of the world and are unlikely to have negative effects*
@@ -59,6 +64,11 @@ removed_config_or_runtime:
 # *Normally occurs at the end of the* :ref:`deprecation period <deprecated>`
 
 new_features:
+- area: stat_sinks
+  change: |
+    Added :ref:`max_data_points_per_request
+    <envoy_v3_api_field_extensions.stat_sinks.open_telemetry.v3.SinkConfig.max_data_points_per_request>`
+    configuration to the OpenTelemetry stat sink to chunk metric export requests.
 - area: set_metadata_filter
   change: |
     Added :ref:`per-route configuration support <envoy_v3_api_msg_extensions.filters.http.set_metadata.v3.Config>`
@@ -96,6 +106,13 @@ new_features:
     RSA public key exchange on behalf of the client. Added a new
     :ref:`downstream_ssl <envoy_v3_api_field_extensions.filters.network.mysql_proxy.v3.MySQLProxy.downstream_ssl>`
     config option with ``DISABLE``, ``REQUIRE``, and ``ALLOW`` modes.
+- area: quic
+  change: |
+    Added support for TLS session ticket resumption in QUIC using configured session ticket keys from
+    :ref:`session_ticket_keys <envoy_v3_api_field_extensions.transport_sockets.tls.v3.DownstreamTlsContext.session_ticket_keys>`.
+    This enables faster reconnection across server instances by allowing clients to resume TLS sessions
+    without full handshakes. The feature is disabled by default and can be enabled by setting runtime guard
+    ``envoy.reloadable_features.quic_session_ticket_support`` to ``true``.
 - area: composite
   change: |
     Added support for the
@@ -103,6 +120,5 @@ new_features:
     in the composite HTTP filter. Now users could specify the matcher inline in the filter configuration
     instead of using the :ref:`ExtensionWithMatcher
     <envoy_v3_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>` filter.
-
 
 deprecated:

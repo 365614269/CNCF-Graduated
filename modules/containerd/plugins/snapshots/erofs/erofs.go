@@ -20,11 +20,8 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
-	"time"
 
 	"github.com/containerd/continuity/fs"
 	"github.com/containerd/errdefs"
@@ -48,9 +45,7 @@ type SnapshotterConfig struct {
 	setImmutable bool
 	// defaultSize creates a default size writable layer for active snapshots
 	defaultSize int64
-	// fsMergeThreshold (>0) enables fsmerge when the number of image layers exceeds this value
-	fsMergeThreshold uint
-	remapIDs         bool
+	remapIDs    bool
 	// dmverityMode controls dm-verity behavior: "auto" (use if .dmverity exists), "on" (require .dmverity), "off" (disable)
 	dmverityMode string
 }
@@ -93,13 +88,6 @@ func WithDefaultSize(size int64) Opt {
 	}
 }
 
-// WithFsMergeThreshold (>0) enables fsmerge when the number of image layers exceeds this value
-func WithFsMergeThreshold(v uint) Opt {
-	return func(config *SnapshotterConfig) {
-		config.fsMergeThreshold = v
-	}
-}
-
 // WithRemapIDs enables kernel ID-mapped mounts for user namespace support
 func WithRemapIDs() Opt {
 	return func(config *SnapshotterConfig) {
@@ -114,16 +102,15 @@ type MetaStore interface {
 }
 
 type snapshotter struct {
-	root             string
-	ms               *storage.MetaStore
-	ovlOptions       []string
-	enableFsverity   bool
-	setImmutable     bool
-	defaultWritable  int64
-	blockMode        bool
-	fsMergeThreshold uint
-	remapIDs         bool
-	dmverityMode     string
+	root            string
+	ms              *storage.MetaStore
+	ovlOptions      []string
+	enableFsverity  bool
+	setImmutable    bool
+	defaultWritable int64
+	blockMode       bool
+	remapIDs        bool
+	dmverityMode    string
 }
 
 // NewSnapshotter returns a Snapshotter which uses EROFS+OverlayFS. The layers
@@ -191,16 +178,15 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
 	}
 
 	return &snapshotter{
-		root:             root,
-		ms:               ms,
-		ovlOptions:       config.ovlOptions,
-		enableFsverity:   config.enableFsverity,
-		setImmutable:     config.setImmutable,
-		defaultWritable:  config.defaultSize,
-		blockMode:        config.defaultSize > 0,
-		fsMergeThreshold: config.fsMergeThreshold,
-		remapIDs:         config.remapIDs,
-		dmverityMode:     config.dmverityMode,
+		root:            root,
+		ms:              ms,
+		ovlOptions:      config.ovlOptions,
+		enableFsverity:  config.enableFsverity,
+		setImmutable:    config.setImmutable,
+		defaultWritable: config.defaultSize,
+		blockMode:       config.defaultSize > 0,
+		remapIDs:        config.remapIDs,
+		dmverityMode:    config.dmverityMode,
 	}, nil
 }
 
@@ -448,12 +434,10 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
 	for i := range snap.ParentIDs {
 		// If a merged fsmeta is valid for this layer, skip the remaining bottom layers.
 		// Why? Because bottom layers have been flattened with the thin fsmeta.
-		if s.fsMergeThreshold > 0 {
-			if m, ok := s.mountFsMeta(snap, i); ok {
-				mounts = append(mounts, m)
-				first = len(mounts) - 1
-				break
-			}
+		if m, ok := s.mountFsMeta(snap, i); ok {
+			mounts = append(mounts, m)
+			first = len(mounts) - 1
+			break
 		}
 
 		layerBlob, err := s.lowerPath(snap.ParentIDs[i])
@@ -601,11 +585,6 @@ func (s *snapshotter) createSnapshot(ctx context.Context, kind snapshots.Kind, k
 		return nil, err
 	}
 
-	// Generate fsmeta outside of the transaction since it's unnecessary.
-	// Also ignore all errors since it's a nice-to-have stuff.
-	if !strings.Contains(key, snapshots.UnpackKeyPrefix) {
-		s.generateFsMeta(ctx, snap.ParentIDs)
-	}
 	return s.mounts(snap, info)
 }
 
@@ -652,47 +631,6 @@ func (s *snapshotter) commitBlock(ctx context.Context, layerBlob string, id stri
 		return fmt.Errorf("failed to convert upper block to erofs layer: %w", cerr)
 	}
 	return nil
-}
-
-// generate a metadata-only EROFS fsmeta.erofs if all EROFS layer blobs are valid
-func (s *snapshotter) generateFsMeta(ctx context.Context, snapIDs []string) {
-	var blobs []string
-
-	if s.fsMergeThreshold == 0 || uint(len(snapIDs)) <= s.fsMergeThreshold {
-		return
-	}
-
-	t1 := time.Now()
-	mergedMeta := s.fsMetaPath(snapIDs[0])
-	// If the empty placeholder cannot be created (mainly due to os.IsExist), just return
-	if _, err := os.OpenFile(mergedMeta, os.O_CREATE|os.O_EXCL, 0644); err != nil {
-		return
-	}
-
-	for i := len(snapIDs) - 1; i >= 0; i-- {
-		blob := s.layerBlobPath(snapIDs[i])
-		if _, err := os.Stat(blob); err != nil {
-			return
-		}
-		blobs = append(blobs, blob)
-	}
-	tmpMergedMeta := mergedMeta + ".tmp"
-	args := append([]string{"--aufs", "--ovlfs-strip=1", "--quiet", tmpMergedMeta}, blobs...)
-	log.G(ctx).Infof("merging layers with mkfs.erofs %v", args)
-	cmd := exec.CommandContext(ctx, "mkfs.erofs", args...)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		log.G(ctx).Warnf("failed to generate merged fsmeta for %v: %q: %v", snapIDs[0], string(out), err)
-		return
-	}
-	// Atomically replace the fsmeta with the generated file
-	if err = os.Rename(tmpMergedMeta, mergedMeta); err != nil {
-		log.G(ctx).Errorf("failed to rename fsmeta: %v", err)
-		return
-	}
-	log.G(ctx).WithFields(log.Fields{
-		"d": time.Since(t1),
-	}).Infof("merged fsmeta for %v generated", snapIDs[0])
 }
 
 func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snapshots.Opt) error {
