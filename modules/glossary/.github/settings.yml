@@ -220,7 +220,7 @@ collaborators:
   - username: mertssmnoglu
     permission: push
 
-  - username: alianait
+  - username: b-beyaz
     permission: push
 
   # l10n ru approvers
@@ -518,7 +518,7 @@ branches:
          - aliok
          - canogluonur
          - mertssmnoglu
-         - alianait
+         - b-beyaz
         teams: []
       enforce_admins: null
       required_linear_history: null
