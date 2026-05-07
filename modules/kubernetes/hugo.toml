@@ -20,7 +20,7 @@ disableKinds = ["taxonomy"]
 
 ignoreFiles = [ "(?:^|/)OWNERS$", "README[-]+[a-z]*\\.md", "^node_modules$", "content/en/docs/doc-contributor-tools" ]
 
-timeout = "180s"
+timeout = "600s"
 
 # Enable Git variables like commit, lastmod
 enableGitInfo = true

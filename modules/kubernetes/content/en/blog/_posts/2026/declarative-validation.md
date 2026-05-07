@@ -4,7 +4,7 @@ title: "Kubernetes v1.36: Declarative Validation Graduates to GA"
 date: 2026-05-05T10:35:00-08:00
 slug: kubernetes-v1-36-declarative-validation-ga
 author: >
-  [Yongrui Lin](https://github.com/yongruilin)
+  [Yongrui Lin](https://github.com/yongruilin) (Google)
 ---
 
 In Kubernetes v1.36, **Declarative Validation** for Kubernetes native types has reached General Availability (GA).
