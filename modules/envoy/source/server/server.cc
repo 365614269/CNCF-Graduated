@@ -103,8 +103,7 @@ InstanceBase::InstanceBase(Init::Manager& init_manager, const Options& options,
                                                   : nullptr),
       grpc_context_(store.symbolTable()), http_context_(store.symbolTable()),
       router_context_(store.symbolTable()), process_context_(std::move(process_context)),
-      hooks_(hooks), quic_stat_names_(store.symbolTable()), server_contexts_(*this),
-      enable_reuse_port_default_(true), stats_flush_in_progress_(false) {
+      hooks_(hooks), quic_stat_names_(store.symbolTable()), server_contexts_(*this) {
   // Register the server factory context on the main thread.
   Configuration::ServerFactoryContextInstance::initialize(&server_contexts_);
 }

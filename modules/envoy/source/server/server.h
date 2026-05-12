@@ -439,9 +439,9 @@ private:
   ListenerHooks& hooks_;
   Quic::QuicStatNames quic_stat_names_;
   ServerFactoryContextImpl server_contexts_;
-  bool enable_reuse_port_default_{false};
+  bool enable_reuse_port_default_ = true;
   Regex::EnginePtr regex_engine_;
-  bool stats_flush_in_progress_ : 1;
+  bool stats_flush_in_progress_ = false;
   std::unique_ptr<Memory::AllocatorManager> memory_allocator_manager_;
 
   template <class T>
