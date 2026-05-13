@@ -348,6 +348,7 @@ private:
   Network::DnsResolverSharedPtr getOrCreateDnsResolver();
 
   ProtobufTypes::MessagePtr dumpBootstrapConfig();
+  void flushStatsImpl();
   void flushStatsInternal();
   void updateServerStats();
   // This does most of the work of initialization, but can throw or return errors caught
