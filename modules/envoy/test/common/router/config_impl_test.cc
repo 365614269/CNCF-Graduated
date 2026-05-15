@@ -27,7 +27,7 @@
 #include "test/extensions/filters/http/common/empty_http_filter_config.h"
 #include "test/fuzz/utility.h"
 #include "test/mocks/router/mocks.h"
-#include "test/mocks/server/instance.h"
+#include "test/mocks/server/server_factory_context.h"
 #include "test/mocks/upstream/retry_priority.h"
 #include "test/mocks/upstream/retry_priority_factory.h"
 #include "test/mocks/upstream/test_retry_host_predicate_factory.h"
@@ -4961,6 +4961,7 @@ virtual_hosts:
         per_try_idle_timeout: 5s
         num_retries: 3
         retry_on: 5xx,gateway-error,connect-failure,reset
+        refresh_cluster_on_retry: true
   )EOF";
 
   factory_context_.cluster_manager_.initializeClusters({"www2"}, {});
@@ -5021,6 +5022,14 @@ virtual_hosts:
                 ->routeEntry()
                 ->retryPolicy()
                 ->retryOn());
+  EXPECT_FALSE(config.route(genHeaders("www.lyft.com", "/foo", "GET"), 0)
+                   ->routeEntry()
+                   ->retryPolicy()
+                   ->refreshClusterOnRetry());
+  EXPECT_TRUE(config.route(genHeaders("www.lyft.com", "/", "GET"), 0)
+                  ->routeEntry()
+                  ->retryPolicy()
+                  ->refreshClusterOnRetry());
 }
 
 class TestRetryOptionsPredicateFactory : public Upstream::RetryOptionsPredicateFactory {
