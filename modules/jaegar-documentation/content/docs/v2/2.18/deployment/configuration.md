@@ -6,7 +6,7 @@ weight: 1
 ---
 
 {{< warning >}}
-We are currently working on expanding this section with more details. [Examples of working configuration files](https://github.com/jaegertracing/jaeger/tree/main/cmd/jaeger) can be found in the Jaeger repository. In the future the documentation for all configuration properties will be [auto-generated](https://github.com/jaegertracing/jaeger/issues/6186).
+We are currently working on expanding this section with more details. [Examples of working configuration files](https://github.com/jaegertracing/jaeger/tree/v2.18.0/cmd/jaeger) can be found in the Jaeger repository. In the future the documentation for all configuration properties will be [auto-generated](https://github.com/jaegertracing/jaeger/issues/6186).
 {{< /warning >}}
 
 ## Introduction
@@ -19,7 +19,7 @@ jaeger --config config.yaml
 
 ### Configuration Examples
 
-[Examples of working configuration files](https://github.com/jaegertracing/jaeger/tree/main/cmd/jaeger) are available in the Jaeger GitHub repository:
+[Examples of working configuration files](https://github.com/jaegertracing/jaeger/tree/v2.18.0/cmd/jaeger) are available in the Jaeger GitHub repository:
   * `config-{storage}.yaml` are examples of running Jaeger as `collector` role with different storage backends.
   * `config-query.yaml` is an example of running Jaeger in a standalone `query` role (with UI).
   * `cmd/jaeger/internal/all-in-one.yaml` is bundled in the Jaeger binary for `all-in-one` role.
@@ -82,7 +82,7 @@ In this example:
 
 ### Jaeger query
 
-`jaeger_query` extension is responsible for running HTTP and gRPC servers that expose trace query APIs and the UI frontend. In the future the configuration documentation will be [auto-generated](https://github.com/jaegertracing/jaeger/issues/6628) from the schema. Meanwhile, please refer to [config.go](https://github.com/jaegertracing/jaeger/blob/main/cmd/jaeger/internal/extension/jaegerquery/config.go#L16) as the authoritative source.
+`jaeger_query` extension is responsible for running HTTP and gRPC servers that expose trace query APIs and the UI frontend. In the future the configuration documentation will be [auto-generated](https://github.com/jaegertracing/jaeger/issues/6628) from the schema. Meanwhile, please refer to [config.go](https://github.com/jaegertracing/jaeger/blob/v2.18.0/cmd/jaeger/internal/extension/jaegerquery/config.go#L16) as the authoritative source.
 
 Here's an example of how to configure the extension:
 
@@ -105,7 +105,7 @@ Of note here is the `storage` section, which references by name the storage back
 
 #### Clock Skew Adjustment
 
-Jaeger backend combines trace data from applications that are usually running on different hosts. The hardware clocks on the hosts often experience relative drift, known as the [clock skew effect](https://en.wikipedia.org/wiki/Clock_skew). Clock skew can make it difficult to reason about traces, for example, when a server span may appear to start earlier than the client span, which should not be possible. `jaeger_query` extension implements a clock skew adjustment algorithm ([code](https://github.com/jaegertracing/jaeger/blob/main/model/adjuster/clockskew.go)) to correct for clock drift, using the knowledge about causal relationships between spans. All adjusted spans have a warning displayed in the UI that provides the exact clock skew delta applied to their timestamps.
+Jaeger backend combines trace data from applications that are usually running on different hosts. The hardware clocks on the hosts often experience relative drift, known as the [clock skew effect](https://en.wikipedia.org/wiki/Clock_skew). Clock skew can make it difficult to reason about traces, for example, when a server span may appear to start earlier than the client span, which should not be possible. `jaeger_query` extension implements a clock skew adjustment algorithm ([code](https://github.com/jaegertracing/jaeger/blob/v2.18.0/model/adjuster/clockskew.go)) to correct for clock drift, using the knowledge about causal relationships between spans. All adjusted spans have a warning displayed in the UI that provides the exact clock skew delta applied to their timestamps.
 
 Sometimes these adjustments themselves make the trace hard to understand. For example, when repositioning the server span within the bounds of its parent span, Jaeger does not know the exact relationship between the request and response latencies, so it assumes they are equal and places the child span in the middle of the parent span (see [issue #961](https://github.com/jaegertracing/jaeger/issues/961#issuecomment-453925244)).
 
@@ -140,9 +140,9 @@ extensions:
 
 **Note**: The routing scenario where the proxy is rewriting the external prefix to a different internal one was previously impossible (issue [#5157](https://github.com/jaegertracing/jaeger/issues/5157)) and is now supported because the external prefix is no longer a backend concern.
 
-**Example**: A working Docker Compose setup covering forward / strip / rewrite proxy routings ships in the repository at [`examples/reverse-proxy/`](https://github.com/jaegertracing/jaeger/tree/main/examples/reverse-proxy), with Apache httpd configs for each.
+**Example**: A working Docker Compose setup covering forward / strip / rewrite proxy routings ships in the repository at [`examples/reverse-proxy/`](https://github.com/jaegertracing/jaeger/tree/v2.18.0/examples/reverse-proxy), with Apache httpd configs for each.
 
-For background on the design, see [ADR-009](https://github.com/jaegertracing/jaeger/blob/main/docs/adr/009-ui-base-path-auto-detection.md).
+For background on the design, see [ADR-009](https://github.com/jaegertracing/jaeger/blob/v2.18.0/docs/adr/009-ui-base-path-auto-detection.md).
 
 #### UI Customization
 
