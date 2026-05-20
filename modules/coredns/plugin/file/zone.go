@@ -15,9 +15,10 @@ import (
 
 // Zone is a structure that contains all data related to a DNS zone.
 type Zone struct {
-	origin  string
-	origLen int
-	file    string
+	origin     string
+	origLen    int
+	file       string
+	file_mtime time.Time
 	*tree.Tree
 	Apex
 	Expired bool
@@ -28,6 +29,7 @@ type Zone struct {
 	TransferFrom []string
 
 	ReloadInterval time.Duration
+	ReloadByMtime  bool
 	reloadShutdown chan bool
 
 	Upstream *upstream.Upstream // Upstream for looking up external names during the resolution process.
@@ -81,7 +83,7 @@ func (z *Zone) CopyWithoutApex() *Zone {
 func (z *Zone) Insert(r dns.RR) error {
 	// r.Header().Name = strings.ToLower(r.Header().Name)
 	if r.Header().Rrtype != dns.TypeSRV {
-		r.Header().Name = strings.ToLower(r.Header().Name)
+		r.Header().Name = strings.ToLower(canonicalEscape(r.Header().Name))
 	}
 
 	switch h := r.Header().Rrtype; h {
@@ -211,4 +213,28 @@ func (z *Zone) getSOA() *dns.SOA {
 	z.RLock()
 	defer z.RUnlock()
 	return z.SOA
+}
+
+// canonicalEscape normalizes the escape representation of name. RFC 1035
+// §5.1 lets the same byte be written as \DDD (decimal) or \c (literal
+// character), and miekg/dns's zone parser preserves whichever form
+// appeared in the input. Wire format has no such freedom, so packing
+// then unpacking yields the canonical text representation that incoming
+// queries use. Without this, an owner name written as has\046dot.example.
+// in a zone file is stored under that literal string and never matches a
+// query for has\.dot.example., which is how the wire form unpacks.
+func canonicalEscape(name string) string {
+	if !strings.ContainsRune(name, '\\') {
+		return name
+	}
+	buf := make([]byte, len(name)+1)
+	off, err := dns.PackDomainName(name, buf, 0, nil, false)
+	if err != nil {
+		return name
+	}
+	out, _, err := dns.UnpackDomainName(buf[:off], 0)
+	if err != nil {
+		return name
+	}
+	return out
 }
