@@ -26,6 +26,8 @@ import (
 const (
 	// DefaultHTTPS3MaxStreams is the default maximum number of concurrent QUIC streams per connection.
 	DefaultHTTPS3MaxStreams = 256
+	// DefaultHTTPS3MaxHeaderBytes limits HTTP/3 header memory before requests reach the DoH handler.
+	DefaultHTTPS3MaxHeaderBytes = 16 << 10 // 16 KiB
 )
 
 // ServerHTTPS3 represents a DNS-over-HTTP/3 server.
@@ -91,6 +93,7 @@ func NewServerHTTPS3(addr string, group []*Config) (*ServerHTTPS3, error) {
 		TLSConfig:       tlsConfig,
 		EnableDatagrams: true,
 		QUICConfig:      qconf,
+		MaxHeaderBytes:  DefaultHTTPS3MaxHeaderBytes,
 		// Logger: stdlog.New(&loggerAdapter{}, "", 0), TODO: Fix it
 	}
 
