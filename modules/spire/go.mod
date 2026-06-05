@@ -36,7 +36,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.103.0
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.42.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.43.0
-	github.com/aws/smithy-go v1.27.0
+	github.com/aws/smithy-go v1.27.1
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/docker/docker v28.5.2+incompatible
@@ -62,7 +62,7 @@ require (
 	github.com/hashicorp/vault/sdk v0.25.1
 	github.com/imdario/mergo v0.3.16
 	github.com/imkira/go-observer v1.0.3
-	github.com/jackc/pgx/v5 v5.9.2
+	github.com/jackc/pgx/v5 v5.10.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lib/pq v1.12.3
 	github.com/mattn/go-sqlite3 v1.14.44
@@ -76,7 +76,7 @@ require (
 	github.com/sigstore/sigstore v1.10.8
 	github.com/sirupsen/logrus v1.9.4
 	github.com/smallstep/pkcs7 v0.2.1
-	github.com/spiffe/go-spiffe/v2 v2.6.0
+	github.com/spiffe/go-spiffe/v2 v2.7.0
 	github.com/spiffe/spire-api-sdk v1.2.5-0.20260428072036-00f73a61093a
 	github.com/spiffe/spire-plugin-sdk v1.4.4-0.20251120194148-791bbd274dc7
 	github.com/stretchr/testify v1.11.1
