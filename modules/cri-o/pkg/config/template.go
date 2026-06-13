@@ -603,6 +603,11 @@ func initCrioTemplateConfig(c *Config) ([]*templateConfigValue, error) {
 			isDefaultValue: slices.Equal(dc.PluginDirs, c.PluginDirs),
 		},
 		{
+			templateString: templateStringCrioNetworkCNIStatusGracePeriod,
+			group:          crioNetworkConfig,
+			isDefaultValue: simpleEqual(dc.CNIStatusGracePeriod, c.CNIStatusGracePeriod),
+		},
+		{
 			templateString: templateStringCrioMetricsEnableMetrics,
 			group:          crioMetricsConfig,
 			isDefaultValue: simpleEqual(dc.EnableMetrics, c.EnableMetrics),
@@ -1551,10 +1556,10 @@ const templateStringCrioImagePauseCommand = `# The command to run to have a cont
 
 `
 
-const templateStringCrioImagePinnedImages = `# List of images to be excluded from the kubelet's garbage collection.
-# It allows specifying image names using either exact, glob, or keyword
-# patterns. Exact matches must match the entire name, glob matches can
-# have a wildcard * at the end, and keyword matches can have wildcards
+const templateStringCrioImagePinnedImages = `# List of images and OCI artifacts to be excluded from the kubelet's garbage
+# collection. It allows specifying image names using either exact, glob, or
+# keyword patterns. Exact matches must match the entire name, glob matches
+# can have a wildcard * at the end, and keyword matches can have wildcards
 # on both ends. By default, this list includes the "pause" image if
 # configured by the user, which is used as a placeholder in Kubernetes pods.
 {{ $.Comment }}pinned_images = [
@@ -1641,6 +1646,17 @@ const templateStringCrioNetworkNetworkDir = `# Path to the directory where CNI c
 const templateStringCrioNetworkPluginDirs = `# Paths to directories where CNI plugin binaries are located.
 {{ $.Comment }}plugin_dirs = [
 {{ range $opt := .PluginDirs }}{{ $.Comment }}{{ printf "\t%q,\n" $opt }}{{ end }}{{ $.Comment }}]
+
+`
+
+const templateStringCrioNetworkCNIStatusGracePeriod = `# Enable continuous CNI STATUS monitoring with the given grace period.
+# When set to "0s" (default), monitoring is disabled and plugin health is
+# only determined at startup; runtime failures will not be detected.
+# When set to a positive duration (e.g. "1m"), a background goroutine polls
+# the plugin every 5 seconds and waits for this grace period before marking
+# the node not-ready, tolerating brief CNI disruptions during plugin
+# upgrades (e.g. OVN-K daemonset rollout).
+{{ $.Comment }}cni_status_grace_period = "{{ .CNIStatusGracePeriod }}"
 
 `
 

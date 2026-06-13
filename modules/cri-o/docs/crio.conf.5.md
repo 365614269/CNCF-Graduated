@@ -499,7 +499,7 @@ The path to a file like /var/lib/kubelet/config.json holding credentials specifi
 The command to run to have a container stay in the paused state. This option supports live configuration reload.
 
 **pinned_images**=[]
-A list of images to be excluded from the kubelet's garbage collection. It allows specifying image names using either exact, glob, or keyword patterns. Exact matches must match the entire name, glob matches can have a wildcard \* at the end, and keyword matches can have wildcards on both ends. By default, this list includes the `pause` image if configured by the user, which is used as a placeholder in Kubernetes pods.
+A list of images and OCI artifacts to be excluded from the kubelet's garbage collection. It allows specifying image names using either exact, glob, or keyword patterns. Exact matches must match the entire name, glob matches can have a wildcard \* at the end, and keyword matches can have wildcards on both ends. By default, this list includes the `pause` image if configured by the user, which is used as a placeholder in Kubernetes pods.
 
 **signature_policy**=""
 Path to the file which decides what sort of policy we use when deciding whether or not to trust an image that we've pulled. It is not recommended that this option be used, as the default behavior of using the system-wide default policy (i.e., /etc/containers/policy.json) is most often preferred. Please refer to containers-policy.json(5) for more details.
@@ -548,6 +548,9 @@ Path to the directory where CNI configuration files are located.
 
 **plugin_dirs**=["/opt/cni/bin/",]
 List of paths to directories where CNI plugin binaries are located.
+
+**cni_status_grace_period**="0s"
+Enable continuous CNI STATUS monitoring with the given grace period. When set to "0s" (default), monitoring is disabled and plugin health is only determined at startup; runtime failures will not be detected. When set to a positive duration (e.g. "1m"), a background goroutine polls the plugin every 5 seconds and waits for this grace period before marking the node not-ready, tolerating brief CNI disruptions during plugin upgrades (e.g. OVN-K daemonset rollout).
 
 ## CRIO.METRICS TABLE
 
