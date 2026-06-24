@@ -1,0 +1,14 @@
+{{ with hugo.Data.announcement }}
+  <div class="main-announcement">
+    {{ with .content }}
+      {{ . | markdownify }}
+    {{ end }}
+    {{ with .link }}
+      {{ if and .href .text }}
+        <a href="{{ .href }}" class="main-announcement__link"{{ if hasPrefix .href "http" }} target="_blank" rel="noopener"{{ end }}>
+          {{ .text }}
+        </a>
+      {{ end }}
+    {{ end }}
+  </div>
+{{ end }}
