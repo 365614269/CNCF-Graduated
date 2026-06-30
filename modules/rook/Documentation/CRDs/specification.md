@@ -2941,7 +2941,7 @@ KeystoneSpec
 (<em>Appears on:</em><a href="#ceph.rook.io/v1.BucketNotificationSpec">BucketNotificationSpec</a>)
 </p>
 <div>
-<p>BucketNotificationSpec represent the event type of the bucket notification
+<p>BucketNotificationEvent represent the event type of the bucket notification
 See: <a href="https://docs.ceph.com/en/latest/radosgw/s3-notification-compatibility/#event-types">https://docs.ceph.com/en/latest/radosgw/s3-notification-compatibility/#event-types</a></p>
 </div>
 <h3 id="ceph.rook.io/v1.BucketNotificationSpec">BucketNotificationSpec
@@ -3948,6 +3948,20 @@ map[github.com/rook/rook/pkg/apis/ceph.rook.io/v1.KeyType]*github.com/rook/rook/
 <td>
 <em>(Optional)</em>
 <p>StartupProbe allows changing the startupProbe configuration for a given daemon</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>muteHealthWarning</code><br/>
+<em>
+<a href="#ceph.rook.io/v1.MuteHealthWarningSpec">
+map[string]github.com/rook/rook/pkg/apis/ceph.rook.io/v1.MuteHealthWarningSpec
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>MuteHealthWarning configures muting of Ceph health warnings.</p>
 </td>
 </tr>
 </tbody>
@@ -5325,7 +5339,7 @@ was reinstalled but OSD disk still contains the metadata from previous ceph clus
 (<em>Appears on:</em><a href="#ceph.rook.io/v1.ClientSpec">ClientSpec</a>)
 </p>
 <div>
-<p>ClinetSecuritySpec represents security settings for a Ceph Client</p>
+<p>ClientSecuritySpec represents security settings for a Ceph Client</p>
 </div>
 <table>
 <thead>
@@ -7400,7 +7414,7 @@ PeerStatSpec
 (<em>Appears on:</em><a href="#ceph.rook.io/v1.FilesystemMirroringInfoSpec">FilesystemMirroringInfoSpec</a>)
 </p>
 <div>
-<p>FilesystemMirrorInfoSpec is the filesystem mirror status of a given filesystem</p>
+<p>FilesystemMirroringInfo is the filesystem mirror status of a given filesystem</p>
 </div>
 <table>
 <thead>
@@ -7444,7 +7458,7 @@ int
 (<em>Appears on:</em><a href="#ceph.rook.io/v1.CephFilesystemStatus">CephFilesystemStatus</a>)
 </p>
 <div>
-<p>FilesystemMirroringInfo is the status of the pool mirroring</p>
+<p>FilesystemMirroringInfoSpec is the status of the pool mirroring</p>
 </div>
 <table>
 <thead>
@@ -10560,6 +10574,35 @@ string
 <td>
 <p>ClusterID uniquely identifies a cluster. It is used as a prefix to nslookup exported
 services. For example: <clusterid>.<svc>.<ns>.svc.clusterset.local</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ceph.rook.io/v1.MuteHealthWarningSpec">MuteHealthWarningSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#ceph.rook.io/v1.CephClusterHealthCheckSpec">CephClusterHealthCheckSpec</a>)
+</p>
+<div>
+<p>MuteHealthWarningSpec configures muting of a Ceph health warning.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>policy</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Policy controls whether to mute or unmute a Ceph health warning.</p>
 </td>
 </tr>
 </tbody>

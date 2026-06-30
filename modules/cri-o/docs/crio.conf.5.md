@@ -132,7 +132,7 @@ If true, the runtime will not use `pivot_root`, but instead use `MS_MOVE`.
 Path where the keys required for image decryption are located
 
 **additional_artifact_stores**=[]
-A list of additional read-only OCI artifact store paths (experimental, subject to change). CRI-O expects an "artifacts/" subdirectory within each configured path. All entries must be absolute paths. Artifacts in these stores take priority over the main store. Because these stores are read-only, CRI-O cannot remove artifacts from them. If a tag is re-pointed on the registry, the stale local copy in a read-only store will continue to be used; the artifact must be removed from the read-only store directly on the filesystem to pick up the new version.
+A list of additional read-only OCI artifact store paths. CRI-O expects an "artifacts/" subdirectory within each configured path. All entries must be absolute paths. Artifacts in these stores take priority over the main store. Because these stores are read-only, CRI-O cannot remove artifacts from them. If a tag is re-pointed on the registry, the stale local copy in a read-only store will continue to be used; the artifact must be removed from the read-only store directly on the filesystem to pick up the new version.
 
 **conmon**=""
 Path to the conmon binary, used for monitoring the OCI runtime. Will be searched for using $PATH if empty.
@@ -237,7 +237,7 @@ List of devices on the host that a user can specify with the "io.kubernetes.cri-
 **additional_devices**=[]
 List of additional devices. Specified as "<device-on-host>:<device-on-container>:<permissions>", for example: "--additional-devices=/dev/sdc:/dev/xvdc:rwm". If it is empty or commented out, only the devices defined in the container json file by the user/kube will be added.
 
-**hooks_dir**=["*path*", ...]
+**hooks_dir**=["_path_", ...]
 Each `*.json` file in the path configures a hook for CRI-O containers. For more details on the syntax of the JSON files and the semantics of hook injection, see `oci-hooks(5)`. CRI-O currently support both the 1.0.0 and 0.1.0 hook schemas, although the 0.1.0 schema is deprecated.
 
 Paths listed later in the array have higher precedence (`oci-hooks(5)` discusses directory precedence).
