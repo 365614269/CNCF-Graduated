@@ -45,6 +45,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
+	cosiclient "sigs.k8s.io/container-object-storage-interface/client/clientset/versioned"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 )
 
@@ -55,6 +56,7 @@ type K8sHelper struct {
 	Clientset        *kubernetes.Clientset
 	RookClientset    *rookclient.Clientset
 	BucketClientset  *bktclient.Clientset
+	COSIClientset    *cosiclient.Clientset
 	RunningInCluster bool
 	T                func() *testing.T
 }
@@ -97,13 +99,17 @@ func CreateK8sHelper(t func() *testing.T) (*K8sHelper, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get lib-bucket-provisioner clientset. %+v", err)
 	}
+	cosiClientset, err := cosiclient.NewForConfig(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get COSI clientset. %+v", err)
+	}
 
 	remoteExecutor := &exec.RemotePodCommandExecutor{
 		ClientSet:  clientset,
 		RestClient: config,
 	}
 
-	h := &K8sHelper{executor: executor, Clientset: clientset, RookClientset: rookClientset, BucketClientset: bucketClientset, T: t, remoteExecutor: remoteExecutor}
+	h := &K8sHelper{executor: executor, Clientset: clientset, RookClientset: rookClientset, BucketClientset: bucketClientset, COSIClientset: cosiClientset, T: t, remoteExecutor: remoteExecutor}
 	if strings.Contains(config.Host, "//10.") {
 		h.RunningInCluster = true
 	}
@@ -555,7 +561,7 @@ func (k8sh *K8sHelper) GetEventsFromNamespace(namespace, testName, platformName 
 	if events == "" {
 		return
 	}
-	file.WriteString(events) //nolint // ok to ignore this test logging
+	file.WriteString(events) //nolint:errcheck // ok to ignore this test logging
 }
 
 func (k8sh *K8sHelper) appendPodDescribe(file *os.File, namespace, name string) {
@@ -563,9 +569,9 @@ func (k8sh *K8sHelper) appendPodDescribe(file *os.File, namespace, name string) 
 	if description == "" {
 		return
 	}
-	writeHeader(file, fmt.Sprintf("Pod: %s\n", name)) //nolint // ok to ignore this test logging
-	file.WriteString(description)                     //nolint // ok to ignore this test logging
-	file.WriteString("\n")                            //nolint // ok to ignore this test logging
+	writeHeader(file, fmt.Sprintf("Pod: %s\n", name)) //nolint:errcheck // ok to ignore this test logging
+	file.WriteString(description)                     //nolint:errcheck // ok to ignore this test logging
+	file.WriteString("\n")                            //nolint:errcheck // ok to ignore this test logging
 }
 
 func (k8sh *K8sHelper) PrintPodDescribe(namespace string, args ...string) {
@@ -1496,9 +1502,9 @@ func (k8sh *K8sHelper) getPodLogs(pod v1.Pod, platformName, namespace, testName 
 }
 
 func writeHeader(file *os.File, message string) error {
-	file.WriteString("\n-----------------------------------------\n") //nolint // ok to ignore this test logging
-	file.WriteString(message)                                         //nolint // ok to ignore this test logging
-	file.WriteString("\n-----------------------------------------\n") //nolint // ok to ignore this test logging
+	file.WriteString("\n-----------------------------------------\n") //nolint:errcheck // ok to ignore this test logging
+	file.WriteString(message)                                         //nolint:errcheck // ok to ignore this test logging
+	file.WriteString("\n-----------------------------------------\n") //nolint:errcheck // ok to ignore this test logging
 
 	return nil
 }
@@ -1508,7 +1514,7 @@ func (k8sh *K8sHelper) appendContainerLogs(file *os.File, pod v1.Pod, containerN
 	if initContainer {
 		message = "INIT " + message
 	}
-	writeHeader(file, message) //nolint // ok to ignore this test logging
+	writeHeader(file, message) //nolint:errcheck // ok to ignore this test logging
 	ctx := context.TODO()
 	logOpts := &v1.PodLogOptions{Previous: previousLog}
 	if containerName != "" {
