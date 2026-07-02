@@ -46,6 +46,7 @@ import (
 	"github.com/rook/rook/tests/framework/utils"
 	bucketowner "github.com/rook/rook/tests/integration/object/bucket/owner"
 	"github.com/rook/rook/tests/integration/object/cosi"
+	"github.com/rook/rook/tests/integration/object/notification"
 	topickafka "github.com/rook/rook/tests/integration/object/topic/kafka"
 	usercaps "github.com/rook/rook/tests/integration/object/user/caps"
 	userkeys "github.com/rook/rook/tests/integration/object/user/keys"
@@ -217,6 +218,7 @@ func runObjectE2ETest(helper *clients.TestClient, k8sh *utils.K8sHelper, install
 		useropmask.Namespace,
 		usercaps.Namespace,
 		cosi.Namespace,
+		notification.Namespace,
 	)
 	defer sharedObjectStore.Destroy()
 
@@ -228,10 +230,7 @@ func runObjectE2ETest(helper *clients.TestClient, k8sh *utils.K8sHelper, install
 	// the ceph-cosi driver cannot reach a TLS object store endpoint, so this
 	// suite skips itself in the TLS pass
 	cosi.TestCephCOSIDriver(s.T(), k8sh, sharedObjectStore)
-
-	bucketNotificationTestStoreName := "bucket-notification-" + storeName
-	createCephObjectStore(s.T(), helper, k8sh, installer, namespace, bucketNotificationTestStoreName, 1, tlsEnable, swiftAndKeystone)
-	testBucketNotifications(s, helper, k8sh, namespace, bucketNotificationTestStoreName)
+	notification.TestBucketNotification(s.T(), k8sh, sharedObjectStore)
 }
 
 func testObjectStoreOperations(s *suite.Suite, helper *clients.TestClient, k8sh *utils.K8sHelper, settings *installer.TestCephSettings, storeName string, swiftAndKeystone bool) {
@@ -300,27 +299,27 @@ func testObjectStoreOperations(s *suite.Suite, helper *clients.TestClient, k8sh 
 		logger.Infof("endpoint (%s) Accesskey (%s) secret (%s)", s3endpoint, s3AccessKey, s3SecretKey)
 
 		t.Run("put object", func(t *testing.T) {
-			_, poErr := s3client.PutObjectInBucket(bucketname, ObjBody, ObjectKey1, contentType)
+			_, poErr := s3client.PutObjectInBucket(ctx, bucketname, ObjBody, ObjectKey1, contentType)
 			assert.Nil(t, poErr)
 		})
 
 		t.Run("get object", func(t *testing.T) {
-			read, err := s3client.GetObjectInBucket(bucketname, ObjectKey1)
+			read, err := s3client.GetObjectInBucket(ctx, bucketname, ObjectKey1)
 			assert.Nil(t, err)
 			assert.Equal(t, ObjBody, read)
 		})
 
 		t.Run("user quota enforcement", func(t *testing.T) {
-			_, poErr := s3client.PutObjectInBucket(bucketname, ObjBody, ObjectKey2, contentType)
+			_, poErr := s3client.PutObjectInBucket(ctx, bucketname, ObjBody, ObjectKey2, contentType)
 			assert.Nil(t, poErr)
 			logger.Infof("Testing the max object limit")
 			quotaEnforced := utils.Retry(30, 2*time.Second, "user quota enforced", func() bool {
-				_, err := s3client.PutObjectInBucket(bucketname, ObjBody, ObjectKey3, contentType)
+				_, err := s3client.PutObjectInBucket(ctx, bucketname, ObjBody, ObjectKey3, contentType)
 				if err != nil {
 					return true
 				}
 				// delete so next attempt creates a new object rather than overwriting
-				s3client.DeleteObjectInBucket(bucketname, ObjectKey3) //nolint:errcheck
+				s3client.DeleteObjectInBucket(ctx, bucketname, ObjectKey3) //nolint:errcheck
 				return false
 			})
 			assert.True(t, quotaEnforced)
@@ -334,26 +333,26 @@ func testObjectStoreOperations(s *suite.Suite, helper *clients.TestClient, k8sh 
 			})
 			assert.True(t, updated)
 			logger.Infof("Testing the updated object limit")
-			_, poErr = s3client.PutObjectInBucket(bucketname, ObjBody, ObjectKey3, contentType)
+			_, poErr = s3client.PutObjectInBucket(ctx, bucketname, ObjBody, ObjectKey3, contentType)
 			assert.NoError(t, poErr)
 			quotaEnforced := utils.Retry(30, 2*time.Second, "updated user quota enforced", func() bool {
-				_, putErr := s3client.PutObjectInBucket(bucketname, ObjBody, ObjectKey4, contentType)
+				_, putErr := s3client.PutObjectInBucket(ctx, bucketname, ObjBody, ObjectKey4, contentType)
 				if putErr != nil {
 					return true
 				}
 				// delete so next attempt creates a new object rather than overwriting
-				s3client.DeleteObjectInBucket(bucketname, ObjectKey4) //nolint:errcheck
+				s3client.DeleteObjectInBucket(ctx, bucketname, ObjectKey4) //nolint:errcheck
 				return false
 			})
 			assert.True(t, quotaEnforced)
 		})
 
 		t.Run("delete objects", func(t *testing.T) {
-			_, delobjErr := s3client.DeleteObjectInBucket(bucketname, ObjectKey1)
+			_, delobjErr := s3client.DeleteObjectInBucket(ctx, bucketname, ObjectKey1)
 			assert.Nil(t, delobjErr)
-			_, delobjErr = s3client.DeleteObjectInBucket(bucketname, ObjectKey2)
+			_, delobjErr = s3client.DeleteObjectInBucket(ctx, bucketname, ObjectKey2)
 			assert.Nil(t, delobjErr)
-			_, delobjErr = s3client.DeleteObjectInBucket(bucketname, ObjectKey3)
+			_, delobjErr = s3client.DeleteObjectInBucket(ctx, bucketname, ObjectKey3)
 			assert.Nil(t, delobjErr)
 			logger.Info("Objects deleted on bucket successfully")
 		})
@@ -430,15 +429,15 @@ func testObjectStoreOperations(s *suite.Suite, helper *clients.TestClient, k8sh 
 
 		t.Run("bucketMaxObjects quota is enforced", func(t *testing.T) {
 			// first object should succeed
-			_, err := s3client.PutObjectInBucket(bucketName, ObjBody, ObjectKey1, contentType)
+			_, err := s3client.PutObjectInBucket(ctx, bucketName, ObjBody, ObjectKey1, contentType)
 			assert.Nil(t, err)
 			// second object should fail as bucket quota is 1
-			_, err = s3client.PutObjectInBucket(bucketName, ObjBody, ObjectKey2, contentType)
+			_, err = s3client.PutObjectInBucket(ctx, bucketName, ObjBody, ObjectKey2, contentType)
 			assert.Error(t, err)
 			// cleanup bucket
-			_, err = s3client.DeleteObjectInBucket(bucketName, ObjectKey1)
+			_, err = s3client.DeleteObjectInBucket(ctx, bucketName, ObjectKey1)
 			assert.Nil(t, err)
-			_, err = s3client.DeleteObjectInBucket(bucketName, ObjectKey2)
+			_, err = s3client.DeleteObjectInBucket(ctx, bucketName, ObjectKey2)
 			assert.Nil(t, err)
 		})
 
@@ -481,15 +480,15 @@ func testObjectStoreOperations(s *suite.Suite, helper *clients.TestClient, k8sh 
 
 		t.Run("bucketMaxSize quota is enforced", func(t *testing.T) {
 			// first ~3KiB Object should succeed
-			_, err := s3client.PutObjectInBucket(bucketName, strings.Repeat("1", 3072), ObjectKey1, contentType)
+			_, err := s3client.PutObjectInBucket(ctx, bucketName, strings.Repeat("1", 3072), ObjectKey1, contentType)
 			assert.Nil(t, err)
-			// second ~2KiB Object should fail as bucket quota is is 4KiB
-			_, err = s3client.PutObjectInBucket(bucketName, strings.Repeat("2", 2048), ObjectKey2, contentType)
+			// second ~2KiB Object should fail as bucket quota is 4KiB
+			_, err = s3client.PutObjectInBucket(ctx, bucketName, strings.Repeat("2", 2048), ObjectKey2, contentType)
 			assert.Error(t, err)
 			// cleanup bucket
-			_, err = s3client.DeleteObjectInBucket(bucketName, ObjectKey1)
+			_, err = s3client.DeleteObjectInBucket(ctx, bucketName, ObjectKey1)
 			assert.Nil(t, err)
-			_, err = s3client.DeleteObjectInBucket(bucketName, ObjectKey2)
+			_, err = s3client.DeleteObjectInBucket(ctx, bucketName, ObjectKey2)
 			assert.Nil(t, err)
 		})
 
