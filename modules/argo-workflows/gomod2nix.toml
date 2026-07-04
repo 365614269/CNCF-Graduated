@@ -134,8 +134,8 @@ schema = 3
     version = "v1.18.30"
     hash = "sha256-o3uRJ6fMcsNuSkKHeaNBLcnPKoc4Cia3m0ulEO4b5o0="
   [mod."github.com/aws/aws-sdk-go-v2/feature/rds/auth"]
-    version = "v1.6.27"
-    hash = "sha256-Ojt0s7DXpnb1mtCRHhEZ02lm7JNyA4ib/NYYhDuDcXw="
+    version = "v1.6.30"
+    hash = "sha256-pezAAnSxge84pDBL7UX73GQUHDlTXsM99CNiOTIpc0A="
   [mod."github.com/aws/aws-sdk-go-v2/internal/configsources"]
     version = "v1.4.30"
     hash = "sha256-EtDxaxyPB16G1jG7JKLwx4ty/dDPS5DNsPjX1zCp4ss="
@@ -1025,8 +1025,8 @@ schema = 3
     version = "v0.35.4"
     hash = "sha256-qQ+d6Be34puAk4cYSltBU5Dz4azZ4dzYXGAw/HYsj/c="
   [mod."k8s.io/utils"]
-    version = "v0.0.0-20260507154919-ff6756f316d2"
-    hash = "sha256-FDXwN0ebhU9HhxbN9bxGM4bRt7wiy5bKhY0FJqDxLGE="
+    version = "v0.0.0-20260626114624-be93311217bd"
+    hash = "sha256-oxvZoQ4Z/v/OYbkllb6pTJTRW18PCuBg6WxE5o6L3Jc="
   [mod."modernc.org/libc"]
     version = "v1.65.8"
     hash = "sha256-JFsFcP6sB/AUhzxNMFlzgWm/VF445PIvVKk5tGt/wLg="

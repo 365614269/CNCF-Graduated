@@ -15,7 +15,7 @@ require (
 	github.com/aliyun/credentials-go v1.4.12
 	github.com/argoproj/argo-events v1.9.10
 	github.com/argoproj/pkg v0.13.7-0.20250123033407-65f2d4777bfd
-	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.27
+	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.6.30
 	github.com/blushft/go-diagrams v0.0.0-20250322201119-d91ac4ca5de4
 	github.com/colinmarc/hdfs/v2 v2.4.0
 	github.com/coreos/go-oidc/v3 v3.19.0
@@ -95,7 +95,7 @@ require (
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/kube-openapi v0.0.0-20260603220949-865597e52e25
 	k8s.io/kubectl v0.35.4
-	k8s.io/utils v0.0.0-20260507154919-ff6756f316d2
+	k8s.io/utils v0.0.0-20260626114624-be93311217bd
 	sigs.k8s.io/yaml v1.6.0
 	zombiezen.com/go/sqlite v1.4.2
 )
