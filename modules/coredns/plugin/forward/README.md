@@ -47,6 +47,7 @@ forward FROM TO... {
     prefer_udp
     expire DURATION
     max_idle_conns INTEGER
+    read_timeout DURATION
     max_fails INTEGER
     max_connect_attempts INTEGER
     doh_method GET|POST
@@ -79,6 +80,11 @@ forward FROM TO... {
 * `doh_method` **GET|POST**, whether to use GET or POST http method for DoH requests (defaults to POST).
 * `max_idle_conns` **INTEGER**, maximum number of idle connections to cache per upstream for reuse.
   Default is 0, which means unlimited.
+* `read_timeout` **DURATION**, the per-query read timeout applied to each upstream when waiting for a
+  response. The default is 2s. Increase this if upstreams legitimately take longer than 2s to answer
+  (for example slow recursive resolutions that would otherwise surface as `SERVFAIL`/timeouts). Note
+  that this timeout applies to each upstream individually, so large values reduce the time available
+  to retry other upstreams within a single query.
 * `tls` **CERT** **KEY** **CA** define the TLS properties for TLS connection. From 0 to 3 arguments can be
   provided with the meaning as described below
 
@@ -88,6 +94,9 @@ forward FROM TO... {
     The server certificate is verified with the system CAs
   * `tls` **CERT** **KEY**  **CA** - client authentication is used with the specified cert/key pair.
     The server certificate is verified using the specified CA file
+
+CoreDNS sets the minimum TLS version to TLS 1.2. The maximum TLS version, TLS 1.2 cipher suites, and
+key exchange mechanisms use the Go `crypto/tls` defaults.
 
 * `tls_servername` **NAME** allows you to set a server name in the TLS configuration; for instance 9.9.9.9
   needs this to be set to `dns.quad9.net`. Using TLS forwarding but not setting `tls_servername` results in anyone
