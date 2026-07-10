@@ -3,6 +3,7 @@ package proxy
 import (
 	"context"
 	"crypto/tls"
+	"net"
 	"net/http"
 	"sync/atomic"
 	"time"
@@ -28,6 +29,8 @@ type HealthChecker interface {
 	SetReadTimeout(time.Duration)
 	GetWriteTimeout() time.Duration
 	SetWriteTimeout(time.Duration)
+	SetLocalAddress(net.IP)
+	GetLocalAddress() net.IP
 }
 
 // dnsHc is a health checker for a DNS endpoint (DNS, and DoT).
@@ -37,6 +40,8 @@ type dnsHc struct {
 	domain           string
 
 	proxyName string
+
+	localAddress net.IP
 }
 
 const defaultTimeout = 1 * time.Second
@@ -47,8 +52,7 @@ func NewHealthChecker(proxyName, protocol string, recursionDesired bool, domain 
 	case transport.DNS, transport.TLS:
 		c := new(dns.Client)
 		c.Net = "udp"
-		c.ReadTimeout = defaultTimeout
-		c.WriteTimeout = defaultTimeout
+		setDefaultTimeout(c)
 
 		return &dnsHc{
 			c:                c,
@@ -78,6 +82,8 @@ func NewHealthChecker(proxyName, protocol string, recursionDesired bool, domain 
 func (h *dnsHc) SetTLSConfig(cfg *tls.Config) {
 	h.c.Net = "tcp-tls"
 	h.c.TLSConfig = cfg
+	// update the dialer accordingly with the protocol changed
+	h.setDialer()
 }
 
 func (h *dnsHc) GetTLSConfig() *tls.Config {
@@ -100,6 +106,8 @@ func (h *dnsHc) GetDomain() string {
 
 func (h *dnsHc) SetTCPTransport() {
 	h.c.Net = "tcp"
+	// update the dialer accordingly with the protocol changed
+	h.setDialer()
 }
 
 func (h *dnsHc) GetReadTimeout() time.Duration {
@@ -151,12 +159,49 @@ func (h *dnsHc) send(addr string) error {
 	return err
 }
 
+// SetLocalAddress sets the local address in transport.
+func (h *dnsHc) SetLocalAddress(localAddr net.IP) {
+	h.localAddress = localAddr
+	h.setDialer()
+}
+
+// GetLocalAddress returns the local address in transport.
+func (h *dnsHc) GetLocalAddress() net.IP {
+	return h.localAddress
+}
+
+// setDialer sets the local address in the underlying dialer
+func (h *dnsHc) setDialer() {
+	if h.localAddress == nil {
+		if h.c.Dialer != nil {
+			h.c.Dialer.LocalAddr = nil
+		}
+		return
+	}
+	if h.c.Dialer == nil {
+		h.c.Dialer = new(net.Dialer)
+		setDefaultTimeout(h.c)
+	}
+	if h.c.Net == "udp" {
+		h.c.Dialer.LocalAddr = &net.UDPAddr{IP: h.localAddress}
+	} else {
+		h.c.Dialer.LocalAddr = &net.TCPAddr{IP: h.localAddress}
+	}
+}
+
+// setDefaultTimeout sets the default read and write timeout values for the DNS client to 1 second.
+func setDefaultTimeout(c *dns.Client) {
+	c.ReadTimeout = 1 * time.Second
+	c.WriteTimeout = 1 * time.Second
+}
+
 // dohHc is a health checker for a DNS-over-HTTPS (DoH) endpoint.
 type dohHc struct {
 	client           *http.Client
 	recursionDesired bool
 	domain           string
 	proxyName        string
+	localAddress     net.IP
 }
 
 func (h *dohHc) Check(p *Proxy) error {
@@ -243,4 +288,19 @@ func (h *dohHc) GetWriteTimeout() time.Duration {
 
 func (h *dohHc) SetWriteTimeout(t time.Duration) {
 	h.client.Timeout = t
+}
+
+func (h *dohHc) SetLocalAddress(localAddr net.IP) {
+	h.localAddress = localAddr
+	httpTransport := h.client.Transport.(*http.Transport)
+	if localAddr == nil {
+		httpTransport.DialContext = nil
+		return
+	}
+	dialer := &net.Dialer{LocalAddr: &net.TCPAddr{IP: localAddr}}
+	httpTransport.DialContext = dialer.DialContext
+}
+
+func (h *dohHc) GetLocalAddress() net.IP {
+	return h.localAddress
 }

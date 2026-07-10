@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"crypto/tls"
+	"net"
 	"net/http"
 	"runtime"
 	"sync/atomic"
@@ -133,6 +134,20 @@ func (p *Proxy) incrementFails() {
 		return
 	}
 	atomic.AddUint32(&p.fails, 1)
+}
+
+// SetLocalAddress sets the local address for the proxy, used as the source address for outbound connections.
+func (p *Proxy) SetLocalAddress(addr net.IP) {
+	p.transport.SetLocalAddress(addr)
+	if p.transport.httpClient != nil {
+		httpTransport := p.transport.httpClient.Transport.(*http.Transport)
+		if addr == nil {
+			httpTransport.DialContext = nil
+			return
+		}
+		dialer := &net.Dialer{LocalAddr: &net.TCPAddr{IP: addr}}
+		httpTransport.DialContext = dialer.DialContext
+	}
 }
 
 const (

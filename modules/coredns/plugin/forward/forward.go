@@ -61,6 +61,7 @@ type Forward struct {
 	failfastUnhealthyUpstreams bool
 	failoverRcodes             []int
 	maxConnectAttempts         uint32
+	sourceAddress              net.IP
 
 	// Hostname resolution fields
 	resolver  []string  // custom resolver IPs for hostname TO resolution
