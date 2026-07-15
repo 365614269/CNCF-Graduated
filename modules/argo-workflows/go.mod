@@ -27,7 +27,7 @@ require (
 	github.com/gavv/httpexpect/v2 v2.17.0
 	github.com/go-git/go-git/v5 v5.19.1
 	github.com/go-jose/go-jose/v4 v4.1.4
-	github.com/go-openapi/jsonreference v0.21.6
+	github.com/go-openapi/jsonreference v1.0.0
 	github.com/go-playground/webhooks/v6 v6.4.0
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/gogo/protobuf v1.3.2
@@ -78,9 +78,9 @@ require (
 	go.opentelemetry.io/otel/trace v1.44.0
 	go.uber.org/mock v0.6.0
 	go.yaml.in/yaml/v3 v3.0.4
-	golang.org/x/crypto v0.53.0
+	golang.org/x/crypto v0.54.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/sync v0.21.0
+	golang.org/x/sync v0.22.0
 	golang.org/x/time v0.15.0
 	google.golang.org/api v0.287.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260706201446-f0a921348800
@@ -287,7 +287,7 @@ require (
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.9.0 // indirect
 	github.com/go-logr/logr v1.4.3
-	github.com/go-openapi/jsonpointer v0.23.1 // indirect
+	github.com/go-openapi/jsonpointer v1.0.0 // indirect
 	github.com/go-openapi/swag v0.25.4 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/btree v1.1.3 // indirect
@@ -308,7 +308,7 @@ require (
 	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/klauspost/compress v1.18.6
+	github.com/klauspost/compress v1.19.0
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
@@ -353,9 +353,9 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	golang.org/x/net v0.56.0
-	golang.org/x/sys v0.46.0
-	golang.org/x/term v0.44.0
-	golang.org/x/text v0.38.0 // indirect
+	golang.org/x/sys v0.47.0
+	golang.org/x/term v0.45.0
+	golang.org/x/text v0.40.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.2 // indirect
