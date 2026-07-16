@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/coredns/coredns/plugin/pkg/dnsutil"
+
 	"github.com/miekg/dns"
 )
 
@@ -106,7 +108,12 @@ func RequestToMsgWire(req *http.Request) (*dns.Msg, []byte, error) {
 // requestToMsgPost extracts the dns message from the request body.
 func requestToMsgPost(req *http.Request) (*dns.Msg, []byte, error) {
 	defer req.Body.Close()
-	return toMsgWire(req.Body)
+	buf, err := io.ReadAll(http.MaxBytesReader(nil, req.Body, maxDNSQuerySize))
+	if err != nil {
+		return nil, nil, err
+	}
+	m, err := dnsutil.UnpackRequest(buf)
+	return m, buf, err
 }
 
 const maxDNSQuerySize = 65536
@@ -149,9 +156,7 @@ func base64ToMsgWire(b64 string) (*dns.Msg, []byte, error) {
 		return nil, nil, err
 	}
 
-	m := new(dns.Msg)
-	err = m.Unpack(buf)
-
+	m, err := dnsutil.UnpackRequest(buf)
 	return m, buf, err
 }
 

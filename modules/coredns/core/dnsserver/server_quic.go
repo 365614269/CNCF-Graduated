@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/coredns/coredns/plugin/metrics/vars"
+	"github.com/coredns/coredns/plugin/pkg/dnsutil"
 	clog "github.com/coredns/coredns/plugin/pkg/log"
 	cproxyproto "github.com/coredns/coredns/plugin/pkg/proxyproto"
 	"github.com/coredns/coredns/plugin/pkg/reuseport"
@@ -211,8 +212,7 @@ func (s *ServerQUIC) serveQUICStream(stream *quic.Stream, conn *quic.Conn) {
 		return
 	}
 
-	req := &dns.Msg{}
-	err = req.Unpack(buf)
+	req, err := dnsutil.UnpackRequest(buf)
 	if err != nil {
 		clog.Debugf("unpacking quic packet: %s", err)
 		s.closeQUICConn(conn, DoQCodeProtocolError)
