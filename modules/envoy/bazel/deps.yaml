@@ -111,7 +111,7 @@ aws_c_auth_testdata:
   project_name: "aws-c-auth"
   project_desc: "C99 library implementation of AWS client-side authentication: standard credentials providers and signing"
   project_url: "https://github.com/awslabs/aws-c-auth"
-  release_date: "2026-03-05"
+  release_date: "2026-07-10"
   use_category:
   - test_only
   extensions:
@@ -187,7 +187,7 @@ dd_trace_cpp:
   project_name: "Datadog C++ Tracing Library"
   project_desc: "Datadog distributed tracing for C++"
   project_url: "https://github.com/DataDog/dd-trace-cpp"
-  release_date: "2026-05-06"
+  release_date: "2026-06-19"
   use_category:
   - observability_ext
   extensions:
@@ -355,7 +355,7 @@ ipp_crypto:
   project_name: "libipp-crypto"
   project_desc: "Intel® Integrated Performance Primitives Cryptography"
   project_url: "https://github.com/intel/cryptography-primitives"
-  release_date: "2025-10-01"
+  release_date: "2026-05-28"
   use_category:
   - dataplane_ext
   extensions:
@@ -636,7 +636,7 @@ cel_spec:
   project_name: "Common Expression Language (CEL) spec"
   project_desc: "Common Expression Language (CEL) spec and conformance tests"
   project_url: "https://opensource.google/projects/cel"
-  release_date: "2025-11-10"
+  release_date: "2026-05-08"
   use_category:
   - dataplane_ext
   extensions:
@@ -1058,7 +1058,7 @@ io_bazel_rules_go:
   project_name: "Go rules for Bazel"
   project_desc: "Bazel rules for the Go language"
   project_url: "https://github.com/bazelbuild/rules_go"
-  release_date: "2026-02-09"
+  release_date: "2026-06-04"
   use_category:
   - build
   - api
@@ -1087,7 +1087,7 @@ opentelemetry_cpp:
   project_name: "OpenTelemetry"
   project_desc: "Observability framework and toolkit designed to create and manage telemetry data such as traces, metrics, and logs."
   project_url: "https://opentelemetry.io"
-  release_date: "2026-03-20"
+  release_date: "2026-05-13"
   use_category:
   - observability_ext
   extensions:
@@ -1307,7 +1307,7 @@ rules_fuzzing:
   project_name: "Fuzzing Rules for Bazel"
   project_desc: "Bazel rules for fuzz tests"
   project_url: "https://github.com/bazelbuild/rules_fuzzing"
-  release_date: "2025-12-08"
+  release_date: "2026-04-16"
   use_category:
   - test_only
   implied_untracked_deps:
@@ -1406,7 +1406,7 @@ rules_shell:
   project_name: "Shell script rules for Bazel"
   project_desc: "Bazel rules for shell scripts"
   project_url: "https://github.com/bazelbuild/rules_shell"
-  release_date: "2026-03-23"
+  release_date: "2026-04-15"
   use_category:
   - build
   - dataplane_core

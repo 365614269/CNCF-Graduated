@@ -53,8 +53,8 @@ REPOSITORY_LOCATIONS_SPEC = dict(
     ),
     rules_fuzzing = dict(
         # Patch contains workaround for https://github.com/bazelbuild/rules_python/issues/1221
-        version = "0.7.0",
-        sha256 = "87adb1357bb5a932fa0de6fed0fc37412490a0c96f5259855008f208cf53a74f",
+        version = "0.8.0",
+        sha256 = "7d13a78e9edb1f63093adec75e16c47e2b975382b8911fc53b72f2355fcd0a16",
         strip_prefix = "rules_fuzzing-{version}",
         urls = ["https://github.com/bazelbuild/rules_fuzzing/archive/v{version}.tar.gz"],
     ),
@@ -97,8 +97,8 @@ REPOSITORY_LOCATIONS_SPEC = dict(
         urls = ["https://github.com/aignas/rules_shellcheck/archive/{version}.tar.gz"],
     ),
     aws_c_auth_testdata = dict(
-        version = "0.10.1",
-        sha256 = "85d737f0f735256f1931e85e4cadbe228d88698f7b59a9b390b49ef5d0778a43",
+        version = "0.10.4",
+        sha256 = "6fb567f496a450d4b6d3f5749d735977a0156957e8ccbca9af7a5ee15d1ffda7",
         strip_prefix = "aws-c-auth-{version}",
         urls = ["https://github.com/awslabs/aws-c-auth/archive/refs/tags/v{version}.tar.gz"],
     ),
@@ -227,8 +227,8 @@ REPOSITORY_LOCATIONS_SPEC = dict(
         urls = ["https://github.com/unicode-org/icu/releases/download/release-{version}/icu4c-{version}-sources.zip"],
     ),
     ipp_crypto = dict(
-        version = "1.3.0",
-        sha256 = "a1d87cb3b90fe4718609e4e9dd8343fd4531bb815e69bad901ac6b46f98b3b53",
+        version = "2.2.0",
+        sha256 = "d43503c479dd3292173b55aa6777161461e45621c0003169ea1a3b29aba897ed",
         strip_prefix = "cryptography-primitives-{version}",
         urls = ["https://github.com/intel/cryptography-primitives/archive/refs/tags/v{version}.tar.gz"],
     ),
@@ -288,8 +288,8 @@ REPOSITORY_LOCATIONS_SPEC = dict(
         urls = ["https://codeload.github.com/VectorCamp/vectorscan/tar.gz/refs/tags/vectorscan/{version}"],
     ),
     opentelemetry_cpp = dict(
-        version = "1.26.0",
-        sha256 = "8a878777a18a013e0ee6604629d1b5f29b162354c14489ad1dccd370f14ac372",
+        version = "1.27.0",
+        sha256 = "d09c2e8dd95bbc1d6ee493a89f32a4736879948d0eb59ad58c855022d1f55cc1",
         strip_prefix = "opentelemetry-cpp-{version}",
         urls = ["https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v{version}.tar.gz"],
     ),
@@ -306,8 +306,8 @@ REPOSITORY_LOCATIONS_SPEC = dict(
         urls = ["https://github.com/SkyAPM/cpp2sky/archive/v{version}.tar.gz"],
     ),
     dd_trace_cpp = dict(
-        version = "2.1.0",
-        sha256 = "8152fb69e61518a5b55ecb96edcbb19585f8950b6f070ac98ebd0b6dd6177492",
+        version = "2.1.1",
+        sha256 = "3e8d2a12c434b766ac92c1fcec07f49b92b8a12902f97e6c54839a65abe44649",
         strip_prefix = "dd-trace-cpp-{version}",
         urls = ["https://github.com/DataDog/dd-trace-cpp/archive/v{version}.tar.gz"],
     ),
@@ -456,8 +456,8 @@ REPOSITORY_LOCATIONS_SPEC = dict(
         urls = ["https://github.com/opencomputeproject/ocp-diag-core/archive/{version}.zip"],
     ),
     io_bazel_rules_go = dict(
-        version = "0.60.0",
-        sha256 = "86d3dc8f59d253524f933aaf2f3c05896cb0b605fc35b460c0b4b039996124c6",
+        version = "0.61.1",
+        sha256 = "763f4a3f6b03469fdb00a77a333dd0b5546d3ee1fa29db373128c08fee73e0e8",
         urls = ["https://github.com/bazelbuild/rules_go/releases/download/v{version}/rules_go-v{version}.zip"],
     ),
     rules_cc = dict(
@@ -497,8 +497,8 @@ REPOSITORY_LOCATIONS_SPEC = dict(
         urls = ["https://github.com/bazelbuild/rules_pkg/archive/{version}.tar.gz"],
     ),
     rules_shell = dict(
-        version = "0.7.1",
-        sha256 = "3709d1745ba4be4ef054449647b62e424267066eca887bb00dd29242cb8463a0",
+        version = "0.8.0",
+        sha256 = "20721f63908879c083f94869e618ea8d4ff5edb91ff9a72a2ebee357fdbc352d",
         strip_prefix = "rules_shell-{version}",
         urls = ["https://github.com/bazelbuild/rules_shell/releases/download/v{version}/rules_shell-v{version}.tar.gz"],
     ),
@@ -571,8 +571,8 @@ REPOSITORY_LOCATIONS_SPEC = dict(
         strip_prefix = "gurl-{version}",
     ),
     cel_spec = dict(
-        version = "0.25.1",
-        sha256 = "13583c5a312861648449845b709722676a3c9b43396b6b8e9cbe4538feb74ad2",
+        version = "0.25.2",
+        sha256 = "6bd7bbf973c6cd56136e7a5ec8efe61b7656fc52813350bc2807224551f515e7",
         strip_prefix = "cel-spec-{version}",
         urls = ["https://github.com/google/cel-spec/archive/v{version}.tar.gz"],
     ),
