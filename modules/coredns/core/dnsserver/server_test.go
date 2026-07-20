@@ -24,6 +24,42 @@ func (tp testPlugin) ServeDNS(_ctx context.Context, _w dns.ResponseWriter, _r *d
 
 func (tp testPlugin) Name() string { return "local" }
 
+type updateResponsePlugin struct {
+	called atomic.Bool
+}
+
+func (p *updateResponsePlugin) Name() string { return "update-response" }
+
+func (p *updateResponsePlugin) ServeDNS(_ context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
+	p.called.Store(true)
+
+	m := new(dns.Msg)
+	m.SetReply(r)
+	if err := w.WriteMsg(m); err != nil {
+		return dns.RcodeServerFailure, err
+	}
+	return dns.RcodeSuccess, nil
+}
+
+func mustPackRFC2136Update(t *testing.T) []byte {
+	t.Helper()
+
+	m := new(dns.Msg).SetUpdate("example.com.")
+	rr, err := dns.NewRR("foo.example.com. 300 IN A 192.0.2.123")
+	if err != nil {
+		t.Fatalf("dns.NewRR() failed: %v", err)
+	}
+	m.Insert([]dns.RR{rr})
+	// DNS-over-QUIC requires the DNS message ID to be zero.
+	m.Id = 0
+
+	wire, err := m.Pack()
+	if err != nil {
+		t.Fatalf("dns.Msg.Pack() failed: %v", err)
+	}
+	return wire
+}
+
 // blockingPlugin uses sync.Mutex to simulate extended processing.
 type blockingPlugin struct {
 	sync.Mutex
