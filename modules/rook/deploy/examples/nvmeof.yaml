@@ -1,0 +1,26 @@
+# This example is for Ceph v20 and above only
+
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: builtin-nvmeof
+  namespace: rook-ceph # namespace:cluster
+spec:
+  name: .nvmeof
+  failureDomain: host
+  replicated:
+    size: 3
+---
+apiVersion: ceph.rook.io/v1
+kind: CephNVMeOFGateway
+metadata:
+  name: nvmeof
+  namespace: rook-ceph # namespace:cluster
+spec:
+  # image is optional. If not specified, the image is fetched from the Ceph config store
+  # (ceph config get mgr mgr/cephadm/container_image_nvmeof).
+  # Set the image property to override the default:
+  # image: quay.io/ceph/nvmeof:<version>
+  group: group-a
+  instances: 2
+  hostNetwork: false

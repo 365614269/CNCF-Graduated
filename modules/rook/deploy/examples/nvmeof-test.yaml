@@ -1,5 +1,19 @@
 # This example is for Ceph v20 and above only
+# This is a test configuration for CI environments only.
+# For production deployments, use nvmeof.yaml instead.
 
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: builtin-nvmeof
+  namespace: rook-ceph # namespace:cluster
+spec:
+  name: .nvmeof
+  failureDomain: osd
+  replicated:
+    size: 1
+    requireSafeReplicaSize: false
+---
 apiVersion: ceph.rook.io/v1
 kind: CephNVMeOFGateway
 metadata:
@@ -10,7 +24,6 @@ spec:
   # (ceph config get mgr mgr/cephadm/container_image_nvmeof).
   # Set the image property to override the default:
   # image: quay.io/ceph/nvmeof:<version>
-  pool: nvmeof
   group: group-a
   instances: 1
   hostNetwork: false
