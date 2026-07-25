@@ -200,6 +200,8 @@ func CreatePoolWithPGs(context *clusterd.Context, clusterInfo *ClusterInfo, clus
 		pool.Application = "nfs"
 	case ".rgw.root":
 		pool.Application = "rgw"
+	case ".nvmeof":
+		pool.Application = "nvmeof-meta"
 	}
 
 	if pool.IsReplicated() {

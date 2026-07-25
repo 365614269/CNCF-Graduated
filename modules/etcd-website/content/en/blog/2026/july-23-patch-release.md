@@ -42,7 +42,7 @@ More information on the vulnerability, including workarounds, may be found in [i
 
 ### Acknowledgements
 
-This vulnerability was found, and patched, but members of the VMware by Broadcom team.  We are grateful to this team for helping keep etcd secure.
+This vulnerability was found, and patched, by members of the VMware by Broadcom team.  We are grateful to this team for helping keep etcd secure.
 
 ## Security and reliability fixes shared across all three releases
 

@@ -50,6 +50,7 @@ func TestCreatePool(t *testing.T) {
 	p := &cephv1.NamedPoolSpec{}
 	enabledMetricsApp := false
 	enabledMgrApp := false
+	enabledNvmeofApp := false
 	clusterInfo := cephclient.AdminTestClusterInfo("mycluster")
 	executor := &exectest.MockExecutor{
 		MockExecuteCommandWithTimeout: func(timeout time.Duration, command string, args ...string) (string, error) {
@@ -76,11 +77,14 @@ func TestCreatePool(t *testing.T) {
 					}
 					assert.Equal(t, "enable", args[3])
 					if args[5] != "rbd" {
-						if args[4] == ".mgr" {
+						switch args[4] {
+						case ".mgr":
 							enabledMgrApp = true
-							assert.Equal(t, ".mgr", args[4])
 							assert.Equal(t, "mgr", args[5])
-						} else {
+						case ".nvmeof":
+							enabledNvmeofApp = true
+							assert.Equal(t, "nvmeof-meta", args[5])
+						default:
 							fmt.Printf("pool - %v", args)
 							assert.Fail(t, fmt.Sprintf("invalid pool %q", args[4]))
 						}
@@ -120,6 +124,16 @@ func TestCreatePool(t *testing.T) {
 		err := createPool(context, clusterInfo, clusterSpec, p)
 		assert.Nil(t, err)
 		assert.True(t, enabledMgrApp)
+	})
+
+	t.Run("built-in nvmeof pool", func(t *testing.T) {
+		p.Name = ".nvmeof"
+		p.Replicated.Size = 1
+		p.Replicated.RequireSafeReplicaSize = false
+		p.Application = ""
+		err := createPool(context, clusterInfo, clusterSpec, p)
+		assert.Nil(t, err)
+		assert.True(t, enabledNvmeofApp)
 	})
 
 	t.Run("ec pool", func(t *testing.T) {
