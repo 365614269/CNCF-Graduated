@@ -140,7 +140,7 @@ Set backend library.
 
 #### Plot Realtime Access Statistics on a World Map using Elasticsearch and Kibana
 
-The `country_code` field is needed to visualize access statistics on a world map using [Kibana](http://www.elasticsearch.org/overview/kibana/).
+The `country_code` field is needed to visualize access statistics on a world map using [Kibana](https://www.elasticsearch.org/overview/kibana/).
 
 Required plugins:
 
@@ -176,5 +176,5 @@ Required plugins:
 
 * [`fluent-plugin-geoip`](https://github.com/y-ken/fluent-plugin-geoip)
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

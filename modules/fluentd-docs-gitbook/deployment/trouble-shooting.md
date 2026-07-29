@@ -76,7 +76,7 @@ If `fluentd` suddenly hits an unexpected high CPU usage problem, there are sever
 * regular expression with broken data
 * system calls have a bug, e.g. `inotify` with lots of files
 
-In such cases, you can use `perf` tool on recent Linux to investigate the problem. See [Linux perf Examples](http://www.brendangregg.com/perf.html) page. If you want to know which call causes the problem, [`pid2line.rb`](https://gist.github.com/nurse/0619b6af90df140508c2) is useful.
+In such cases, you can use `perf` tool on recent Linux to investigate the problem. See [Linux perf Examples](https://www.brendangregg.com/perf.html) page. If you want to know which call causes the problem, [`pid2line.rb`](https://gist.github.com/nurse/0619b6af90df140508c2) is useful.
 
 ## Check Uncaught Logs
 
@@ -95,5 +95,5 @@ If the problem happens inside Ruby e.g. segmentation fault, C extension bug, etc
 $ sudo LD_PRELOAD=/opt/td-agent/embedded/lib/libjemalloc.so /usr/sbin/td-agent -c /etc/td-agent/td-agent.conf --user td-agent --group td-agent
 ```
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

@@ -46,7 +46,7 @@ $ sudo systemctl restart td-agent.service
 Add the following lines to `build.sbt`:
 
 ```text
-resolvers += "Apache Maven Central Repository" at "http://repo.maven.apache.org/maven2/"
+resolvers += "Apache Maven Central Repository" at "https://repo.maven.apache.org/maven2/"
 
 libraryDependencies += "org.fluentd" %% "fluent-logger-scala" % "(version)"
 ```
@@ -122,5 +122,5 @@ Monitoring Fluentd itself is also important. The article below describes the gen
 
 * [Monitoring Fluentd](../monitoring-fluentd/overview.md)
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

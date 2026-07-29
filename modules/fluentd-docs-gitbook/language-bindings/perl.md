@@ -1,6 +1,6 @@
 # Perl
 
-The [`Fluent::Logger`](http://github.com/fluent/fluent-logger-perl) library is used to post records from Perl applications to Fluentd.
+The [`Fluent::Logger`](https://github.com/fluent/fluent-logger-perl) library is used to post records from Perl applications to Fluentd.
 
 This article explains how to use it.
 
@@ -42,7 +42,7 @@ $ sudo systemctl restart td-agent.service
 
 ## Using `Fluent::Logger`
 
-Install [`Fluent::Logger`](http://search.cpan.org/dist/Fluent-Logger/) library via CPAN:
+Install [`Fluent::Logger`](https://search.cpan.org/dist/Fluent-Logger/) library via CPAN:
 
 ```text
 $ cpan
@@ -99,5 +99,5 @@ Monitoring Fluentd itself is also important. The article below describes the gen
 
 * [Monitoring Fluentd](../monitoring-fluentd/overview.md)
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

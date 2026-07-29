@@ -2,7 +2,7 @@
 
 ![](../.gitbook/assets/mongo%20%283%29.png)
 
-The `out_mongo` Output plugin writes records into [MongoDB](http://mongodb.org/), the emerging document-oriented database system.
+The `out_mongo` Output plugin writes records into [MongoDB](https://mongodb.org/), the emerging document-oriented database system.
 
 If you're using `ReplicaSet`, please see the [`out_mongo_replset`](mongo_replset.md) article instead.
 
@@ -193,5 +193,5 @@ For common output / buffer parameters, please check the following articles:
 
 * [`fluent-plugin-mongo`](https://github.com/fluent/fluent-plugin-mongo)
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

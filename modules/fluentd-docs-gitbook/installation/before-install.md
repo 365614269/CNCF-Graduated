@@ -57,7 +57,7 @@ net.ipv4.ip_local_reserved_ports = 24224
 
 Use `sysctl -p` command or reboot your node for the changes to take effect.
 
-These kernel options were originally taken from the presentation [How Netflix Tunes EC2 Instances for Performance](https://www.slideshare.net/brendangregg/how-netflix-tunes-ec2-instances-for-performance) by [Brendan Gregg](http://www.brendangregg.com/), Senior Performance Architect at AWS re:Invent 2017.
+These kernel options were originally taken from the presentation [How Netflix Tunes EC2 Instances for Performance](https://www.slideshare.net/brendangregg/how-netflix-tunes-ec2-instances-for-performance) by [Brendan Gregg](https://www.brendangregg.com/), Senior Performance Architect at AWS re:Invent 2017.
 
 ## Use sticky bit symlink/hardlink protection
 
@@ -78,5 +78,5 @@ If you turned off these protections, please turn them on.
 
 Use `sysctl -p` command or reboot your node for the changes to take effect.
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

@@ -50,7 +50,7 @@ The most recent version of `@fluent-org/logger` can be found [here](https://www.
 
 ### A Sample Application
 
-Here is a sample [Express](http://expressjs.com/) app using `@fluent-org/logger`:
+Here is a sample [Express](https://expressjs.com/) app using `@fluent-org/logger`:
 
 #### `package.json`
 
@@ -136,5 +136,5 @@ Monitoring Fluentd itself is also important. The article below describes the gen
 
 * [Monitoring Fluentd](../monitoring-fluentd/overview.md)
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

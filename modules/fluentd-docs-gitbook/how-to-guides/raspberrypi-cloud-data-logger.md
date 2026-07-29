@@ -1,16 +1,16 @@
 # Cloud Data Logging with Raspberry Pi
 
-[Raspberry Pi](http://www.raspberrypi.org/) is a credit-card-sized single-board computer. Because it is low-cost and easy to equip with various types of sensors, using Raspberry Pi as a cloud data logger is one of its ideal use cases.
+[Raspberry Pi](https://www.raspberrypi.org/) is a credit-card-sized single-board computer. Because it is low-cost and easy to equip with various types of sensors, using Raspberry Pi as a cloud data logger is one of its ideal use cases.
 
 ![Cloud Data Logger by Raspberry Pi](../.gitbook/assets/raspberry-pi-cloud-data-logger.png)
 
-This article introduces how to transport sensor data from Raspberry Pi to the cloud, using Fluentd as the data collector. For the cloud side, we'll use the [Treasure Data](http://www.fluentd.org/treasuredata) cloud data service as an example, but you can use any cloud service in its place.
+This article introduces how to transport sensor data from Raspberry Pi to the cloud, using Fluentd as the data collector. For the cloud side, we'll use the [Treasure Data](https://www.fluentd.org/treasuredata) cloud data service as an example, but you can use any cloud service in its place.
 
 ## Install Raspbian
 
 [Raspbian](http://www.raspbian.org/) is a free operating system based on Debian, optimized for the Raspberry Pi. Please install Raspbian on your Raspberry Pi by following the instructions in the blog post below:
 
-* [Getting Started with Raspberry Pi: Installing Raspbian](http://www.andrewmunsell.com/blog/getting-started-raspberry-pi-install-raspbian)
+* [Getting Started with Raspberry Pi: Installing Raspbian](https://www.andrewmunsell.com/blog/getting-started-raspberry-pi-install-raspbian)
 
 ## Install Fluentd
 
@@ -91,5 +91,5 @@ SELECT SUM(sensor2) FROM raspberrypi;
 
 Raspberry Pi is an ideal platform for prototyping data logger hardware. Fluentd helps Raspberry Pi transfer the collected data to the cloud easily and reliably.
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

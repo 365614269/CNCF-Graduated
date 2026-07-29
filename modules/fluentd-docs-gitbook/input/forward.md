@@ -337,7 +337,7 @@ The array of usernames.
 
 ## Protocol
 
-This plugin accepts both JSON and [MessagePack](http://msgpack.org/) messages and automatically detects which one is used. Internally, Fluentd uses MessagePack as it is more efficient than JSON.
+This plugin accepts both JSON and [MessagePack](https://msgpack.org/) messages and automatically detects which one is used. Internally, Fluentd uses MessagePack as it is more efficient than JSON.
 
 The time value is an `EventTime` or a platform-specific integer and is based on the output of Ruby's `Time.now.to_i` function. On Linux, BSD, and Mac systems, this is the number of seconds since 1970.
 
@@ -484,6 +484,6 @@ With this configuration, the three \(3\) workers share the port `24224`. No need
 
 `in_forward` does not provide parsing mechanism unlike `in_tail` or `in_tcp` because `in_forward` is mainly for efficient log transfer. If you want to parse an incoming event, use [parser filter](../filter/parser.md) in your pipeline.
 
-See [Docker Logging](http://www.fluentd.org/guides/recipes/docker-logging) driver use case.
+See [Docker Logging](https://www.fluentd.org/guides/recipes/docker-logging) driver use case.
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.

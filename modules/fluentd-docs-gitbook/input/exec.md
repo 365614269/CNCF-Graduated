@@ -184,7 +184,7 @@ If you already have a script that runs periodically \(say, via `cron`\) that you
 
 The only requirement for the script is that it outputs TSV, JSON or MessagePack.
 
-For example, this [script](https://gist.github.com/kiyoto/1bd903ad1bdd6ac51fcc) scrapes the front page of [Hacker News](http://news.ycombinator.com) and scrapes information about each post:
+For example, this [script](https://gist.github.com/kiyoto/1bd903ad1bdd6ac51fcc) scrapes the front page of [Hacker News](https://news.ycombinator.com) and scrapes information about each post:
 
 Suppose that script is called `hn.rb`. Then, you can run it every 5 minutes with the following configuration:
 
@@ -215,5 +215,5 @@ And if you run Fluentd with it, you will see the following output \(if you are i
 
 Of course, you can use Fluentd's many output plugins to store the data into various backend systems like [Elasticsearch](../how-to-guides/free-alternative-to-splunk-by-fluentd.md), [HDFS](../how-to-guides/http-to-hdfs.md), [MongoDB](../how-to-guides/apache-to-mongodb.md), [AWS](../how-to-guides/apache-to-s3.md), etc.
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

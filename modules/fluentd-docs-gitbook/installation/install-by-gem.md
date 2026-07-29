@@ -42,9 +42,9 @@ For large deployments, you must use [`jemalloc`](http://www.canonware.com/jemall
 
 The Fluentd gem does not come with `/etc/init.d/` scripts. You should use Process Management tools such as:
 
-* [`daemontools`](http://cr.yp.to/daemontools.html)
-* [`runit`](http://smarden.org/runit/)
-* [`supervisord`](http://supervisord.org/)
+* [`daemontools`](https://cr.yp.to/daemontools.html)
+* [`runit`](https://smarden.org/runit/)
+* [`supervisord`](https://supervisord.org/)
 * [`upstart`](http://upstart.ubuntu.com/)
 * `systemd`
 
@@ -63,5 +63,5 @@ You are now ready to collect real logs with Fluentd. Refer to the following tuto
   * [Store Apache Log into MongoDB](../how-to-guides/apache-to-mongodb.md)
   * [Data Collection into HDFS](../how-to-guides/http-to-hdfs.md)
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

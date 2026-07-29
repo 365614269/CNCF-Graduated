@@ -93,7 +93,7 @@ You should specify the target version with `-v` option:
 
 ## `--gemfile` option
 
-A Ruby application manages gem dependencies using Gemfile and [`Bundler`](http://bundler.io/). Fluentd's `--gemfile` option takes the same approach, and is useful for managing plugin versions separated from shared gems.
+A Ruby application manages gem dependencies using Gemfile and [`Bundler`](https://bundler.io/). Fluentd's `--gemfile` option takes the same approach, and is useful for managing plugin versions separated from shared gems.
 
 For example, if you have the following Gemfile at `/etc/fluent/Gemfile`:
 
@@ -172,5 +172,5 @@ fluent-plugin-record-modifier (2.0.1, 0.6.0, 0.5.0)
 
 `2.0.1` version is used.
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 

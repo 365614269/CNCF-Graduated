@@ -8,7 +8,7 @@ The recommended way to install Fluentd on Windows is to use MSI installers of `t
 
 * Includes Ruby and other library dependencies \(since most Windows machines don't have them installed\).
 * Includes a set of commonly-used 3rd-party plugins such as `out_es`.
-* Originally developed by [Treasure Data, Inc](http://www.treasuredata.com/) \(hence the name\).
+* Originally developed by [Treasure Data, Inc](https://www.treasuredata.com/) \(hence the name\).
 
 Currently two versions of `td-agent` are available.
 
@@ -138,5 +138,5 @@ For further steps, follow these:
 * [ChangeLog of td-agent](https://docs.treasuredata.com/display/public/PD/The+td-agent+Change+Log)
 * [Chef Cookbook](https://github.com/treasure-data/chef-td-agent/)
 
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](http://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
+If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
 
