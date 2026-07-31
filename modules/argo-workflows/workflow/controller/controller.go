@@ -48,6 +48,7 @@ import (
 	"github.com/argoproj/argo-workflows/v4/util/deprecation"
 	"github.com/argoproj/argo-workflows/v4/util/env"
 	"github.com/argoproj/argo-workflows/v4/util/errors"
+	informerutil "github.com/argoproj/argo-workflows/v4/util/informer"
 	rbacutil "github.com/argoproj/argo-workflows/v4/util/rbac"
 	"github.com/argoproj/argo-workflows/v4/util/retry"
 	utilsqldb "github.com/argoproj/argo-workflows/v4/util/sqldb"
@@ -962,17 +963,30 @@ func (wfc *WorkflowController) processNextItem(ctx context.Context) bool {
 	// this will ensure we process every incomplete workflow once every 20m
 	wfc.wfQueue.AddAfter(key, workflowResyncPeriod)
 
-	woc := newWorkflowOperationCtx(ctx, wf, wfc)
-	ctx = logging.WithLogger(ctx, woc.log)
+	// Check the parallelism limit before building the operation context: newWorkflowOperationCtx
+	// deep-copies the entire Workflow, and for a workflow that is postponed that copy is discarded
+	// immediately. Only read from wf on this path, never mutate it.
+	shutdownStrategy := wf.Spec.Shutdown
 
-	if (!woc.GetShutdownStrategy().Enabled() || woc.GetShutdownStrategy() != wfv1.ShutdownStrategyTerminate) && !wfc.throttler.Admit(key) {
-		woc.log.WithField("key", key).Info(ctx, "Workflow processing has been postponed due to max parallelism limit")
-		if woc.wf.Status.Phase == wfv1.WorkflowUnknown {
+	// A Running workflow must never be postponed, even if the throttler no longer admits
+	// it (e.g. it was removed when an archive attempt failed mid-flight): skipping
+	// reconciliation would orphan its pods (#14123).
+	if (!shutdownStrategy.Enabled() || shutdownStrategy != wfv1.ShutdownStrategyTerminate) && !wfc.throttler.Admit(key) && wf.Status.Phase != wfv1.WorkflowRunning {
+		logger.WithFields(logging.Fields{"workflow": wf.Name, "namespace": wf.Namespace, "key": key}).
+			Info(ctx, "Workflow processing has been postponed due to max parallelism limit")
+		if wf.Status.Phase == wfv1.WorkflowUnknown {
+			// Only this branch mutates and persists the workflow, so only it needs the deep copy.
+			// It runs once per workflow, the first time that workflow is postponed.
+			woc := newWorkflowOperationCtx(ctx, wf, wfc)
+			ctx = logging.WithLogger(ctx, woc.log)
 			ctx = woc.markWorkflowPhase(ctx, wfv1.WorkflowPending, "Workflow processing has been postponed because too many workflows are already running")
 			woc.persistUpdates(ctx)
 		}
 		return true
 	}
+
+	woc := newWorkflowOperationCtx(ctx, wf, wfc)
+	ctx = logging.WithLogger(ctx, woc.log)
 
 	// make sure this is removed from the throttler is complete
 	defer func() {
@@ -1351,6 +1365,8 @@ func (wfc *WorkflowController) newTypedConfigMapInformer(ctx context.Context) ca
 	}, func(opts *metav1.ListOptions) {
 		opts.LabelSelector = common.LabelKeyConfigMapType
 	})
+	//nolint:errcheck // the error only happens if the informer was already started, and it hasn't been
+	indexInformer.SetTransform(informerutil.StripManagedFields)
 	ctx, logger := logging.RequireLoggerFromContext(ctx).WithField("component", "config_map_informer").InContext(ctx)
 	logger.WithField("executorPlugins", wfc.executorPlugins != nil).Info(ctx, "Plugins")
 	if wfc.executorPlugins != nil {
@@ -1532,7 +1548,8 @@ func (wfc *WorkflowController) newWorkflowTaskSetInformer() wfextvv1alpha1.Workf
 		externalversions.WithTweakListOptions(func(x *metav1.ListOptions) {
 			r := util.InstanceIDRequirement(wfc.Config.InstanceID)
 			x.LabelSelector = r.String()
-		})).Argoproj().V1alpha1().WorkflowTaskSets()
+		}),
+		externalversions.WithTransform(informerutil.StripManagedFields)).Argoproj().V1alpha1().WorkflowTaskSets()
 	//nolint:errcheck // the error only happens if the informer was stopped, and it hasn't even started (https://github.com/kubernetes/client-go/blob/46588f2726fa3e25b1704d6418190f424f95a990/tools/cache/shared_informer.go#L580)
 	informer.Informer().AddEventHandler(
 		cache.ResourceEventHandlerFuncs{
@@ -1554,7 +1571,8 @@ func (wfc *WorkflowController) newArtGCTaskInformer() wfextvv1alpha1.WorkflowArt
 		externalversions.WithTweakListOptions(func(x *metav1.ListOptions) {
 			r := util.InstanceIDRequirement(wfc.Config.InstanceID)
 			x.LabelSelector = r.String()
-		})).Argoproj().V1alpha1().WorkflowArtifactGCTasks()
+		}),
+		externalversions.WithTransform(informerutil.StripManagedFields)).Argoproj().V1alpha1().WorkflowArtifactGCTasks()
 	//nolint:errcheck // the error only happens if the informer was stopped, and it hasn't even started (https://github.com/kubernetes/client-go/blob/46588f2726fa3e25b1704d6418190f424f95a990/tools/cache/shared_informer.go#L580)
 	informer.Informer().AddEventHandler(
 		cache.ResourceEventHandlerFuncs{
