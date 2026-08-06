@@ -12,7 +12,7 @@ require (
 	github.com/containerd/btrfs/v2 v2.0.0
 	github.com/containerd/cgroups/v3 v3.1.3
 	github.com/containerd/console v1.0.5
-	github.com/containerd/containerd/api v1.11.0
+	github.com/containerd/containerd/api v1.12.0-beta.0
 	github.com/containerd/continuity v0.5.0
 	github.com/containerd/errdefs v1.0.0
 	github.com/containerd/errdefs/pkg v0.3.0
@@ -56,7 +56,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/opencontainers/runtime-spec v1.3.0
 	github.com/opencontainers/runtime-tools v0.9.1-0.20251114084447-edf4cb3d2116
-	github.com/opencontainers/selinux v1.13.1
+	github.com/opencontainers/selinux v1.15.1
 	github.com/pelletier/go-toml/v2 v2.4.3
 	github.com/prometheus/client_golang v1.24.0
 	github.com/prometheus/client_model v0.6.2
@@ -164,5 +164,3 @@ require (
 	sigs.k8s.io/yaml v1.6.0 // indirect
 	tags.cncf.io/container-device-interface/specs-go v1.1.0 // indirect
 )
-
-replace github.com/containerd/containerd/api => ./api
