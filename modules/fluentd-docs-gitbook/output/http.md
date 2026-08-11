@@ -61,7 +61,7 @@ endpoint http://example.com/api/${tag}-${key}
 
 See [Buffer Section Configurations](../configuration/buffer-section.md) for more details.
 
-Since v1.19.3, if a placeholder is used in the host part of the endpoint, [`allowed_hosts`](#allowed_hosts) must also be set. A placeholder used only in the path or the query string is not affected.
+Since v1.19.3, if a placeholder is used in the host part of the endpoint, [`allowed_hosts`](#allowedhosts) must also be set. A placeholder used only in the path or the query string is not affected.
 
 ### `allowed_hosts`
 
@@ -497,5 +497,3 @@ And, receiver `in_http` configuration should be:
 ```
 
 But, we recommend using in/out [`forward`](forward.md) plugin to communicate with two Fluentd instances due to `at-most-once` and `at-least-once` semantics for rigidity.
-
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.

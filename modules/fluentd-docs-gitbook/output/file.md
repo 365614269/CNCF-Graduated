@@ -27,7 +27,7 @@ With this configuration, files named `/var/log/fluent/myapp.{%Y%m%d}.log.gz` wil
 
 Please see the [Configuration File](../configuration/config-file.md) article for the basic structure and syntax of the configuration file.
 
-For `<buffer>`, refer to [`<buffer>` Section](#less-than-buffer-greater-than-section).
+For `<buffer>`, refer to [`<buffer>` Section](#buffer-section).
 
 ## Plugin Helpers
 
@@ -60,7 +60,7 @@ path /path/to/${tag}/${key1}/file.%Y%m%d
 </buffer>
 ```
 
-See [`<buffer>` Section](#less-than-buffer-greater-than-section) for more detail.
+See [`<buffer>` Section](#buffer-section) for more detail.
 
 The `path` parameter is used as `<buffer>`'s `path` in this plugin.
 
@@ -289,5 +289,3 @@ $ tree /tmp/logs/
 ├── current-dummy1 -> /tmp/logs/${tag}/buffer.b57fb1dd96339a870530991d4871cfe11.log
 └── current-dummy2 -> /tmp/logs/${tag}/buffer.b57fb1dd96306dd0b308e094f7ec2228f.log
 ```
-
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.

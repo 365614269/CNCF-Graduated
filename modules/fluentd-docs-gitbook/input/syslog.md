@@ -294,7 +294,7 @@ The field name of the client's address. If set, the client's address will be set
 
 This parameter is deprecated. Use `source_hostname_key` or `source_address_key` instead.
 
-If `true`, adds the source address to the event record. The field name is specified by [`source_host_key`](#source_host_key).
+If `true`, adds the source address to the event record. The field name is specified by [`source_host_key`](#sourcehostkey).
 
 ### `source_host_key`
 
@@ -414,5 +414,3 @@ If other parts are different, the `syslog` parser cannot parse your message. To 
 ## Learn More
 
 * [Input Plugin Overview](./)
-
-If this article is incorrect or outdated, or omits critical information, please [let us know](https://github.com/fluent/fluentd-docs-gitbook/issues?state=open). [Fluentd](https://www.fluentd.org/) is an open-source project under [Cloud Native Computing Foundation \(CNCF\)](https://cncf.io/). All components are available under the Apache 2 License.
