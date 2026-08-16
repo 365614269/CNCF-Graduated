@@ -348,11 +348,14 @@ var prefetchAddr = &net.TCPAddr{}
 // short-circuits after caching when w.prefetch is true, and the nil-safe
 // overrides below make the remaining dns.ResponseWriter methods well-defined.
 func newPrefetchResponseWriter(server string, req *dns.Msg, do, cd bool, c *Cache) *ResponseWriter {
+	req = req.Copy()
+	req.AuthenticatedData = true
 	cw := &ResponseWriter{
 		Cache:      c,
 		server:     server,
 		do:         do,
 		cd:         cd,
+		ad:         true,
 		prefetch:   true,
 		remoteAddr: prefetchAddr,
 	}
@@ -435,13 +438,6 @@ func (w *ResponseWriter) WriteMsg(res *dns.Msg) error {
 	res.Ns = filterRRSlice(res.Ns, ttl, false)
 	res.Extra = filterRRSlice(res.Extra, ttl, false)
 
-	if !w.do && !w.ad {
-		// unset AD bit if requester is not OK with DNSSEC
-		// But retain AD bit if requester set the AD bit in the request, per RFC6840 5.7-5.8
-		res.AuthenticatedData = false
-	}
-	w.lastResponse = res.Copy()
-
 	if hasKey && duration > 0 {
 		if w.state.Match(res) {
 			w.set(res, key, mt, duration)
@@ -452,6 +448,13 @@ func (w *ResponseWriter) WriteMsg(res *dns.Msg) error {
 			cacheDrops.WithLabelValues(w.server, w.zonesMetricLabel, w.viewMetricLabel).Inc()
 		}
 	}
+
+	if !w.do && !w.ad {
+		// unset AD bit if requester is not OK with DNSSEC
+		// But retain AD bit if requester set the AD bit in the request, per RFC6840 5.7-5.8
+		res.AuthenticatedData = false
+	}
+	w.lastResponse = res.Copy()
 
 	if w.prefetch {
 		return nil
