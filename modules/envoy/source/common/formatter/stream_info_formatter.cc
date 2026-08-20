@@ -375,6 +375,14 @@ const absl::flat_hash_map<absl::string_view, CommonDurationFormatter::TimePointG
          [](const StreamInfo::StreamInfo& stream_info) -> std::optional<MonotonicTime> {
            return stream_info.startTimeMonotonic();
          }},
+        {LastDownstreamHeaderRxByteReceived,
+         [](const StreamInfo::StreamInfo& stream_info) -> std::optional<MonotonicTime> {
+           const auto downstream_timing = stream_info.downstreamTiming();
+           if (downstream_timing.has_value()) {
+             return downstream_timing->lastDownstreamHeaderRxByteReceived();
+           }
+           return {};
+         }},
         {LastDownstreamRxByteReceived,
          [](const StreamInfo::StreamInfo& stream_info) -> std::optional<MonotonicTime> {
            const auto downstream_timing = stream_info.downstreamTiming();
@@ -1927,7 +1935,8 @@ const StreamInfoFormatterProviderLookupTable& getKnownStreamInfoFormatterProvide
                                  return std::make_unique<
                                      StreamInfoUpstreamSslConnectionInfoFormatterProvider>(
                                      [](const Ssl::ConnectionInfo& connection_info) {
-                                       return connection_info.ciphersuiteString();
+                                       return std::make_optional<std::string>(
+                                           connection_info.ciphersuiteString());
                                      });
                                }}},
                              {"UPSTREAM_TLS_GROUP",
@@ -2399,7 +2408,8 @@ const StreamInfoFormatterProviderLookupTable& getKnownStreamInfoFormatterProvide
                                  return std::make_unique<
                                      StreamInfoSslConnectionInfoFormatterProvider>(
                                      [](const Ssl::ConnectionInfo& connection_info) {
-                                       return connection_info.ciphersuiteString();
+                                       return std::make_optional<std::string>(
+                                           connection_info.ciphersuiteString());
                                      });
                                }}},
                              {"DOWNSTREAM_TLS_GROUP",
