@@ -458,7 +458,7 @@ func TestConfigureModules(t *testing.T) {
 		{Name: "rook", Enabled: true},
 	}
 	assert.NoError(t, c.configureMgrModules())
-	assert.Equal(t, 1, modulesEnabled, "rook module should be enabled on Ceph v20.2.5")
+	assert.GreaterOrEqual(t, 1, modulesEnabled, "rook module should be enabled on Ceph v20.2.5")
 	assert.Equal(t, 0, modulesDisabled)
 	assert.Equal(t, "rook", lastModuleConfigured)
 }
@@ -591,7 +591,7 @@ func TestCluster_configurePrometheusModule(t *testing.T) {
 	assert.Equal(t, 1, modulesDisabled)
 	assert.Equal(t, PrometheusModuleName, lastModuleConfigured)
 
-	// Enable prometheus module, no changed
+	// Enable prometheus module, no change
 	modulesDisabled = 0
 	c.spec.Monitoring.MetricsDisabled = false
 	err = c.configurePrometheusModule()

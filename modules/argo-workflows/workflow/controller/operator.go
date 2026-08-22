@@ -64,6 +64,7 @@ import (
 	"github.com/argoproj/argo-workflows/v4/workflow/controller/indexes"
 	"github.com/argoproj/argo-workflows/v4/workflow/metrics"
 	"github.com/argoproj/argo-workflows/v4/workflow/progress"
+	wfsync "github.com/argoproj/argo-workflows/v4/workflow/sync"
 	"github.com/argoproj/argo-workflows/v4/workflow/templateresolution"
 	wfutil "github.com/argoproj/argo-workflows/v4/workflow/util"
 	"github.com/argoproj/argo-workflows/v4/workflow/validate"
@@ -288,6 +289,20 @@ func (woc *wfOperationCtx) operate(ctx context.Context) {
 		lockSpan.SetAttributes(attribute.Bool("LockAcquired", acquired))
 		lockSpan.End()
 		if syncErr != nil {
+			if wfsync.IsRetryableSyncError(syncErr) || errorsutil.IsTransientErr(ctx, syncErr) {
+				// Transient failure in the lock backend (e.g. a database
+				// serialization conflict that exhausted its in-place retries):
+				// leave the workflow pending and try again on a later
+				// reconcile instead of failing it.
+				woc.log.WithError(syncErr).WithField("lockName", failedLockName).Warn(ctx, "Transient failure acquiring the synchronization lock, requeueing")
+				phase := woc.wf.Status.Phase
+				if phase == wfv1.WorkflowUnknown {
+					phase = wfv1.WorkflowPending
+				}
+				ctx = woc.markWorkflowPhase(ctx, phase, fmt.Sprintf("Waiting to acquire the synchronization lock. %v", syncErr))
+				woc.requeue()
+				return
+			}
 			woc.log.WithField("lockName", failedLockName).Warn(ctx, "Failed to acquire the lock")
 			woc.markWorkflowFailed(ctx, fmt.Sprintf("Failed to acquire the synchronization lock. %s", syncErr.Error()))
 			return
@@ -301,8 +316,11 @@ func (woc *wfOperationCtx) operate(ctx context.Context) {
 					phase = wfv1.WorkflowPending
 				}
 				ctx = woc.markWorkflowPhase(ctx, phase, msg)
-				return
 			}
+			// Whether the workflow remains queued or its locks were just
+			// released for shutdown, there is nothing more to do this
+			// reconcile.
+			return
 		}
 	}
 
@@ -574,7 +592,10 @@ func (woc *wfOperationCtx) releaseLocksForPendingShuttingdownWfs(ctx context.Con
 	if woc.GetShutdownStrategy().Enabled() && woc.wf.Status.Phase == wfv1.WorkflowPending && woc.GetShutdownStrategy() == wfv1.ShutdownStrategyTerminate {
 		if woc.controller.syncManager.ReleaseAll(ctx, woc.execWf) {
 			woc.log.WithFields(logging.Fields{"key": woc.execWf.Name}).Info(ctx, "Released all locks since this pending workflow is being shutdown")
-			_ = woc.markWorkflowSuccess(ctx)
+			// The workflow never started: it was still waiting for its
+			// synchronization lock when it was terminated, so it completes as
+			// Failed, matching every other shutdown path.
+			_ = woc.markWorkflowFailed(ctx, fmt.Sprintf("Stopped with strategy '%s'", woc.GetShutdownStrategy()))
 			return true
 		}
 	}
@@ -1376,6 +1397,15 @@ func (woc *wfOperationCtx) failNodesWithoutCreatedPodsAfterDeadlineOrShutdown(ct
 		if woc.GetShutdownStrategy().Enabled() && !woc.GetShutdownStrategy().ShouldExecute(node.IsPartOfExitHandler(ctx, nodes)) {
 			// fail suspended nodes or taskset nodes when shutting down
 			if node.IsActiveSuspendNode() || node.IsTaskSetNode() {
+				message := fmt.Sprintf("Stopped with strategy '%s'", woc.GetShutdownStrategy())
+				woc.markNodePhase(ctx, node.Name, wfv1.NodeFailed, message)
+				continue
+			}
+			// fail pending nodes waiting for a synchronization lock when
+			// shutting down: their pod is only created once the lock is
+			// acquired, so pod reconciliation will never fail them, and
+			// without this the shutdown is ignored until the lock frees up
+			if node.Phase == wfv1.NodePending && node.SynchronizationStatus != nil && node.SynchronizationStatus.Waiting != "" {
 				message := fmt.Sprintf("Stopped with strategy '%s'", woc.GetShutdownStrategy())
 				woc.markNodePhase(ctx, node.Name, wfv1.NodeFailed, message)
 				continue
@@ -2297,6 +2327,15 @@ func (woc *wfOperationCtx) executeTemplate(ctx context.Context, nodeName string,
 		lockSpan.SetAttributes(attribute.Bool("LockAcquired", lockAcquired))
 		lockSpan.End()
 		if syncErr != nil {
+			if wfsync.IsRetryableSyncError(syncErr) || errorsutil.IsTransientErr(ctx, syncErr) {
+				// Transient failure in the lock backend: leave the node pending
+				// and try again on a later reconcile instead of erroring it.
+				woc.requeue()
+				if node == nil {
+					_, node = woc.initializeExecutableNode(ctx, nodeName, wfutil.GetNodeType(processedTmpl), templateScope, processedTmpl, orgTmpl, opts.boundaryID, wfv1.NodePending, opts.nodeFlag, false, syncErr.Error())
+				}
+				return node, nil
+			}
 			errNode := woc.initializeNodeOrMarkError(ctx, node, nodeName, templateScope, orgTmpl, opts.boundaryID, opts.nodeFlag, syncErr)
 			return errNode, syncErr
 		}
