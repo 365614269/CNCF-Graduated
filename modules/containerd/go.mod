@@ -7,7 +7,7 @@ require (
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6
 	github.com/Microsoft/go-winio v0.6.3-0.20251027160822-ad3df93bed29
 	github.com/Microsoft/hcsshim v0.15.0-rc.4
-	github.com/checkpoint-restore/checkpointctl v1.5.0
+	github.com/checkpoint-restore/checkpointctl v1.6.0
 	github.com/checkpoint-restore/go-criu/v7 v7.2.0
 	github.com/containerd/btrfs/v2 v2.0.0
 	github.com/containerd/cgroups/v3 v3.1.3
@@ -19,7 +19,7 @@ require (
 	github.com/containerd/fifo v1.1.0
 	github.com/containerd/go-cni v1.1.13
 	github.com/containerd/go-dmverity v0.1.0
-	github.com/containerd/go-runc v1.1.0
+	github.com/containerd/go-runc v1.2.0
 	github.com/containerd/imgcrypt/v2 v2.0.3
 	github.com/containerd/log v0.1.0
 	github.com/containerd/nri v0.12.2
@@ -51,7 +51,7 @@ require (
 	github.com/moby/sys/signal v0.7.1
 	github.com/moby/sys/symlink v0.3.0
 	github.com/moby/sys/user v0.4.1
-	github.com/moby/sys/userns v0.1.0
+	github.com/moby/sys/userns v0.2.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/opencontainers/runtime-spec v1.3.0
@@ -83,16 +83,16 @@ require (
 	google.golang.org/protobuf v1.36.12
 	k8s.io/apimachinery v0.36.3
 	k8s.io/client-go v0.36.3
-	k8s.io/cri-api v0.36.3
+	k8s.io/cri-api v0.36.4
 	k8s.io/cri-client v0.36.3
 	k8s.io/cri-streaming v0.36.3
 	k8s.io/klog/v2 v2.140.0
-	k8s.io/streaming v0.36.3
+	k8s.io/streaming v0.36.4
 	tags.cncf.io/container-device-interface v1.1.1-0.20260821104259-05ae4b5bb730
 )
 
 require (
-	cyphar.com/go-pathrs v0.2.4 // indirect
+	cyphar.com/go-pathrs v0.2.5 // indirect
 	github.com/ProtonMail/go-crypto v1.4.1 // indirect
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -102,7 +102,7 @@ require (
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/containers/ocicrypt v1.3.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
-	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
+	github.com/cyphar/filepath-securejoin v0.7.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
