@@ -642,6 +642,14 @@ func (s *Server) createSandboxContainer(ctx context.Context, ctr container.Conta
 		return nil, err
 	}
 
+	// Labels are added as OCI annotations downstream, so filter them through
+	// the full annotation pipeline (internal + allowlist) to prevent injection.
+	// Must run before SpecAddAnnotations, which sets internal annotations that
+	// unfiltered labels could overwrite (maps are shared by reference).
+	if err := s.FilterDisallowedAnnotations(sb.Annotations(), ctr.Config().GetLabels(), sb.RuntimeHandler()); err != nil {
+		return nil, err
+	}
+
 	containerID := ctr.ID()
 	containerName := ctr.Name()
 	containerConfig := ctr.Config()
@@ -1024,8 +1032,12 @@ func (s *Server) setupContainerEnvironmentAndWorkdir(ctx context.Context, specge
 	// Add environment variables from image the CRI configuration
 	envs := mergeEnvs(containerImageConfig, containerConfig.GetEnvs())
 	for _, e := range envs {
-		parts := strings.SplitN(e, "=", 2)
-		specgen.AddProcessEnv(parts[0], parts[1])
+		key, val, ok := strings.Cut(e, "=")
+		if !ok || key == "" {
+			continue
+		}
+
+		specgen.AddProcessEnv(key, val)
 	}
 
 	// Setup user and groups
