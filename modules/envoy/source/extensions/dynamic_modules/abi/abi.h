@@ -14891,6 +14891,36 @@ bool envoy_dynamic_module_callback_cluster_specifier_get_dynamic_metadata(
     envoy_dynamic_module_type_module_buffer path, envoy_dynamic_module_type_envoy_buffer* result);
 
 /**
+ * envoy_dynamic_module_callback_cluster_specifier_get_dynamic_metadata_number is called by the
+ * module to get a number value from dynamic metadata by filter name and key path.
+ *
+ * @param context_envoy_ptr is the pointer to the cluster selection context.
+ * @param filter_name is the filter namespace in dynamic metadata.
+ * @param path is the key path within the filter namespace, which may be nested with dots.
+ * @param result receives the number value. It is left untouched when this returns false.
+ * @return true if a number value exists at the path, false otherwise.
+ */
+bool envoy_dynamic_module_callback_cluster_specifier_get_dynamic_metadata_number(
+    envoy_dynamic_module_type_cluster_specifier_context_envoy_ptr context_envoy_ptr,
+    envoy_dynamic_module_type_module_buffer filter_name,
+    envoy_dynamic_module_type_module_buffer path, double* result);
+
+/**
+ * envoy_dynamic_module_callback_cluster_specifier_get_dynamic_metadata_bool is called by the module
+ * to get a boolean value from dynamic metadata by filter name and key path.
+ *
+ * @param context_envoy_ptr is the pointer to the cluster selection context.
+ * @param filter_name is the filter namespace in dynamic metadata.
+ * @param path is the key path within the filter namespace, which may be nested with dots.
+ * @param result receives the boolean value. It is left untouched when this returns false.
+ * @return true if a boolean value exists at the path, false otherwise.
+ */
+bool envoy_dynamic_module_callback_cluster_specifier_get_dynamic_metadata_bool(
+    envoy_dynamic_module_type_cluster_specifier_context_envoy_ptr context_envoy_ptr,
+    envoy_dynamic_module_type_module_buffer filter_name,
+    envoy_dynamic_module_type_module_buffer path, bool* result);
+
+/**
  * envoy_dynamic_module_callback_cluster_specifier_get_route_name is called by the module to get the
  * name of the matched route.
  *
@@ -14915,12 +14945,37 @@ bool envoy_dynamic_module_callback_cluster_specifier_get_route_name(
 uint64_t envoy_dynamic_module_callback_cluster_specifier_get_random_value(
     envoy_dynamic_module_type_cluster_specifier_context_envoy_ptr context_envoy_ptr);
 
+/**
+ * envoy_dynamic_module_callback_cluster_specifier_get_cluster_host_count retrieves the host counts
+ * for a cluster by name. This lets a module check whether a cluster is routable from the current
+ * worker before naming it with set_cluster_name.
+ *
+ * The lookup uses getThreadLocalCluster(), so false is returned when the cluster is not routable
+ * from this worker at the moment, which can happen even when the cluster is configured but not yet
+ * warmed or propagated. Healthy and degraded host counts are eventually consistent.
+ *
+ * @param context_envoy_ptr is the pointer to the cluster selection context.
+ * @param cluster_name is the name of the cluster to query owned by the module.
+ * @param priority is the priority level to query (0 for default priority).
+ * @param total_count is the pointer to store the total number of hosts. Can be null if not needed.
+ * @param healthy_count is the pointer to store the number of healthy hosts. Can be null if not
+ * needed.
+ * @param degraded_count is the pointer to store the number of degraded hosts. Can be null if not
+ * needed.
+ * @return true if the counts were retrieved successfully, false otherwise (e.g., cluster not
+ * routable from this worker).
+ */
+bool envoy_dynamic_module_callback_cluster_specifier_get_cluster_host_count(
+    envoy_dynamic_module_type_cluster_specifier_context_envoy_ptr context_envoy_ptr,
+    envoy_dynamic_module_type_module_buffer cluster_name, uint32_t priority, size_t* total_count,
+    size_t* healthy_count, size_t* degraded_count);
+
 // ------------------- Cluster Specifier Callbacks - Selection -----------------
 
 /**
  * envoy_dynamic_module_callback_cluster_specifier_set_cluster_name sets the upstream cluster for
  * the request. When the cluster does not exist, the request is failed with the cluster-not-found
- * response code of the matched route.
+ * response code of the matched route. Use get_cluster_host_count to check `routability` first.
  *
  * @param context_envoy_ptr is the pointer to the cluster selection context.
  * @param cluster_name is the name of the cluster to route to. Envoy copies the buffer. An empty
@@ -14985,6 +15040,22 @@ void envoy_dynamic_module_callback_cluster_specifier_set_request_body_buffer_lim
 void envoy_dynamic_module_callback_cluster_specifier_set_priority(
     envoy_dynamic_module_type_cluster_specifier_context_envoy_ptr context_envoy_ptr,
     envoy_dynamic_module_type_resource_priority priority);
+
+/**
+ * envoy_dynamic_module_callback_cluster_specifier_set_cluster_not_found_response_code sets the
+ * status code Envoy replies with when the selected cluster does not exist, replacing the one of the
+ * matched route. A module that derives cluster names from the request can use this to distinguish a
+ * name that resolves to nothing from an upstream that is unavailable.
+ *
+ * @param context_envoy_ptr is the pointer to the cluster selection context.
+ * @param status_code is the HTTP status code to reply with. Only codes in the range [200, 600) are
+ * accepted, because the code is used to terminate the request.
+ * @return true if the status code was accepted, false when it is out of range, in which case the
+ * call changes nothing.
+ */
+bool envoy_dynamic_module_callback_cluster_specifier_set_cluster_not_found_response_code(
+    envoy_dynamic_module_type_cluster_specifier_context_envoy_ptr context_envoy_ptr,
+    uint32_t status_code);
 
 /**
  * envoy_dynamic_module_callback_cluster_specifier_set_route_action_override selects one of the

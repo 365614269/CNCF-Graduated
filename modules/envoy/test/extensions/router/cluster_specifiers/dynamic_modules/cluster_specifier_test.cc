@@ -5,6 +5,7 @@
 
 #include "source/common/common/fmt.h"
 #include "source/common/protobuf/utility.h"
+#include "source/extensions/dynamic_modules/abi/abi.h"
 #include "source/extensions/dynamic_modules/dynamic_modules.h"
 #include "source/extensions/router/cluster_specifiers/dynamic_modules/config.h"
 
@@ -12,6 +13,8 @@
 #include "test/mocks/router/mocks.h"
 #include "test/mocks/server/server_factory_context.h"
 #include "test/mocks/stream_info/mocks.h"
+#include "test/mocks/upstream/cluster_manager.h"
+#include "test/mocks/upstream/thread_local_cluster.h"
 #include "test/test_common/logging.h"
 #include "test/test_common/utility.h"
 
@@ -207,7 +210,68 @@ TEST_F(DynamicModuleClusterSpecifierFactoryTest, EmptyOverrideRejected) {
   (*proto_config.mutable_route_action_overrides())["empty"] = {};
   EXPECT_THROW_WITH_REGEX(factory_.createClusterSpecifierPlugin(proto_config, context_),
                           EnvoyException,
-                          "Route action override must specify at least one property to replace");
+                          "Route action override must replace at least one route action property");
+}
+
+// Only the envoy.lb entry of a metadata match is used, so an override whose only property is a
+// metadata match without one replaces nothing even though the proto looks populated.
+TEST_F(DynamicModuleClusterSpecifierFactoryTest, OverrideWithNonLoadBalancingMetadataOnlyRejected) {
+  auto proto_config = protoConfig("cluster_specifier_no_op", "test_cluster_specifier");
+  auto& entry = (*proto_config.mutable_route_action_overrides())["hollow"];
+  Protobuf::Struct metadata;
+  (*metadata.mutable_fields())["shard"] = ValueUtil::stringValue("a");
+  (*entry.mutable_metadata_match()->mutable_filter_metadata())["envoy.not_lb"] = metadata;
+  EXPECT_THROW_WITH_REGEX(factory_.createClusterSpecifierPlugin(proto_config, context_),
+                          EnvoyException,
+                          "Route action override must replace at least one route action property");
+}
+
+// The route level cluster validation only walks the mirror policies of the matched route, so the
+// plugin has to validate the ones its overrides carry.
+TEST_F(DynamicModuleClusterSpecifierFactoryTest, UnknownMirrorClusterInOverrideRejected) {
+  auto proto_config = protoConfig("cluster_specifier_no_op", "test_cluster_specifier");
+  (*proto_config.mutable_route_action_overrides())["mirror"]
+      .add_request_mirror_policies()
+      ->set_cluster("absent-cluster");
+  auto plugin = factory_.createClusterSpecifierPlugin(proto_config, context_);
+  EXPECT_CALL(context_.cluster_manager_, hasCluster(absl::string_view("absent-cluster")))
+      .WillOnce(Return(false));
+  EXPECT_THAT(plugin->validateClusters(context_.cluster_manager_).message(),
+              testing::HasSubstr("route action override 'mirror': unknown shadow cluster "
+                                 "'absent-cluster'"));
+}
+
+TEST_F(DynamicModuleClusterSpecifierFactoryTest, KnownMirrorClusterInOverrideAccepted) {
+  auto proto_config = protoConfig("cluster_specifier_no_op", "test_cluster_specifier");
+  (*proto_config.mutable_route_action_overrides())["mirror"]
+      .add_request_mirror_policies()
+      ->set_cluster("present-cluster");
+  auto plugin = factory_.createClusterSpecifierPlugin(proto_config, context_);
+  EXPECT_CALL(context_.cluster_manager_, hasCluster(absl::string_view("present-cluster")))
+      .WillOnce(Return(true));
+  EXPECT_TRUE(plugin->validateClusters(context_.cluster_manager_).ok());
+}
+
+// A mirror policy that names its cluster through a header resolves it per request, so there is
+// nothing to look up at configuration load.
+TEST_F(DynamicModuleClusterSpecifierFactoryTest, HeaderNamedMirrorClusterNotValidated) {
+  auto proto_config = protoConfig("cluster_specifier_no_op", "test_cluster_specifier");
+  (*proto_config.mutable_route_action_overrides())["mirror"]
+      .add_request_mirror_policies()
+      ->set_cluster_header("x-mirror");
+  auto plugin = factory_.createClusterSpecifierPlugin(proto_config, context_);
+  EXPECT_CALL(context_.cluster_manager_, hasCluster(testing::_)).Times(0);
+  EXPECT_TRUE(plugin->validateClusters(context_.cluster_manager_).ok());
+}
+
+// An override without mirror policies has no cluster to validate.
+TEST_F(DynamicModuleClusterSpecifierFactoryTest, OverrideWithoutMirrorPolicyNotValidated) {
+  auto proto_config = protoConfig("cluster_specifier_no_op", "test_cluster_specifier");
+  (*proto_config.mutable_route_action_overrides())["retry"].mutable_retry_policy()->set_retry_on(
+      "5xx");
+  auto plugin = factory_.createClusterSpecifierPlugin(proto_config, context_);
+  EXPECT_CALL(context_.cluster_manager_, hasCluster(testing::_)).Times(0);
+  EXPECT_TRUE(plugin->validateClusters(context_.cluster_manager_).ok());
 }
 
 // An override key must not be empty.
@@ -487,6 +551,53 @@ TEST_F(DynamicModuleClusterSpecifierTest, DefaultPriorityReplaced) {
   EXPECT_EQ(Upstream::ResourcePriority::Default, resolveRouteEntry(headers)->priority());
 }
 
+TEST_F(DynamicModuleClusterSpecifierTest, ClusterNotFoundResponseCodeDelegatesByDefault) {
+  setUpPlugin();
+  EXPECT_CALL(parent_->route_entry_, clusterNotFoundResponseCode())
+      .WillRepeatedly(Return(Http::Code::InternalServerError));
+  Http::TestRequestHeaderMapImpl headers{{":path", "/"}, {"env", "prod"}};
+  EXPECT_EQ(Http::Code::InternalServerError,
+            resolveRouteEntry(headers)->clusterNotFoundResponseCode());
+}
+
+TEST_F(DynamicModuleClusterSpecifierTest, ClusterNotFoundResponseCodeReplaced) {
+  setUpPlugin();
+  EXPECT_CALL(parent_->route_entry_, clusterNotFoundResponseCode()).Times(0);
+  Http::TestRequestHeaderMapImpl headers{
+      {":path", "/"}, {"env", "prod"}, {"x-not-found-code", "404"}};
+  EXPECT_EQ(Http::Code::NotFound, resolveRouteEntry(headers)->clusterNotFoundResponseCode());
+}
+
+// The code is only read once the selected cluster turns out to be missing, so an invalid one would
+// otherwise surface as a malformed response far from the module call that set it.
+TEST_F(DynamicModuleClusterSpecifierTest, OutOfRangeClusterNotFoundResponseCodeRejected) {
+  setUpPlugin();
+  EXPECT_CALL(parent_->route_entry_, clusterNotFoundResponseCode())
+      .WillRepeatedly(Return(Http::Code::ServiceUnavailable));
+  Http::TestRequestHeaderMapImpl headers{
+      {":path", "/"}, {"env", "prod"}, {"x-not-found-code", "max"}};
+  EXPECT_LOG_CONTAINS("warn", "out of range cluster not found response code", {
+    EXPECT_EQ(Http::Code::ServiceUnavailable,
+              resolveRouteEntry(headers)->clusterNotFoundResponseCode());
+  });
+}
+
+// A refresh replaces the whole decision, so a response code an earlier call set goes back to the
+// matched route.
+TEST_F(DynamicModuleClusterSpecifierTest, RefreshWithoutResponseCodeRevertsToMatchedRoute) {
+  setUpPlugin();
+  ON_CALL(parent_->route_entry_, clusterNotFoundResponseCode())
+      .WillByDefault(Return(Http::Code::ServiceUnavailable));
+  Http::TestRequestHeaderMapImpl headers{
+      {":path", "/"}, {"env", "prod"}, {"x-not-found-code", "404"}};
+  const auto* entry = resolveRouteEntry(headers);
+  EXPECT_EQ(Http::Code::NotFound, entry->clusterNotFoundResponseCode());
+
+  headers.remove(Http::LowerCaseString("x-not-found-code"));
+  entry->refreshRouteCluster(headers, stream_info_);
+  EXPECT_EQ(Http::Code::ServiceUnavailable, entry->clusterNotFoundResponseCode());
+}
+
 // Tests that assert the values the module read through the context callbacks. The module echoes the
 // value named by the x-echo header into the cluster name, so every read is observable.
 class DynamicModuleClusterSpecifierReadTest : public DynamicModuleClusterSpecifierTest {
@@ -551,6 +662,31 @@ TEST_F(DynamicModuleClusterSpecifierReadTest, AbsentDynamicMetadataReadable) {
   setUpPlugin();
   Http::TestRequestHeaderMapImpl headers{{":path", "/"}, {"env", "prod"}};
   EXPECT_EQ("absent", echoedValue(headers, "dynamic-metadata"));
+  EXPECT_EQ("absent", echoedValue(headers, "dynamic-metadata-number"));
+  EXPECT_EQ("absent", echoedValue(headers, "dynamic-metadata-bool"));
+}
+
+TEST_F(DynamicModuleClusterSpecifierReadTest, NumberAndBoolDynamicMetadataReadable) {
+  setUpPlugin();
+  Protobuf::Struct metadata;
+  (*metadata.mutable_fields())["weight"] = ValueUtil::numberValue(7);
+  (*metadata.mutable_fields())["enabled"] = ValueUtil::boolValue(true);
+  (*stream_info_.metadata_.mutable_filter_metadata())["envoy.test"] = metadata;
+  Http::TestRequestHeaderMapImpl headers{{":path", "/"}, {"env", "prod"}};
+  EXPECT_EQ("7", echoedValue(headers, "dynamic-metadata-number"));
+  EXPECT_EQ("true", echoedValue(headers, "dynamic-metadata-bool"));
+}
+
+// A value of the wrong type is not returned, so a module cannot read a string as a number.
+TEST_F(DynamicModuleClusterSpecifierReadTest, MistypedDynamicMetadataNotReadable) {
+  setUpPlugin();
+  Protobuf::Struct metadata;
+  (*metadata.mutable_fields())["weight"] = ValueUtil::stringValue("7");
+  (*metadata.mutable_fields())["enabled"] = ValueUtil::stringValue("true");
+  (*stream_info_.metadata_.mutable_filter_metadata())["envoy.test"] = metadata;
+  Http::TestRequestHeaderMapImpl headers{{":path", "/"}, {"env", "prod"}};
+  EXPECT_EQ("absent", echoedValue(headers, "dynamic-metadata-number"));
+  EXPECT_EQ("absent", echoedValue(headers, "dynamic-metadata-bool"));
 }
 
 TEST_F(DynamicModuleClusterSpecifierReadTest, RouteNameReadable) {
@@ -670,10 +806,14 @@ TEST_F(DynamicModuleRouteActionOverrideTest, RefreshWithoutOverrideDelegatesToMa
 }
 
 // Metadata under a namespace other than envoy.lb is ignored, matching RouteAction.metadata_match.
+// The retry policy makes the override replace something, since one that replaces nothing is
+// rejected at configuration load.
 TEST_F(DynamicModuleClusterSpecifierTest, NonLoadBalancingMetadataIgnored) {
   setUpPlugin(R"EOF(
 route_action_overrides:
   other:
+    retry_policy:
+      num_retries: 7
     metadata_match:
       filter_metadata:
         envoy.other:
@@ -681,7 +821,85 @@ route_action_overrides:
 )EOF");
   const auto* matched_route_criteria = giveMatchedRouteMetadataMatchCriteria();
   Http::TestRequestHeaderMapImpl headers{{":path", "/"}, {"env", "prod"}, {"x-override", "other"}};
-  EXPECT_EQ(matched_route_criteria, resolveRouteEntry(headers)->metadataMatchCriteria());
+  const auto* entry = resolveRouteEntry(headers);
+  EXPECT_EQ(matched_route_criteria, entry->metadataMatchCriteria());
+  // The retry policy still comes from the override, so the entry itself was selected.
+  EXPECT_EQ(7, entry->retryPolicy()->numRetries());
+}
+
+class DynamicModuleClusterSpecifierHostCountAbiTest : public testing::Test {
+public:
+  DynamicModuleClusterSpecifierHostCountAbiTest() {
+    TestEnvironment::setEnvVar("ENVOY_DYNAMIC_MODULES_SEARCH_PATH",
+                               TestEnvironment::substitute(
+                                   "{{ test_rundir }}/test/extensions/dynamic_modules/test_data/c"),
+                               1);
+    EXPECT_CALL(context_, clusterManager()).WillRepeatedly(testing::ReturnRef(cluster_manager_));
+  }
+
+  DynamicModuleClusterSpecifierConfigSharedPtr makeConfig() {
+    auto dynamic_module = Extensions::DynamicModules::newDynamicModule(
+        Extensions::DynamicModules::testSharedObjectPath("cluster_specifier_no_op", "c"),
+        /*do_not_close=*/true);
+    EXPECT_TRUE(dynamic_module.ok());
+    auto config_or_error = newDynamicModuleClusterSpecifierConfig(
+        protoConfig("cluster_specifier_no_op", "test_cluster_specifier"),
+        std::move(dynamic_module.value()), context_);
+    EXPECT_TRUE(config_or_error.ok());
+    return config_or_error.value();
+  }
+
+  ClusterSpecifierContext makeContext(DynamicModuleClusterSpecifierConfigSharedPtr config) {
+    return ClusterSpecifierContext{*config, headers_, stream_info_, route_name_, /*random=*/0, {}};
+  }
+
+  NiceMock<Server::Configuration::MockServerFactoryContext> context_;
+  Upstream::MockClusterManager cluster_manager_;
+  NiceMock<Upstream::MockThreadLocalCluster> thread_local_cluster_;
+  NiceMock<StreamInfo::MockStreamInfo> stream_info_;
+  Http::TestRequestHeaderMapImpl headers_;
+  const std::string route_name_{"named-route"};
+};
+
+TEST_F(DynamicModuleClusterSpecifierHostCountAbiTest, UnknownClusterReturnsFalse) {
+  auto config = makeConfig();
+  auto context = makeContext(config);
+  EXPECT_CALL(cluster_manager_, getThreadLocalCluster(absl::string_view("absent")))
+      .WillOnce(testing::Return(nullptr));
+  size_t total = 0;
+  EXPECT_FALSE(envoy_dynamic_module_callback_cluster_specifier_get_cluster_host_count(
+      static_cast<void*>(&context), {"absent", 6}, 0, &total, nullptr, nullptr));
+}
+
+TEST_F(DynamicModuleClusterSpecifierHostCountAbiTest, HostCountsReturnedForKnownCluster) {
+  auto config = makeConfig();
+  auto context = makeContext(config);
+  EXPECT_CALL(cluster_manager_, getThreadLocalCluster(absl::string_view("present")))
+      .WillOnce(testing::Return(&thread_local_cluster_));
+  auto* mock_host_set = thread_local_cluster_.cluster_.priority_set_.getMockHostSet(0);
+  mock_host_set->hosts_.resize(4);
+  mock_host_set->healthy_hosts_.resize(2);
+  mock_host_set->degraded_hosts_.resize(1);
+
+  size_t total = 0;
+  size_t healthy = 0;
+  size_t degraded = 0;
+  EXPECT_TRUE(envoy_dynamic_module_callback_cluster_specifier_get_cluster_host_count(
+      static_cast<void*>(&context), {"present", 7}, 0, &total, &healthy, &degraded));
+  EXPECT_EQ(4, total);
+  EXPECT_EQ(2, healthy);
+  EXPECT_EQ(1, degraded);
+}
+
+TEST_F(DynamicModuleClusterSpecifierReadTest, ClusterHostCountReadable) {
+  setUpPlugin();
+  EXPECT_CALL(context_.cluster_manager_, getThreadLocalCluster(absl::string_view("cluster_0")))
+      .WillOnce(testing::Return(nullptr));
+  Http::TestRequestHeaderMapImpl headers{{":path", "/"},
+                                         {"env", "prod"},
+                                         {"x-echo", "cluster-host-count"},
+                                         {"x-query-cluster", "cluster_0"}};
+  EXPECT_EQ("absent", echoedValue(headers, "cluster-host-count"));
 }
 
 } // namespace

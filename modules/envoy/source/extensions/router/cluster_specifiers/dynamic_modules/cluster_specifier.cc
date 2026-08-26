@@ -24,11 +24,6 @@ using RouteActionOverrideProto =
 absl::StatusOr<RouteActionOverride>
 buildRouteActionOverride(const RouteActionOverrideProto& proto_override,
                          Server::Configuration::ServerFactoryContext& context) {
-  if (!proto_override.has_retry_policy() && !proto_override.has_metadata_match() &&
-      proto_override.request_mirror_policies().empty()) {
-    return absl::InvalidArgumentError(
-        "Route action override must specify at least one property to replace");
-  }
   RouteActionOverride entry;
   if (proto_override.has_retry_policy()) {
     auto policy_or_error = Envoy::Router::RetryPolicyImpl::create(
@@ -50,6 +45,14 @@ buildRouteActionOverride(const RouteActionOverrideProto& proto_override,
     RETURN_IF_NOT_OK_REF(policy_or_error.status());
     entry.shadow_policies.push_back(std::move(policy_or_error.value()));
   }
+  // Validate what was built rather than what was configured. A metadata_match without an envoy.lb
+  // entry contributes nothing, so a populated looking configuration can still build an override
+  // that replaces no property, which set_route_action_override would then accept as a decision.
+  if (entry.retry_policy == nullptr && entry.metadata_match_criteria == nullptr &&
+      entry.shadow_policies.empty()) {
+    return absl::InvalidArgumentError(
+        "Route action override must replace at least one route action property");
+  }
   return entry;
 }
 
@@ -58,9 +61,9 @@ buildRouteActionOverride(const RouteActionOverrideProto& proto_override,
 DynamicModuleClusterSpecifierConfig::DynamicModuleClusterSpecifierConfig(
     absl::string_view specifier_name, absl::string_view specifier_config,
     Extensions::DynamicModules::DynamicModulePtr dynamic_module,
-    RouteActionOverrideMap route_action_overrides)
+    RouteActionOverrideMap route_action_overrides, Upstream::ClusterManager& cluster_manager)
     : specifier_name_(specifier_name), specifier_config_(specifier_config),
-      dynamic_module_(std::move(dynamic_module)),
+      dynamic_module_(std::move(dynamic_module)), cluster_manager_(cluster_manager),
       route_action_overrides_(std::move(route_action_overrides)) {}
 
 DynamicModuleClusterSpecifierConfig::~DynamicModuleClusterSpecifierConfig() {
@@ -75,6 +78,23 @@ const RouteActionOverride*
 DynamicModuleClusterSpecifierConfig::routeActionOverride(absl::string_view name) const {
   const auto it = route_action_overrides_.find(name);
   return it != route_action_overrides_.end() ? &it->second : nullptr;
+}
+
+absl::Status DynamicModuleClusterSpecifierConfig::validateClusters(
+    const Upstream::ClusterManager& cluster_manager) const {
+  for (const auto& [name, override_entry] : route_action_overrides_) {
+    for (const auto& shadow_policy : override_entry.shadow_policies) {
+      // A policy that names its cluster through a request header resolves it per request, so only a
+      // statically named cluster can be checked here.
+      if (!shadow_policy->cluster().empty() &&
+          !cluster_manager.hasCluster(shadow_policy->cluster())) {
+        return absl::InvalidArgumentError(
+            fmt::format("route action override '{}': unknown shadow cluster '{}'", name,
+                        shadow_policy->cluster()));
+      }
+    }
+  }
+  return absl::OkStatus();
 }
 
 absl::StatusOr<DynamicModuleClusterSpecifierConfigSharedPtr>
@@ -113,7 +133,7 @@ newDynamicModuleClusterSpecifierConfig(const DynamicModuleClusterSpecifierProto&
 
   auto config = std::make_shared<DynamicModuleClusterSpecifierConfig>(
       proto_config.specifier_name(), specifier_config, std::move(dynamic_module),
-      std::move(route_action_overrides));
+      std::move(route_action_overrides), context.clusterManager());
   config->on_config_destroy_ = on_config_destroy.value();
   config->on_select_ = on_select.value();
 
