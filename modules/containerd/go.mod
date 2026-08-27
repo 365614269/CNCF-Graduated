@@ -35,7 +35,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/distribution/reference v0.6.0
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c
-	github.com/docker/go-metrics v0.0.1
+	github.com/docker/go-metrics v0.1.0
 	github.com/docker/go-units v0.5.0
 	github.com/erofs/go-erofs v0.3.1
 	github.com/fsnotify/fsnotify v1.10.1
@@ -59,7 +59,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.4.3
 	github.com/prometheus/client_golang v1.24.0
 	github.com/prometheus/client_model v0.6.2
-	github.com/sirupsen/logrus v1.10.1
+	github.com/sirupsen/logrus v1.10.2
 	github.com/stretchr/testify v1.12.1
 	github.com/tchap/go-patricia/v2 v2.3.3
 	github.com/urfave/cli/v2 v2.27.7
@@ -79,7 +79,7 @@ require (
 	golang.org/x/sys v0.47.0
 	golang.org/x/time v0.15.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260803160001-6ac0973c030d
-	google.golang.org/grpc v1.83.1
+	google.golang.org/grpc v1.83.2
 	google.golang.org/protobuf v1.36.12
 	k8s.io/apimachinery v0.36.3
 	k8s.io/client-go v0.36.3
@@ -88,7 +88,7 @@ require (
 	k8s.io/cri-streaming v0.36.3
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/streaming v0.36.4
-	tags.cncf.io/container-device-interface v1.1.1-0.20260821104259-05ae4b5bb730
+	tags.cncf.io/container-device-interface v1.1.1-0.20260826075544-04278701a635
 )
 
 require (
@@ -157,3 +157,5 @@ require (
 	sigs.k8s.io/yaml v1.6.0 // indirect
 	tags.cncf.io/container-device-interface/specs-go v1.1.0 // indirect
 )
+
+replace github.com/containerd/containerd/api => ./api
