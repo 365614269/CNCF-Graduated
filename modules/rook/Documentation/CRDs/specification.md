@@ -6930,6 +6930,18 @@ bool
 </tr>
 <tr>
 <td>
+<code>sslCertificateRef</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>SSLCertificateRef references a Kubernetes secret of type kubernetes.io/tls in the CephCluster namespace. If set, Rook will configure the dashboard with this certificate instead of creating a self-signed certificate.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>prometheusEndpoint</code><br/>
 <em>
 string
@@ -16374,8 +16386,8 @@ Kubernetes core/v1.TypedLocalObjectReference
 * An existing PVC (PersistentVolumeClaim)
 If the provisioner or an external controller can support the specified data source,
 it will create a new volume based on the contents of the specified data source.
-When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
-and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+dataSource contents will be copied to dataSourceRef, and dataSourceRef contents will be
+copied to dataSource when dataSourceRef.namespace is not specified.
 If the namespace is specified, then dataSourceRef will not be copied to dataSource.</p>
 </td>
 </tr>
@@ -16411,7 +16423,6 @@ preserves all values, and generates an error if a disallowed value is
 specified.
 * While dataSource only allows local objects, dataSourceRef allows objects
 in any namespaces.
-(Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
 (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.</p>
 </td>
 </tr>
