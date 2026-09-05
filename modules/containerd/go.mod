@@ -17,11 +17,12 @@ require (
 	github.com/containerd/errdefs v1.0.0
 	github.com/containerd/errdefs/pkg v0.3.0
 	github.com/containerd/fifo v1.1.0
-	github.com/containerd/go-cni v1.1.13
+	github.com/containerd/go-cni v1.1.14
 	github.com/containerd/go-dmverity v0.1.0
 	github.com/containerd/go-runc v1.2.1
 	github.com/containerd/imgcrypt/v2 v2.0.3
 	github.com/containerd/log v0.1.0
+	github.com/containerd/log/otel v0.0.0-20260828142140-8b5d6538fa1f // main
 	github.com/containerd/nri v0.12.2
 	github.com/containerd/otelttrpc v0.1.0
 	github.com/containerd/platforms v1.0.0-rc.5
@@ -29,7 +30,7 @@ require (
 	github.com/containerd/ttrpc v1.2.9
 	github.com/containerd/typeurl/v2 v2.3.0
 	github.com/containerd/zfs/v2 v2.0.0
-	github.com/containernetworking/cni v1.3.0
+	github.com/containernetworking/cni v1.3.1
 	github.com/containernetworking/plugins v1.9.1
 	github.com/coreos/go-systemd/v22 v22.7.0
 	github.com/distribution/reference v0.6.0
@@ -88,7 +89,7 @@ require (
 	k8s.io/cri-streaming v0.37.0
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/streaming v0.37.0
-	tags.cncf.io/container-device-interface v1.1.1-0.20260828125525-73444d1f71f2
+	tags.cncf.io/container-device-interface v1.1.1
 )
 
 require (
@@ -141,7 +142,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.11.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/crypto v0.55.0 // indirect
+	golang.org/x/crypto v0.56.0 // indirect
 	golang.org/x/net v0.58.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/term v0.45.0 // indirect
@@ -156,7 +157,7 @@ require (
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.4.2 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
-	tags.cncf.io/container-device-interface/specs-go v1.1.0 // indirect
+	tags.cncf.io/container-device-interface/specs-go v1.1.1 // indirect
 )
 
 replace github.com/containerd/containerd/api => ./api
