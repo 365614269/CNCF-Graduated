@@ -57,10 +57,9 @@ var (
 		"network_dir":             "cni-config-dir",
 		"plugin_dir":              "cni-plugin-dir",
 		"plugin_dirs":             "cni-plugin-dir",
-		"insecure_registries":     "insecure-registry",
 		"log_to_journald":         "log-journald",
 		"storage_option":          "storage-opt",
-		"container_level_enabled": "checkpoint-restore-container-level-enabled",
+		"container_level_enabled": "checkpoint-restore-level",
 	}
 )
 

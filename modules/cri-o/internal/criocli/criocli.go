@@ -57,8 +57,8 @@ func mergeConfig(config *libconfig.Config, ctx *cli.Context) error {
 		return err
 	}
 
-	if ctx.IsSet("checkpoint-restore-container-level-enabled") {
-		config.ContainerLevelEnabled = libconfig.ContainerCheckpointRestoreLevel(ctx.String("checkpoint-restore-container-level-enabled"))
+	if ctx.IsSet("checkpoint-restore-level") {
+		config.ContainerLevelEnabled = libconfig.ContainerCheckpointRestoreLevel(ctx.String("checkpoint-restore-level"))
 	}
 
 	mergeNetworkConfig(config, ctx)
@@ -179,11 +179,6 @@ func mergeImageConfig(config *libconfig.Config, ctx *cli.Context) {
 
 	if ctx.IsSet("signature-policy-dir") {
 		config.SignaturePolicyDir = ctx.String("signature-policy-dir")
-	}
-
-	if ctx.IsSet("insecure-registry") {
-		//nolint:staticcheck // SA1019: InsecureRegistries is deprecated but still supported for backward compatibility
-		config.InsecureRegistries = StringSliceTrySplit(ctx, "insecure-registry")
 	}
 
 	if ctx.IsSet("default-transport") {
@@ -868,53 +863,32 @@ func getCrioFlags(defConf *libconfig.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:      "root",
 			Aliases:   []string{"r"},
-			Usage:     "The CRI-O root directory.",
-			Value:     defConf.Root,
+			Usage:     "The CRI-O root directory. Defaults to the value from containers/storage configuration.",
 			EnvVars:   []string{"CONTAINER_ROOT"},
 			TakesFile: true,
 		},
 		&cli.StringFlag{
 			Name:      "runroot",
-			Usage:     "The CRI-O state directory.",
-			Value:     defConf.RunRoot,
+			Usage:     "The CRI-O state directory. Defaults to the value from containers/storage configuration.",
 			EnvVars:   []string{"CONTAINER_RUNROOT"},
 			TakesFile: true,
 		},
 		&cli.StringFlag{
 			Name:      "imagestore",
-			Usage:     "Store newly pulled images in the specified path, rather than the path provided by --root.",
-			Value:     defConf.ImageStore,
+			Usage:     "Store newly pulled images in the specified path, rather than the path provided by --root. Defaults to the value from containers/storage configuration.",
 			EnvVars:   []string{"CONTAINER_IMAGESTORE"},
 			TakesFile: true,
 		},
 		&cli.StringFlag{
 			Name:    "storage-driver",
 			Aliases: []string{"s"},
-			Usage:   "OCI storage driver.",
+			Usage:   "OCI storage driver. Defaults to the value from containers/storage configuration.",
 			EnvVars: []string{"CONTAINER_STORAGE_DRIVER"},
 		},
 		&cli.StringSliceFlag{
 			Name:    "storage-opt",
-			Value:   cli.NewStringSlice(defConf.StorageOptions...),
-			Usage:   "OCI storage driver option.",
+			Usage:   "OCI storage driver option. Defaults to the value from containers/storage configuration.",
 			EnvVars: []string{"CONTAINER_STORAGE_OPT"},
-		},
-		&cli.StringSliceFlag{
-			Name: "insecure-registry",
-			//nolint:staticcheck // SA1019: InsecureRegistries is deprecated but still supported for backward compatibility
-			Value: cli.NewStringSlice(defConf.InsecureRegistries...),
-			Usage: "Enable insecure registry communication, i.e., enable un-encrypted and/or untrusted communication." + `
-    This option is deprecated. Please use "insecure" in registries.conf instead.
-    1. List of insecure registries can contain an element with CIDR notation to
-       specify a whole subnet.
-    2. Insecure registries accept HTTP or accept HTTPS with certificates from
-       unknown CAs.
-    3. Enabling '--insecure-registry' is useful when running a local registry.
-       However, because its use creates security vulnerabilities, **it should ONLY
-       be enabled for testing purposes**. For increased security, users should add
-       their CA to their system's list of trusted CAs instead of using
-       '--insecure-registry'.`,
-			EnvVars: []string{"CONTAINER_INSECURE_REGISTRY"},
 		},
 		&cli.StringFlag{
 			Name:    "default-transport",
@@ -1561,9 +1535,9 @@ func getCrioFlags(defConf *libconfig.Config) []cli.Flag {
 			Value:   false,
 		},
 		&cli.StringFlag{
-			Name:    "checkpoint-restore-container-level-enabled",
+			Name:    "checkpoint-restore-level",
 			Usage:   "The level of container checkpoint/restore support to enable. Must be one of \"none\", \"checkpoint_only\" or \"checkpoint_restore\". Enabling checkpoint or restore requires that the criu binary is available in $PATH.",
-			EnvVars: []string{"CONTAINER_CHECKPOINT_RESTORE_CONTAINER_LEVEL_ENABLED"},
+			EnvVars: []string{"CONTAINER_CHECKPOINT_RESTORE_LEVEL"},
 			Value:   string(defConf.ContainerLevelEnabled),
 		},
 		&cli.BoolFlag{

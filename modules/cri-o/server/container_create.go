@@ -1654,9 +1654,10 @@ func (s *Server) setupContainerRuntimeAndStopSignal(ctx context.Context, ctr con
 	// https://github.com/kubernetes/enhancements/issues/4960
 	stopSignal = containerImageConfig.Config.StopSignal
 
-	if signal := ctr.Config().GetStopSignal(); signal != types.Signal_RUNTIME_DEFAULT {
-		log.Debugf(ctx, "Override stop signal to %s", signal)
-		stopSignal = signal.String()
+	if signal := ctr.Config().GetStopSignal(); signal != types.Signal_SIGNAL_RUNTIME_DEFAULT {
+		signalName := strings.TrimPrefix(signal.String(), "SIGNAL_")
+		log.Debugf(ctx, "Override stop signal to %s", signalName)
+		stopSignal = signalName
 	}
 
 	return runtimePath, stopSignal, nil

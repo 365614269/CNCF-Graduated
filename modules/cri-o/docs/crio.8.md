@@ -24,7 +24,7 @@ crio
 [--blockio-reload]
 [--cdi-spec-dirs]=[value]
 [--cgroup-manager]=[value]
-[--checkpoint-restore-container-level-enabled]=[value]
+[--checkpoint-restore-level]=[value]
 [--clean-shutdown-file]=[value]
 [--cni-config-dir]=[value]
 [--cni-default-network]=[value]
@@ -67,7 +67,6 @@ crio
 [--imagestore]=[value]
 [--included-pod-metrics]=[value]
 [--infra-ctr-cpuset]=[value]
-[--insecure-registry]=[value]
 [--internal-repair]
 [--internal-wipe]
 [--irqbalance-config-file]=[value]
@@ -201,7 +200,7 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--cgroup-manager**="": cgroup manager (cgroupfs or systemd). (default: "systemd")
 
-**--checkpoint-restore-container-level-enabled**="": The level of container checkpoint/restore support to enable. Must be one of "none", "checkpoint_only" or "checkpoint_restore". Enabling checkpoint or restore requires that the criu binary is available in $PATH. (default: "checkpoint_only")
+**--checkpoint-restore-level**="": The level of container checkpoint/restore support to enable. Must be one of "none", "checkpoint_only" or "checkpoint_restore". Enabling checkpoint or restore requires that the criu binary is available in $PATH. (default: "checkpoint_only")
 
 **--clean-shutdown-file**="": Location for CRI-O to lay down the clean shutdown file. It indicates whether we've had time to sync changes to disk before shutting down. If not found, crio wipe will clear the storage directory. (default: "/var/lib/crio/clean.shutdown")
 
@@ -313,23 +312,11 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
        mounted into the container for the volumes.
 	3. ignore: All volumes are just ignored and no action is taken. (default: "mkdir")
 
-**--imagestore**="": Store newly pulled images in the specified path, rather than the path provided by --root.
+**--imagestore**="": Store newly pulled images in the specified path, rather than the path provided by --root. Defaults to the value from containers/storage configuration.
 
 **--included-pod-metrics**="": A list of pod metrics to include. Specify the names of the metrics to include in this list.
 
 **--infra-ctr-cpuset**="": CPU set to run infra containers, if not specified CRI-O will use all online CPUs to run infra containers.
-
-**--insecure-registry**="": Enable insecure registry communication, i.e., enable un-encrypted and/or untrusted communication.
-    This option is deprecated. Please use "insecure" in registries.conf instead.
-    1. List of insecure registries can contain an element with CIDR notation to
-       specify a whole subnet.
-    2. Insecure registries accept HTTP or accept HTTPS with certificates from
-       unknown CAs.
-    3. Enabling '--insecure-registry' is useful when running a local registry.
-       However, because its use creates security vulnerabilities, **it should ONLY
-       be enabled for testing purposes**. For increased security, users should add
-       their CA to their system's list of trusted CAs instead of using
-       '--insecure-registry'.
 
 **--internal-repair**: If true, CRI-O will check if the container and image storage was corrupted after a sudden restart, and attempt to repair the storage if it was.
 
@@ -435,9 +422,9 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--read-only**: Setup all unprivileged containers to run as read-only. Automatically mounts the containers' tmpfs on '/run', '/tmp' and '/var/tmp'.
 
-**--root, -r**="": The CRI-O root directory. (default: "/var/lib/containers/storage")
+**--root, -r**="": The CRI-O root directory. Defaults to the value from containers/storage configuration.
 
-**--runroot**="": The CRI-O state directory. (default: "/run/containers/storage")
+**--runroot**="": The CRI-O state directory. Defaults to the value from containers/storage configuration.
 
 **--runtimes**="": OCI runtimes, format is 'runtime_name:runtime_path:runtime_root:runtime_type:privileged_without_host_devices:runtime_config_path:container_min_memory'.
 
@@ -457,9 +444,9 @@ crio [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--stats-collection-period**="": The number of seconds between collecting pod and container stats. If set to 0, the stats are collected on-demand instead. DEPRECATED: This option will be removed in the future. (default: 0)
 
-**--storage-driver, -s**="": OCI storage driver.
+**--storage-driver, -s**="": OCI storage driver. Defaults to the value from containers/storage configuration.
 
-**--storage-opt**="": OCI storage driver option.
+**--storage-opt**="": OCI storage driver option. Defaults to the value from containers/storage configuration.
 
 **--stream-address**="": Bind address for streaming socket. (default: "127.0.0.1")
 
