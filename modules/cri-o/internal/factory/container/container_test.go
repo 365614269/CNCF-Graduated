@@ -96,9 +96,13 @@ var _ = t.Describe("Container", func() {
 
 			currentTime := time.Now()
 			volumes := []oci.ContainerVolume{}
-			imageID, err := storage.ParseStorageImageIDFromOutOfProcessData("8a788232037eaf17794408ff3df6b922a1aedf9ef8de36afdae3ed0b0381907b")
+			imageID, err := storage.ParseStorageImageIDFromOutOfProcessData(
+				"8a788232037eaf17794408ff3df6b922a1aedf9ef8de36afdae3ed0b0381907b",
+			)
 			Expect(err).ToNot(HaveOccurred())
-			someNameOfThisImage, err := references.ParseRegistryImageReferenceFromOutOfProcessData("example.com/repo/image:tag")
+			someNameOfThisImage, err := references.ParseRegistryImageReferenceFromOutOfProcessData(
+				"example.com/repo/image:tag",
+			)
 			Expect(err).ToNot(HaveOccurred())
 
 			imageResult := storage.ImageResult{
@@ -129,7 +133,12 @@ var _ = t.Describe("Container", func() {
 			sbox.SetPodLinuxOverhead(nil)
 			sbox.SetPodLinuxResources(nil)
 			sbox.SetCreatedAt(time.Now())
-			err = sbox.SetCRISandbox(sbox.ID(), make(map[string]string), make(map[string]string), &types.PodSandboxMetadata{})
+			err = sbox.SetCRISandbox(
+				sbox.ID(),
+				make(map[string]string),
+				make(map[string]string),
+				&types.PodSandboxMetadata{},
+			)
 			Expect(err).ToNot(HaveOccurred())
 			sbox.SetPortMappings([]*hostport.PortMapping{})
 			sbox.SetHostNetwork(false)
@@ -160,30 +169,60 @@ var _ = t.Describe("Container", func() {
 			Expect(currentTime).ToNot(BeNil())
 			Expect(sb).ToNot(BeNil())
 
-			err = sut.SpecAddAnnotations(context.Background(), sb, volumes, mountPoint, configStopSignal, &imageResult, false, "foo", "")
+			err = sut.SpecAddAnnotations(
+				context.Background(),
+				sb,
+				volumes,
+				mountPoint,
+				configStopSignal,
+				&imageResult,
+				false,
+				"foo",
+				"",
+			)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(sut.Spec().Config.Annotations[annotations.UserRequestedImage]).To(Equal(image))
-			Expect(sut.Spec().Config.Annotations[annotations.SomeNameOfTheImage]).To(Equal(imageResult.SomeNameOfThisImage.StringForOutOfProcessConsumptionOnly()))
-			Expect(sut.Spec().Config.Annotations[annotations.ImageRef]).To(Equal(imageResult.ID.IDStringForOutOfProcessConsumptionOnly()))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.SomeNameOfTheImage],
+			).To(Equal(imageResult.SomeNameOfThisImage.StringForOutOfProcessConsumptionOnly()))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.ImageRef],
+			).To(Equal(imageResult.ID.IDStringForOutOfProcessConsumptionOnly()))
 			Expect(sut.Spec().Config.Annotations[annotations.Name]).To(Equal(sut.Name()))
 			Expect(sut.Spec().Config.Annotations[annotations.ContainerID]).To(Equal(sut.ID()))
 			Expect(sut.Spec().Config.Annotations[annotations.SandboxID]).To(Equal(sb.ID()))
 			Expect(sut.Spec().Config.Annotations[annotations.SandboxName]).To(Equal(sb.Name()))
-			Expect(sut.Spec().Config.Annotations[annotations.ContainerType]).To(Equal(annotations.ContainerTypeContainer))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.ContainerType],
+			).To(Equal(annotations.ContainerTypeContainer))
 			Expect(sut.Spec().Config.Annotations[annotations.LogPath]).To(Equal(logpath))
-			Expect(sut.Spec().Config.Annotations[annotations.TTY]).To(Equal(strconv.FormatBool(sut.Config().GetTty())))
-			Expect(sut.Spec().Config.Annotations[annotations.Stdin]).To(Equal(strconv.FormatBool(sut.Config().GetStdin())))
-			Expect(sut.Spec().Config.Annotations[annotations.StdinOnce]).To(Equal(strconv.FormatBool(sut.Config().GetStdinOnce())))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.TTY],
+			).To(Equal(strconv.FormatBool(sut.Config().GetTty())))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.Stdin],
+			).To(Equal(strconv.FormatBool(sut.Config().GetStdin())))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.StdinOnce],
+			).To(Equal(strconv.FormatBool(sut.Config().GetStdinOnce())))
 			Expect(sut.Spec().Config.Annotations[annotations.ResolvPath]).To(Equal(sb.ResolvPath()))
-			Expect(sut.Spec().Config.Annotations[annotations.ContainerManager]).To(Equal(constants.ContainerManagerCRIO))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.ContainerManager],
+			).To(Equal(constants.ContainerManagerCRIO))
 			Expect(sut.Spec().Config.Annotations[annotations.MountPoint]).To(Equal(mountPoint))
 			Expect(sut.Spec().Config.Annotations[annotations.SeccompProfilePath]).To(Equal("foo"))
 			Expect(sut.Spec().Config.Annotations[annotations.Created]).ToNot(BeNil())
-			Expect(sut.Spec().Config.Annotations[annotations.Metadata]).To(Equal(string(metadataJSON)))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.Metadata],
+			).To(Equal(string(metadataJSON)))
 			Expect(sut.Spec().Config.Annotations[annotations.Labels]).To(Equal(string(labelsJSON)))
-			Expect(sut.Spec().Config.Annotations[annotations.Volumes]).To(Equal(string(volumesJSON)))
-			Expect(sut.Spec().Config.Annotations[annotations.Annotations]).To(Equal(string(kubeAnnotationsJSON)))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.Volumes],
+			).To(Equal(string(volumesJSON)))
+			Expect(
+				sut.Spec().Config.Annotations[annotations.Annotations],
+			).To(Equal(string(kubeAnnotationsJSON)))
 		})
 	})
 	t.Describe("FipsDisable", func() {
@@ -456,7 +495,9 @@ var _ = t.Describe("Container", func() {
 
 			// Then
 			Expect(sut.SpecSetProcessArgs(nil)).To(Succeed())
-			Expect(sut.Spec().Config.Process.Args).To(Equal(append(config.Command, config.GetArgs()...)))
+			Expect(
+				sut.Spec().Config.Process.Args,
+			).To(Equal(append(config.Command, config.GetArgs()...)))
 		})
 		It("should inherit entrypoint from image", func() {
 			// Given
@@ -473,7 +514,9 @@ var _ = t.Describe("Container", func() {
 
 			// Then
 			Expect(sut.SpecSetProcessArgs(img)).To(Succeed())
-			Expect(sut.Spec().Config.Process.Args).To(Equal(append(img.Config.Entrypoint, config.GetArgs()...)))
+			Expect(
+				sut.Spec().Config.Process.Args,
+			).To(Equal(append(img.Config.Entrypoint, config.GetArgs()...)))
 		})
 		It("should always use Command if specified", func() {
 			// Given
@@ -525,7 +568,9 @@ var _ = t.Describe("Container", func() {
 
 			// Then
 			Expect(sut.SpecSetProcessArgs(img)).To(Succeed())
-			Expect(sut.Spec().Config.Process.Args).To(Equal(append(img.Config.Entrypoint, img.Config.Cmd...)))
+			Expect(
+				sut.Spec().Config.Process.Args,
+			).To(Equal(append(img.Config.Entrypoint, img.Config.Cmd...)))
 		})
 	})
 	t.Describe("WillRunSystemd", func() {
@@ -687,9 +732,15 @@ var _ = t.Describe("Container", func() {
 			Expect(sut.SpecSetPrivileges(context.Background(), sc, cfg)).To(Succeed())
 
 			// Then
-			Expect(sut.Spec().Config.Process.Capabilities.Bounding).To(HaveLen(len(cfg.DefaultCapabilities) + 1))
-			Expect(sut.Spec().Config.Process.Capabilities.Effective).To(HaveLen(len(cfg.DefaultCapabilities) + 1))
-			Expect(sut.Spec().Config.Process.Capabilities.Permitted).To(HaveLen(len(cfg.DefaultCapabilities) + 1))
+			Expect(
+				sut.Spec().Config.Process.Capabilities.Bounding,
+			).To(HaveLen(len(cfg.DefaultCapabilities) + 1))
+			Expect(
+				sut.Spec().Config.Process.Capabilities.Effective,
+			).To(HaveLen(len(cfg.DefaultCapabilities) + 1))
+			Expect(
+				sut.Spec().Config.Process.Capabilities.Permitted,
+			).To(HaveLen(len(cfg.DefaultCapabilities) + 1))
 			Expect(sut.Spec().Config.Process.Capabilities.Inheritable).To(BeEmpty())
 			Expect(sut.Spec().Config.Process.Capabilities.Ambient).To(BeEmpty())
 		})
@@ -782,10 +833,16 @@ var _ = t.Describe("Container", func() {
 			Expect(sut.SpecSetLinuxContainerResources(resources, 0)).To(Succeed())
 
 			// Then
-			Expect(*sut.Spec().Config.Linux.Resources.CPU.Period).To(Equal(uint64(resources.GetCpuPeriod())))
+			Expect(
+				*sut.Spec().Config.Linux.Resources.CPU.Period,
+			).To(Equal(uint64(resources.GetCpuPeriod())))
 			Expect(*sut.Spec().Config.Linux.Resources.CPU.Quota).To(Equal(resources.GetCpuQuota()))
-			Expect(*sut.Spec().Config.Linux.Resources.CPU.Shares).To(Equal(uint64(resources.GetCpuShares())))
-			Expect(*sut.Spec().Config.Process.OOMScoreAdj).To(Equal(int(resources.GetOomScoreAdj())))
+			Expect(
+				*sut.Spec().Config.Linux.Resources.CPU.Shares,
+			).To(Equal(uint64(resources.GetCpuShares())))
+			Expect(
+				*sut.Spec().Config.Process.OOMScoreAdj,
+			).To(Equal(int(resources.GetOomScoreAdj())))
 			Expect(sut.Spec().Config.Linux.Resources.CPU.Cpus).To(Equal(resources.GetCpusetCpus()))
 			Expect(sut.Spec().Config.Linux.Resources.CPU.Mems).To(Equal(resources.GetCpusetMems()))
 		})
@@ -828,8 +885,12 @@ var _ = t.Describe("Container", func() {
 			Expect(sut.SpecSetLinuxContainerResources(resources, 2048)).To(Succeed())
 
 			// Then
-			Expect(*sut.Spec().Config.Linux.Resources.Memory.Limit).To(Equal(resources.GetMemoryLimitInBytes()))
-			Expect(*sut.Spec().Config.Linux.Resources.Memory.Swap).To(Equal(resources.GetMemoryLimitInBytes()))
+			Expect(
+				*sut.Spec().Config.Linux.Resources.Memory.Limit,
+			).To(Equal(resources.GetMemoryLimitInBytes()))
+			Expect(
+				*sut.Spec().Config.Linux.Resources.Memory.Swap,
+			).To(Equal(resources.GetMemoryLimitInBytes()))
 		})
 		It("Set memory limits appropriately when Limit and SwapLimit are set", func() {
 			if !node.CgroupHasMemorySwap() {
@@ -846,8 +907,12 @@ var _ = t.Describe("Container", func() {
 			Expect(sut.SpecSetLinuxContainerResources(resources, 0)).To(Succeed())
 
 			// Then
-			Expect(*sut.Spec().Config.Linux.Resources.Memory.Limit).To(Equal(resources.GetMemoryLimitInBytes()))
-			Expect(*sut.Spec().Config.Linux.Resources.Memory.Swap).To(Equal(resources.GetMemorySwapLimitInBytes()))
+			Expect(
+				*sut.Spec().Config.Linux.Resources.Memory.Limit,
+			).To(Equal(resources.GetMemoryLimitInBytes()))
+			Expect(
+				*sut.Spec().Config.Linux.Resources.Memory.Swap,
+			).To(Equal(resources.GetMemorySwapLimitInBytes()))
 		})
 		It("Set hugepage limits", func() {
 			// Given
@@ -886,7 +951,9 @@ var _ = t.Describe("Container", func() {
 			Expect(sut.SpecSetLinuxContainerResources(resources, 2048)).To(Succeed())
 
 			// Then
-			Expect(sut.Spec().Config.Linux.Resources.Unified).To(HaveLen(len(resources.GetUnified())))
+			Expect(
+				sut.Spec().Config.Linux.Resources.Unified,
+			).To(HaveLen(len(resources.GetUnified())))
 		})
 	})
 })

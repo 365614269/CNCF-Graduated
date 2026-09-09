@@ -27,7 +27,4 @@ coverage:
         if_ci_failed: error
     changes: false
 
-comment:
-  layout: "header, diff"
-  behavior: default
-  require_changes: false
+comment: false

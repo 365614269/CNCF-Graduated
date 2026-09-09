@@ -99,7 +99,9 @@ var _ = t.Describe("ContainerEvents", func() {
 
 	t.Describe("ContainerEvents", func() {
 		It("should send events to single client", func() {
-			cesMock := containereventservermock.NewMockRuntimeService_GetContainerEventsServer[string](mockCtrl)
+			cesMock := containereventservermock.NewMockRuntimeService_GetContainerEventsServer[string](
+				mockCtrl,
+			)
 
 			var sent sync.WaitGroup
 
@@ -135,8 +137,12 @@ var _ = t.Describe("ContainerEvents", func() {
 
 		It("should send events all events to both clients", func() {
 			clients := []*containereventservermock.MockRuntimeService_GetContainerEventsServer[string]{
-				containereventservermock.NewMockRuntimeService_GetContainerEventsServer[string](mockCtrl),
-				containereventservermock.NewMockRuntimeService_GetContainerEventsServer[string](mockCtrl),
+				containereventservermock.NewMockRuntimeService_GetContainerEventsServer[string](
+					mockCtrl,
+				),
+				containereventservermock.NewMockRuntimeService_GetContainerEventsServer[string](
+					mockCtrl,
+				),
 			}
 
 			var (

@@ -1283,7 +1283,9 @@ func (c *Config) Validate(onExecution bool) error {
 	// [crio.checkpoint_restore] table. Translate the deprecated option into the
 	// new one when it is used to disable checkpoint/restore support.
 	if !c.EnableCriuSupport {
-		logrus.Warnf("The config field enable_criu_support is deprecated. Please use the [crio.checkpoint_restore] table with container_level_enabled instead")
+		logrus.Warnf(
+			"The config field enable_criu_support is deprecated. Please use the [crio.checkpoint_restore] table with container_level_enabled instead",
+		)
 
 		c.ContainerLevelEnabled = ContainerCheckpointRestoreLevelNone
 	}
@@ -1366,7 +1368,9 @@ func (c *APIConfig) Validate(onExecution bool) error {
 
 	// Only TLS 1.2 and TLS 1.3 are supported
 	if tlsVersion != tls.VersionTLS12 && tlsVersion != tls.VersionTLS13 {
-		return errors.New("tls_min_version must be VersionTLS12 or VersionTLS13, got unsupported version")
+		return errors.New(
+			"tls_min_version must be VersionTLS12 or VersionTLS13, got unsupported version",
+		)
 	}
 
 	c.tlsMinVersionParsed = tlsVersion
@@ -1381,7 +1385,9 @@ func (c *APIConfig) Validate(onExecution bool) error {
 
 		c.tlsCipherSuitesParsed = cipherSuites
 	} else if tlsVersion == tls.VersionTLS13 && len(c.TLSCipherSuites) > 0 {
-		logrus.Warn("tls_cipher_suites configuration is ignored when tls_min_version is VersionTLS13 (Go manages TLS 1.3 cipher suites automatically)")
+		logrus.Warn(
+			"tls_cipher_suites configuration is ignored when tls_min_version is VersionTLS13 (Go manages TLS 1.3 cipher suites automatically)",
+		)
 	}
 
 	if onExecution {
@@ -1548,7 +1554,10 @@ func (c *RuntimeConfig) Validate(systemContext *types.SystemContext, onExecution
 		for _, hooksDir := range c.HooksDir {
 			if err := utils.IsDirectory(hooksDir); err != nil {
 				if !os.IsNotExist(err) {
-					logrus.Warnf("Skipping invalid hooks directory: %s exists but is not a directory", hooksDir)
+					logrus.Warnf(
+						"Skipping invalid hooks directory: %s exists but is not a directory",
+						hooksDir,
+					)
 
 					continue
 				}
@@ -1592,7 +1601,9 @@ func (c *RuntimeConfig) Validate(systemContext *types.SystemContext, onExecution
 			}
 
 			// Fallback to the internal default in order not to break upgrade paths.
-			logrus.Info("Seccomp profile does not exist on disk, fallback to internal default profile")
+			logrus.Info(
+				"Seccomp profile does not exist on disk, fallback to internal default profile",
+			)
 
 			if err := c.seccompConfig.LoadDefaultProfile(); err != nil {
 				return fmt.Errorf("unable to load default seccomp profile: %w", err)
@@ -1630,11 +1641,18 @@ func (c *RuntimeConfig) ValidateDefaultRuntime() error {
 
 	// If a non-empty runtime does not exist in the runtime entry table, this is an error.
 	if c.DefaultRuntime != "" {
-		return fmt.Errorf("default_runtime set to %q, but no runtime entry table [crio.runtime.runtimes.%s] was found", c.DefaultRuntime, c.DefaultRuntime)
+		return fmt.Errorf(
+			"default_runtime set to %q, but no runtime entry table [crio.runtime.runtimes.%s] was found",
+			c.DefaultRuntime,
+			c.DefaultRuntime,
+		)
 	}
 
 	// Set the default runtime to "crun" if default_runtime is not set
-	logrus.Debugf("Defaulting to %q as the runtime since default_runtime is not set", DefaultRuntime)
+	logrus.Debugf(
+		"Defaulting to %q as the runtime since default_runtime is not set",
+		DefaultRuntime,
+	)
 	// The default config sets crun and its path in the runtimes map, so check for that
 	// first. If it does not exist then we add runc + its path to the runtimes map.
 	if _, ok := c.Runtimes[DefaultRuntime]; !ok {
@@ -1741,7 +1759,12 @@ func (c *RuntimeConfig) initializeRuntimeFeatures() {
 		// not supported by the runtime.
 		output, err := cmdrunner.CombinedOutput(handler.RuntimePath, "features")
 		if err != nil {
-			logrus.Errorf("Getting %s OCI runtime features failed: %s: %v", handler.RuntimePath, output, err)
+			logrus.Errorf(
+				"Getting %s OCI runtime features failed: %s: %v",
+				handler.RuntimePath,
+				output,
+				err,
+			)
 
 			continue
 		}
@@ -1768,7 +1791,11 @@ func (c *RuntimeConfig) initializeRuntimeFeatures() {
 			// A given runtime might support Recursive Read-only (RRO) mounts,
 			// but the current kernel might not.
 			if err := checkKernelRROMountSupport(); err != nil {
-				logrus.Warnf("Runtime handler %q supports Recursive Read-only (RRO) mounts, but kernel does not: %v", name, err)
+				logrus.Warnf(
+					"Runtime handler %q supports Recursive Read-only (RRO) mounts, but kernel does not: %v",
+					name,
+					err,
+				)
 
 				rro = false
 			}
@@ -1782,7 +1809,11 @@ func (c *RuntimeConfig) TranslateMonitorFields(onExecution bool) error {
 	for name, handler := range c.Runtimes {
 		if handler.RuntimeType == DefaultRuntimeType || handler.RuntimeType == "" {
 			if err := c.TranslateMonitorFieldsForHandler(handler, onExecution); err != nil {
-				return fmt.Errorf("failed to translate monitor fields for runtime %s: %w", name, err)
+				return fmt.Errorf(
+					"failed to translate monitor fields for runtime %s: %w",
+					name,
+					err,
+				)
 			}
 		}
 	}
@@ -1792,7 +1823,10 @@ func (c *RuntimeConfig) TranslateMonitorFields(onExecution bool) error {
 
 // TranslateMonitorFields is a transitional function that takes the configuration fields
 // previously held by the RuntimeConfig that are being moved inside of the runtime handler structure.
-func (c *RuntimeConfig) TranslateMonitorFieldsForHandler(handler *RuntimeHandler, onExecution bool) error {
+func (c *RuntimeConfig) TranslateMonitorFieldsForHandler(
+	handler *RuntimeHandler,
+	onExecution bool,
+) error {
 	if c.ConmonCgroup != "" {
 		logrus.Debugf("Monitor cgroup %s is becoming %s", handler.MonitorCgroup, c.ConmonCgroup)
 		handler.MonitorCgroup = c.ConmonCgroup
@@ -1825,13 +1859,17 @@ func (c *RuntimeConfig) TranslateMonitorFieldsForHandler(handler *RuntimeHandler
 			}
 
 			if handler.MonitorCgroup != utils.PodCgroupName && handler.MonitorCgroup != "" {
-				return fmt.Errorf("cgroupfs manager conmon cgroup should be 'pod' or empty, but got: '%s'", handler.MonitorCgroup)
+				return fmt.Errorf(
+					"cgroupfs manager conmon cgroup should be 'pod' or empty, but got: '%s'",
+					handler.MonitorCgroup,
+				)
 			}
 
 			return nil
 		}
 
-		if handler.MonitorCgroup != utils.PodCgroupName && !strings.HasSuffix(handler.MonitorCgroup, ".slice") {
+		if handler.MonitorCgroup != utils.PodCgroupName &&
+			!strings.HasSuffix(handler.MonitorCgroup, ".slice") {
 			return errors.New("conmon cgroup should be 'pod' or a systemd slice")
 		}
 	}
@@ -1995,7 +2033,10 @@ func (c *ImageConfig) ParsePauseImage() (references.RegistryImageReference, erro
 // `nil`.
 func (c *NetworkConfig) Validate(onExecution bool) error {
 	if c.CNIStatusGracePeriod < 0 {
-		return fmt.Errorf("invalid cni_status_grace_period: must not be negative, got %v", c.CNIStatusGracePeriod)
+		return fmt.Errorf(
+			"invalid cni_status_grace_period: must not be negative, got %v",
+			c.CNIStatusGracePeriod,
+		)
 	}
 
 	if onExecution {
@@ -2017,7 +2058,9 @@ func (c *NetworkConfig) Validate(onExecution bool) error {
 		}
 		// While the plugin_dir option is being deprecated, we need this check
 		if c.PluginDir != "" {
-			logrus.Warnf("The config field plugin_dir is being deprecated. Please use plugin_dirs instead")
+			logrus.Warnf(
+				"The config field plugin_dir is being deprecated. Please use plugin_dirs instead",
+			)
 
 			if err := os.MkdirAll(c.PluginDir, 0o755); err != nil {
 				return fmt.Errorf("invalid plugin_dir entry: %w", err)
@@ -2064,7 +2107,11 @@ func (r *RuntimeHandler) Validate(name string) error {
 	}
 
 	if err := r.ValidateContainerMinMemory(name); err != nil {
-		logrus.Errorf("Unable to set minimum container memory for runtime handler %q: %v", name, err)
+		logrus.Errorf(
+			"Unable to set minimum container memory for runtime handler %q: %v",
+			name,
+			err,
+		)
 	}
 
 	r.ValidateContainerCreateTimeout(name)
@@ -2121,8 +2168,10 @@ func (r *RuntimeHandler) ValidateRuntimePath(name string) error {
 
 	ok := r.ValidateRuntimeVMBinaryPattern()
 	if !ok {
-		return fmt.Errorf("invalid runtime_path for runtime '%s': containerd binary naming pattern is not followed",
-			name)
+		return fmt.Errorf(
+			"invalid runtime_path for runtime '%s': containerd binary naming pattern is not followed",
+			name,
+		)
 	}
 
 	logrus.Debugf(
@@ -2134,7 +2183,9 @@ func (r *RuntimeHandler) ValidateRuntimePath(name string) error {
 
 // ValidateRuntimeType checks if the `RuntimeType` is valid.
 func (r *RuntimeHandler) ValidateRuntimeType(name string) error {
-	if r.RuntimeType != "" && r.RuntimeType != DefaultRuntimeType && r.RuntimeType != RuntimeTypeVM && r.RuntimeType != RuntimeTypePod {
+	if r.RuntimeType != "" && r.RuntimeType != DefaultRuntimeType &&
+		r.RuntimeType != RuntimeTypeVM &&
+		r.RuntimeType != RuntimeTypePod {
 		return fmt.Errorf("invalid `runtime_type` %q for runtime %q",
 			r.RuntimeType, name)
 	}
@@ -2187,7 +2238,10 @@ func (r *RuntimeHandler) ValidateNoSyncLog() error {
 		return nil
 	}
 
-	return fmt.Errorf("no_sync_log is only allowed with runtime type 'oci', runtime type is '%s'", r.RuntimeType)
+	return fmt.Errorf(
+		"no_sync_log is only allowed with runtime type 'oci', runtime type is '%s'",
+		r.RuntimeType,
+	)
 }
 
 // ValidateContainerMinMemory sets the minimum container memory for a given runtime.
@@ -2199,7 +2253,12 @@ func (r *RuntimeHandler) ValidateContainerMinMemory(name string) error {
 
 	memorySize, err := units.RAMInBytes(r.ContainerMinMemory)
 	if err != nil {
-		err = fmt.Errorf("unable to set runtime memory to %q: %w. Setting to %d instead", r.ContainerMinMemory, err, defaultContainerMinMemory)
+		err = fmt.Errorf(
+			"unable to set runtime memory to %q: %w. Setting to %d instead",
+			r.ContainerMinMemory,
+			err,
+			defaultContainerMinMemory,
+		)
 		// Fallback to default value if something is wrong with the configured value.
 		r.ContainerMinMemory = units.BytesSize(defaultContainerMinMemory)
 
@@ -2216,12 +2275,26 @@ func (r *RuntimeHandler) ValidateContainerCreateTimeout(name string) {
 	switch {
 	case r.ContainerCreateTimeout == 0:
 		r.ContainerCreateTimeout = defaultContainerCreateTimeout
-		logrus.Infof("Runtime handler %q container create timeout not set, using default: %d seconds", name, r.ContainerCreateTimeout)
+		logrus.Infof(
+			"Runtime handler %q container create timeout not set, using default: %d seconds",
+			name,
+			r.ContainerCreateTimeout,
+		)
 	case r.ContainerCreateTimeout < minimumContainerCreateTimeout:
-		logrus.Warnf("Runtime handler %q container create timeout (%d seconds) is less than minimum (%d seconds), setting to minimum: %d seconds", name, r.ContainerCreateTimeout, minimumContainerCreateTimeout, minimumContainerCreateTimeout)
+		logrus.Warnf(
+			"Runtime handler %q container create timeout (%d seconds) is less than minimum (%d seconds), setting to minimum: %d seconds",
+			name,
+			r.ContainerCreateTimeout,
+			minimumContainerCreateTimeout,
+			minimumContainerCreateTimeout,
+		)
 		r.ContainerCreateTimeout = minimumContainerCreateTimeout
 	default:
-		logrus.Infof("Runtime handler %q container create timeout set to: %d seconds", name, r.ContainerCreateTimeout)
+		logrus.Infof(
+			"Runtime handler %q container create timeout set to: %d seconds",
+			name,
+			r.ContainerCreateTimeout,
+		)
 	}
 }
 
@@ -2229,7 +2302,11 @@ func (r *RuntimeHandler) ValidateContainerCreateTimeout(name string) {
 func (r *RuntimeHandler) ValidateWebsocketStreaming(name string) error {
 	if r.RuntimeType != RuntimeTypePod {
 		if r.StreamWebsockets {
-			return fmt.Errorf(`only the 'runtime_type = "pod"' supports websocket streaming, not %q (runtime %q)`, r.RuntimeType, name)
+			return fmt.Errorf(
+				`only the 'runtime_type = "pod"' supports websocket streaming, not %q (runtime %q)`,
+				r.RuntimeType,
+				name,
+			)
 		}
 
 		return nil
@@ -2260,7 +2337,14 @@ func (r *RuntimeHandler) ValidateWebsocketStreaming(name string) error {
 
 	logrus.Infof(
 		"Runtime handler %q is using conmon-rs version: %s, tag: %s, commit: %s, build: %s, target: %s, %s, %s",
-		name, v.Version, v.Tag, v.Commit, v.BuildDate, v.Target, v.RustVersion, v.CargoVersion,
+		name,
+		v.Version,
+		v.Tag,
+		v.Commit,
+		v.BuildDate,
+		v.Target,
+		v.RustVersion,
+		v.CargoVersion,
 	)
 
 	return nil
@@ -2292,7 +2376,8 @@ func (r *RuntimeHandler) LoadRuntimeFeatures(input []byte) error {
 // RuntimeSupportsIDMap returns whether this runtime supports the "runtime features"
 // command, and that the output of that command advertises IDMap mounts as an option.
 func (r *RuntimeHandler) RuntimeSupportsIDMap() bool {
-	if r.features.Linux == nil || r.features.Linux.MountExtensions == nil || r.features.Linux.MountExtensions.IDMap == nil {
+	if r.features.Linux == nil || r.features.Linux.MountExtensions == nil ||
+		r.features.Linux.MountExtensions.IDMap == nil {
 		return false
 	}
 
@@ -2354,7 +2439,9 @@ func (r *RuntimeHandler) validateRuntimeSeccompProfile() error {
 	return nil
 }
 
-func validateAllowedAndGenerateDisallowedAnnotations(allowed []string) (disallowed []string, _ error) {
+func validateAllowedAndGenerateDisallowedAnnotations(
+	allowed []string,
+) (disallowed []string, _ error) {
 	disallowedMap := make(map[string]bool)
 	for _, ann := range v2.AllAllowedAnnotations {
 		disallowedMap[ann] = false
@@ -2425,7 +2512,11 @@ func (c *StatsConfig) Validate() error {
 		}
 
 		if !slices.Contains(AvailableMetrics, metrics) {
-			return fmt.Errorf("invalid pod metrics %q, available metrics: %v", metrics, AvailableMetrics)
+			return fmt.Errorf(
+				"invalid pod metrics %q, available metrics: %v",
+				metrics,
+				AvailableMetrics,
+			)
 		}
 	}
 
@@ -2466,7 +2557,10 @@ func validateStorePath(p string) error {
 	}
 
 	if !storePathRegexp.MatchString(p) {
-		return fmt.Errorf("path %q must be absolute, non-root, and contain only alphanumeric characters, '/', '.', '_', and '-'", p)
+		return fmt.Errorf(
+			"path %q must be absolute, non-root, and contain only alphanumeric characters, '/', '.', '_', and '-'",
+			p,
+		)
 	}
 
 	if strings.HasSuffix(p, "/") {

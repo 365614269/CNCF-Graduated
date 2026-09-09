@@ -33,7 +33,9 @@ func generateContainerMemoryMetrics(ctr *oci.Container, mem *cgroups.MemoryStats
 		{
 			desc: containerMemoryKernelUsage,
 			valueFunc: func() metricValues {
-				return metricValues{{value: mem.KernelUsage.Usage, metricType: types.MetricType_GAUGE}}
+				return metricValues{
+					{value: mem.KernelUsage.Usage, metricType: types.MetricType_GAUGE},
+				}
 			},
 		},
 		{
@@ -51,7 +53,9 @@ func generateContainerMemoryMetrics(ctr *oci.Container, mem *cgroups.MemoryStats
 		{
 			desc: containerMemoryFailcnt,
 			valueFunc: func() metricValues {
-				return metricValues{{value: mem.Usage.Failcnt, metricType: types.MetricType_COUNTER}}
+				return metricValues{
+					{value: mem.Usage.Failcnt, metricType: types.MetricType_COUNTER},
+				}
 			},
 		},
 		{
@@ -120,7 +124,9 @@ func generateContainerMemoryMetrics(ctr *oci.Container, mem *cgroups.MemoryStats
 // generateContainerMemoryExtraMetrics reports the memory metrics that have no
 // cAdvisor equivalent, so they can be enabled independently of the cAdvisor
 // compatible set in generateContainerMemoryMetrics.
-func generateContainerMemoryExtraMetrics(ctr *oci.Container, mem *cgroups.MemoryStats) []*types.Metric {
+func generateContainerMemoryExtraMetrics(
+	ctr *oci.Container, mem *cgroups.MemoryStats,
+) []*types.Metric {
 	if mem == nil {
 		return []*types.Metric{}
 	}
@@ -166,7 +172,9 @@ func generateContainerMemoryExtraMetrics(ctr *oci.Container, mem *cgroups.Memory
 }
 
 // computeMemoryMetricValues computes derived memory statistics for metrics.
-func computeMemoryMetricValues(memStats *cgroups.MemoryStats) (workingSetBytes, rssBytes, pageFaults, majorPageFaults, availableBytes uint64) {
+func computeMemoryMetricValues(
+	memStats *cgroups.MemoryStats,
+) (workingSetBytes, rssBytes, pageFaults, majorPageFaults, availableBytes uint64) {
 	var inactiveFileName string
 
 	usageBytes := memStats.Usage.Usage
@@ -223,7 +231,9 @@ func computeFileMapped(memStats *cgroups.MemoryStats) uint64 {
 // Both cgroup versions report these, but v1 prefixes the hierarchical totals
 // with "total_". The cgroup version is passed in so both branches are
 // exercisable regardless of the host.
-func computeAnonMemory(memStats *cgroups.MemoryStats, isCgroupV2 bool) (activeAnon, inactiveAnon uint64) {
+func computeAnonMemory(
+	memStats *cgroups.MemoryStats, isCgroupV2 bool,
+) (activeAnon, inactiveAnon uint64) {
 	if isCgroupV2 {
 		return memStats.Stats["active_anon"], memStats.Stats["inactive_anon"]
 	}
@@ -236,7 +246,9 @@ func computeAnonMemory(memStats *cgroups.MemoryStats, isCgroupV2 bool) (activeAn
 // only exist under cgroup v2; cgroup v1 has no equivalent, so all three are
 // reported as zero there. The cgroup version is passed in so both branches are
 // exercisable regardless of the host.
-func computeTransparentHugepages(memStats *cgroups.MemoryStats, isCgroupV2 bool) (anonTHP, shmemTHP, fileTHP uint64) {
+func computeTransparentHugepages(
+	memStats *cgroups.MemoryStats, isCgroupV2 bool,
+) (anonTHP, shmemTHP, fileTHP uint64) {
 	if !isCgroupV2 {
 		return 0, 0, 0
 	}
