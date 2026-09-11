@@ -9,6 +9,10 @@ Mahad Zaryab mahadzaryab1
 # Other names (sometimes from github links)
 robbert
 
+## LFX Mentorship September-November 2026 (Term 3)
+Roshan Singh lopster568
+Shashank Singh sksingh2005
+
 ## LFX Mentorship June-August 2026 (Term 2)
 Soumya Raikwar
 Swetalin Rout
