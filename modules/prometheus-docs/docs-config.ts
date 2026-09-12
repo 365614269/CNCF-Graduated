@@ -57,7 +57,7 @@ export default {
 
   // Long-term support versions configuration.
   ltsVersions: {
-    prometheus: ["3.5", "3.13"],
+    prometheus: ["3.13"],
   },
 
   // Repositories for the downloads page. The order in this file is the
