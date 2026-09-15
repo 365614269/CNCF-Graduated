@@ -83,7 +83,7 @@ require (
 	golang.org/x/sync v0.22.0
 	golang.org/x/time v0.15.0
 	google.golang.org/api v0.288.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20260908043556-f8649ddbbfe6
+	google.golang.org/genproto/googleapis/api v0.0.0-20260911204522-f61a6ca850bd
 	google.golang.org/grpc v1.83.2
 	k8s.io/api v0.35.4
 	k8s.io/apiextensions-apiserver v0.35.4
@@ -363,7 +363,7 @@ require (
 	k8s.io/component-helpers v0.35.4 // indirect
 	k8s.io/metrics v0.35.4 // indirect
 	moul.io/http2curl/v2 v2.3.0 // indirect
-	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730
+	sigs.k8s.io/json v0.0.0-20260909141634-11ed52e25bc5
 	sigs.k8s.io/kustomize/api v0.20.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.20.1 // indirect
 )
