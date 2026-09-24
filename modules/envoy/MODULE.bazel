@@ -55,7 +55,7 @@ bazel_dep(name = "libevent", version = "2.2.2-alpha.envoy")
 bazel_dep(name = "libbpf", version = "1.7.0.envoy")
 bazel_dep(name = "libsxg", version = "0.0.0-210708-beaa393.envoy")
 bazel_dep(name = "liburing", version = "2.15.envoy")
-bazel_dep(name = "toolchains_llvm", version = "1.9.0.envoy")
+bazel_dep(name = "toolchains_llvm", version = "1.9.1.envoy")
 bazel_dep(name = "lz4", version = "1.10.0.bcr.2.envoy")
 bazel_dep(name = "luajit", version = "0.0.0-260126-871db2c.envoy")
 bazel_dep(name = "msgpack-cxx", version = "7.0.0.envoy")
@@ -80,10 +80,10 @@ bazel_dep(name = "proxy-wasm-rust-sdk", version = "0.2.4-251205-5283e57.envoy")
 bazel_dep(name = "qat-zstd", version = "1.0.0.envoy")
 bazel_dep(name = "qatlib", version = "26.02.0.envoy")
 bazel_dep(name = "qatzip", version = "1.3.2.envoy")
-bazel_dep(name = "quiche", version = "0.0.0-260831-5c9cc6b.envoy")
+bazel_dep(name = "quiche", version = "0.0.0-260922-7f07dc4.envoy")
 bazel_dep(name = "ragel", version = "7.0.4-211228-d4577c9.envoy")
 bazel_dep(name = "re2", version = "2025-11-05.bcr.1")
-bazel_dep(name = "rules_apple", version = "3.20.1.envoy")
+bazel_dep(name = "rules_apple", version = "5.1.0")
 bazel_dep(name = "rules_buf", version = "0.5.4")
 bazel_dep(name = "rules_cc", version = "0.2.25")
 bazel_dep(name = "rules_foreign_cc", version = "0.16.0")
@@ -97,7 +97,7 @@ bazel_dep(name = "rules_proto_grpc_cpp", version = "5.8.0")
 bazel_dep(name = "rules_python", version = "2.2.0")
 bazel_dep(name = "rules_rust", version = "0.69.0.envoy")
 bazel_dep(name = "rules_shell", version = "0.8.0")
-bazel_dep(name = "rules_swift", version = "2.5.0.envoy")
+bazel_dep(name = "rules_swift", version = "4.0.1")
 bazel_dep(name = "spdlog", version = "1.17.0")
 bazel_dep(name = "sq", version = "1.4.0.envoy")
 bazel_dep(name = "sql-parser", version = "0.0.0-260715-52e5ad1.envoy")
@@ -140,11 +140,6 @@ bazel_dep(name = "rules_shellcheck", version = "0.6.4", dev_dependency = True, r
 local_path_override(
     module_name = "envoy_api",
     path = "api",
-)
-
-single_version_override(
-    module_name = "rules_apple",
-    version = "3.20.1.envoy",
 )
 
 single_version_override(
@@ -210,11 +205,6 @@ llvm.toolchain(
     name = "llvm_toolchain",
     cxx_standard = {"": "c++20"},
     exec_os = "linux",
-    extra_llvm_distributions = {
-        "LLVM-22.1.8-Linux-ARM64.tar.xz": "805efad2bb91cb4967fa569e0881d10c0f69c04461cf671cccbae19f547acc34",
-        "LLVM-22.1.8-Linux-X64.tar.xz": "df0e1ecf16caf3489a272a5eea4eec9b0d82878f6477fa309504f918a0006384",
-        "LLVM-22.1.8-macOS-ARM64.tar.xz": "f260f4f7c0d430828a81ae8a3826a1d63fc0963ec2459489308cc23b1f7eab4f",
-    },
     llvm_version = "22.1.8",
 )
 llvm.toolchain_root(

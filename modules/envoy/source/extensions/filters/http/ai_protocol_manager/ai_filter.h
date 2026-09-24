@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
@@ -132,7 +133,9 @@ struct AiFilterContext {
   StreamInfo::StreamInfo& stream_info;
   const Http::RequestHeaderMap& request_headers;
   // Route-declared request wire API; Unspecified when the route named none.
-  ApiProtocol request_protocol;
+  LLMProtocol request_protocol;
+  // Bytes of the buffered request payload, captured before replay drains it.
+  uint64_t request_payload_bytes{0};
 };
 
 // Creates one AiFilter per stream, or nullptr to skip the stream; built once at config load.
