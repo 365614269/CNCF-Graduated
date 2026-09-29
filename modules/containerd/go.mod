@@ -81,15 +81,15 @@ require (
 	golang.org/x/sys v0.48.0
 	golang.org/x/time v0.16.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260825221802-da73d73af1c5
-	google.golang.org/grpc v1.83.2
+	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
 	k8s.io/apimachinery v0.37.0
 	k8s.io/client-go v0.37.0
-	k8s.io/cri-api v0.37.0
+	k8s.io/cri-api v0.37.1
 	k8s.io/cri-client v0.37.0
 	k8s.io/cri-streaming v0.37.0
 	k8s.io/klog/v2 v2.140.0
-	k8s.io/streaming v0.37.0
+	k8s.io/streaming v0.37.1
 	tags.cncf.io/container-device-interface v1.1.1
 )
 
