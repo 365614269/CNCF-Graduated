@@ -18,7 +18,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sns v1.47.2
 	github.com/aws/smithy-go v1.28.2
 	github.com/banzaicloud/k8s-objectmatcher v1.8.0
-	github.com/ceph/ceph-csi-operator/api v0.0.0-20260701062509-bc21847a37a7
+	github.com/ceph/ceph-csi-operator/api v0.0.0-20261001132947-98eee8980fc6
 	github.com/ceph/ceph-csi/api v0.0.0-20241216133622-88b7e0d6684f
 	github.com/ceph/go-ceph v0.41.0
 	github.com/coreos/pkg v0.0.0-20240122114842-bbd7aa9bf6fb
@@ -53,7 +53,7 @@ require (
 	k8s.io/cloud-provider v0.37.1
 	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3
 	sigs.k8s.io/container-object-storage-interface/client v0.2.2
-	sigs.k8s.io/controller-runtime v0.25.1
+	sigs.k8s.io/controller-runtime v0.25.2
 	sigs.k8s.io/mcs-api v0.5.2
 	sigs.k8s.io/yaml v1.6.0
 )
