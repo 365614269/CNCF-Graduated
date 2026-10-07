@@ -2,6 +2,7 @@
 
 ## Breaking Changes
 
+- The NFS controller no longer automatically creates the `.nfs` pool. Users must create a CephBlockPool CR with `spec.name` set to `.nfs` before creating any CephNFS resources. See `deploy/examples/nfs.yaml` for a sample.
 - Helm OCI chart tags no longer include the `v` prefix (e.g., `1.21.0` instead of `v1.21.0`). Update any scripts or tooling that reference the chart by tag.
 - The OSD prepare job now fails, and is retried by Kubernetes, when a freshly prepared device is
   missing from the `ceph-volume raw list` output, instead of silently reporting fewer OSDs than
@@ -24,3 +25,4 @@
   reported in `status.info`. Removing either field stops Rook from managing it and leaves the last applied value in place
   on the RGW user, except that changing `defaultPlacement` without a `defaultStorageClass` resets the storage class to
   the new placement target's default.
+- Default CSI container images are no longer set by Rook. The `rook-csi-operator-image-set-configmap` configmap now ships with empty values, allowing the ceph-csi-operator to use its built-in defaults. Users with custom CSI images should ensure their overrides are present in the configmap after upgrade.
