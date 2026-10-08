@@ -12,7 +12,7 @@ It is included in Fluentd's core.
 <source>
   @type tail
   path /var/log/httpd-access.log
-  pos_file /var/log/td-agent/httpd-access.log.pos
+  pos_file /var/log/fluent/httpd-access.log.pos
   tag apache.access
   <parse>
     @type apache2
@@ -312,7 +312,7 @@ If you set `multiline_flush_interval 5s`, `in_tail` flushes buffered event after
 Fluentd will record the position it last read from this file:
 
 ```text
-pos_file /var/log/td-agent/tmp/access.log.pos
+pos_file /var/log/fluent/tmp/access.log.pos
 ```
 
 `pos_file` handles multiple positions in one file so no need to have multiple `pos_file` parameters per `source`.
@@ -335,7 +335,7 @@ The interval of doing compaction of pos file.
 The targets of compaction are unwatched, unparsable, and the duplicated line. You can use this value when `pos_file` option is set:
 
 ```text
-pos_file /var/log/td-agent/tmp/access.log.pos
+pos_file /var/log/fluent/tmp/access.log.pos
 pos_file_compaction_interval 72h
 ```
 
@@ -579,7 +579,7 @@ the default Nginx access file `/var/log/nginx/access.log` is mode `0640` and own
 this case, several options are available to allow read access:
 
 1. Add the `td-agent` user to the `adm` group, e.g. through `usermod -aG`, or
-2. Use the [`cap_dac_read_search` capability](../deployment/linux-capability.md#capability-handling-on-in_tail)
+2. Use the [`cap_dac_read_search` capability](../deployment/linux-capability.md#capability-handling-on-intail)
    to allow the invoking user to read the file without otherwise changing its permission bits or ownership.
 
 A bug exists in Fluentd 1.13.x where it may suppress warning logs about unreadable files. (See Fluentd PR [#3478](https://github.com/fluent/fluentd/pull/3478).)

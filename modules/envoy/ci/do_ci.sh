@@ -1105,18 +1105,11 @@ case $CI_TARGET in
         bazel build "${BAZEL_BUILD_OPTIONS[@]}" \
               "${BAZEL_RELEASE_OPTIONS[@]}" \
               --remote_download_outputs=toplevel \
-              //distribution/binary:release \
-              //distribution/binary:release_docker
+              //distribution/binary:release
         # Copy release binaries to binary export directory
         cp -a \
            "bazel-bin/distribution/binary/release.tar.zst" \
            "${ENVOY_BINARY_DIR}/release.tar.zst"
-        # Copy the docker-only release tarball (carries the vrp test certs, see
-        # distribution/binary/BUILD) to the binary export directory. This is
-        # only consumed by the `docker` CI target below, never by signing.
-        cp -a \
-           "bazel-bin/distribution/binary/release.docker.tar.zst" \
-           "${ENVOY_BINARY_DIR}/release.docker.tar.zst"
         # Grab the schema_validator_tool
         # TODO(phlax): bundle this with the release when #26390 is resolved
         bazel build "${BAZEL_BUILD_OPTIONS[@]}" "${BAZEL_RELEASE_OPTIONS[@]}" \
@@ -1236,6 +1229,8 @@ case $CI_TARGET in
                   --host_action_env="DEV_CONTAINER_ID=${DEV_CONTAINER_ID}" \
                   --action_env="CARGO_BAZEL_REPIN=true" \
                   --host_action_env="CARGO_BAZEL_REPIN=true" \
+                  --action_env="BUILDX_BAKE_ENTITLEMENTS_FS=0" \
+                  --host_action_env="BUILDX_BAKE_ENTITLEMENTS_FS=0" \
                   --sandbox_writable_path="${HOME}/.docker/" \
                   --sandbox_writable_path="$HOME" \
                   @envoy-examples//:verify_examples

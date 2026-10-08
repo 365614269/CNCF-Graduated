@@ -258,17 +258,19 @@ The plugins are required to be installed:
     time_format %d/%b/%Y:%H:%M:%S %z
   </parse>
   tag apache.access
-  pos_file /var/log/td-agent/apache_access.pos
+  pos_file /var/log/fluent/apache_access.pos
 </source>
 
 # Forward to monitoring server
 <match apache.access>
   @type forward
-  flush_interval 5s
   <server>
     name server_name
     host 10.100.1.20
   </server>
+  <buffer>
+    flush_interval 5s
+  </buffer>
 </match>
 ```
 
@@ -342,17 +344,19 @@ The plugins are required to be installed:
     time_format %d/%b/%Y:%H:%M:%S %z
   </parse>
   tag apache.access
-  pos_file /var/log/td-agent/apache_access.pos
+  pos_file /var/log/fluent/apache_access.pos
 </source>
 
 # Forward to monitoring server
 <match apache.access>
   @type forward
-  flush_interval 5s
   <server>
     name server_name
     host 10.100.1.20
   </server>
+  <buffer>
+    flush_interval 5s
+  </buffer>
 </match>
 ```
 
@@ -443,7 +447,7 @@ The plugins are required to be installed:
 # sample results: {"message":"HTTP Status warn [5xx_count] apache.access: 1.0 (threshold 1.0)"}
 <match alert.http_5xx_error>
   @type deparser
-  tag irc.http_5xx_error>
+  tag irc.http_5xx_error
   format_key_names level,target_key,target_tag,value,threshold
   format HTTP Status %s [%s] %s: %s (threshold %s)
   key_name message
