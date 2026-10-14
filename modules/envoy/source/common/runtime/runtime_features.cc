@@ -152,12 +152,14 @@ RUNTIME_GUARD(envoy_reloadable_features_proxy_protocol_allow_duplicate_tlvs);
 RUNTIME_GUARD(envoy_reloadable_features_proxy_protocol_remove_too_long_tlvs);
 // TODO(panting): Default to true after ssl fix.
 FALSE_RUNTIME_GUARD(envoy_reloadable_features_quic_enable_reset_ssl_after_handshake);
+RUNTIME_GUARD(envoy_reloadable_features_quic_hot_restart_time_wait_before_forward);
 RUNTIME_GUARD(envoy_reloadable_features_quic_mtls_resumption_disabled_by_default);
 RUNTIME_GUARD(envoy_reloadable_features_quic_mtls_server_enabled);
 // Ignore the automated "remove this flag" issue: we should keep this for 1 year. Confirm with
 // @danzh2010 or @RyanTheOptimist before removing.
 RUNTIME_GUARD(envoy_reloadable_features_quic_send_server_preferred_address_to_all_clients);
 RUNTIME_GUARD(envoy_reloadable_features_quic_support_additional_ecdsa_curves);
+RUNTIME_GUARD(envoy_reloadable_features_quic_upstream_auto_host_sni);
 RUNTIME_GUARD(envoy_reloadable_features_quic_upstream_client_certificates);
 RUNTIME_GUARD(envoy_reloadable_features_quic_upstream_reads_fixed_number_packets);
 RUNTIME_GUARD(envoy_reloadable_features_quic_validate_headers_only_content_length);
