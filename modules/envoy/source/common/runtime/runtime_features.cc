@@ -45,6 +45,12 @@ RUNTIME_GUARD(envoy_reloadable_features_conn_pool_fix_reentrancy);
 RUNTIME_GUARD(envoy_reloadable_features_conn_pool_grid_early_return_on_teardown);
 RUNTIME_GUARD(envoy_reloadable_features_connectivity_grid_prevent_double_h2_scheduled);
 RUNTIME_GUARD(envoy_reloadable_features_decouple_explicit_drain_pools_and_dns_refresh);
+// When enabled, which is the default, the dynamic forward proxy cluster replaces a host with a
+// new host instance when DNS resolution changes its address, publishing the change as a regular
+// priority set update (old host removed, new host added) so that connection pools to the stale
+// address are drained. Disable to restore the previous behavior of mutating the existing host's
+// address in place, which keeps already-established connections to the old address alive.
+RUNTIME_GUARD(envoy_reloadable_features_dfp_cluster_replace_host_on_address_change);
 RUNTIME_GUARD(envoy_reloadable_features_dfp_cluster_resolves_hosts);
 RUNTIME_GUARD(envoy_reloadable_features_direct_local_reply_flush_saved_response_metadata);
 RUNTIME_GUARD(envoy_reloadable_features_disallow_quic_client_udp_mmsg);
@@ -350,6 +356,13 @@ FALSE_RUNTIME_GUARD(envoy_reloadable_features_tls_certificate_compression_brotli
 // DnsFilter created resolver on the worker thread which could lead to race when sharing resolvers
 // Do not turn this on if DnsFilter is used or until the race is fixed
 FALSE_RUNTIME_GUARD(envoy_restart_features_shared_cares_dns_resolver);
+
+// When an on-demand cluster discovery asks for a cluster its config source has already answered
+// as missing, answer the request immediately from that remembered answer instead of starting
+// another discovery and waiting for the response or the discovery timeout.
+// TODO(wbpcode): flip to true after deployments have had a few releases to adopt the behavior
+// change.
+FALSE_RUNTIME_GUARD(envoy_reloadable_features_odcds_missing_cluster_cache);
 
 // Block of non-boolean flags. Use of int flags is deprecated. Do not add more.
 ABSL_FLAG(uint64_t, re2_max_program_size_error_level, 100, ""); // NOLINT

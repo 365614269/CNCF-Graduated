@@ -52,6 +52,7 @@ BOM
 CCL
 CGROUP
 CROSSSLOT
+DLL
 ECN
 ECS
 EdDSA
@@ -674,6 +675,7 @@ auths
 authz
 automata
 autoscale
+autosharding
 awaitable
 awaitables
 awaiter
