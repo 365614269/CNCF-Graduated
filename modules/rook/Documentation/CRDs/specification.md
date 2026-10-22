@@ -4799,6 +4799,22 @@ bool
 </tr>
 <tr>
 <td>
+<code>interruptMode</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>InterruptMode controls whether SPDK runs in interrupt mode (true) or poll mode (false).
+In interrupt mode, SPDK reactors only consume CPU when processing I/O, dramatically
+reducing idle CPU usage. In poll mode, reactors spin at 100% CPU per core for lowest
+latency under heavy I/O workloads.
+If not set, defaults to true (interrupt mode).</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>ports</code><br/>
 <em>
 <a href="#ceph.rook.io/v1.NVMeOFGatewayPorts">
@@ -10854,6 +10870,20 @@ Kubernetes meta/v1.Duration
 </tr>
 <tr>
 <td>
+<code>scrapeTimeoutSeconds</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ScrapeTimeoutSeconds determines the timeout of a prometheus scrape, in seconds. It must
+not be greater than the scrape interval, which defaults to 10s when unset. Defaults to the
+Prometheus global scrape timeout when unset.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>metricsTLS,omitzero</code><br/>
 <em>
 <a href="#ceph.rook.io/v1.MetricsTLSSpec">
@@ -11342,6 +11372,22 @@ bool
 <td>
 <em>(Optional)</em>
 <p>Whether host networking is enabled for the gateway. If not set, the network settings from the cluster CR will be applied.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>interruptMode</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>InterruptMode controls whether SPDK runs in interrupt mode (true) or poll mode (false).
+In interrupt mode, SPDK reactors only consume CPU when processing I/O, dramatically
+reducing idle CPU usage. In poll mode, reactors spin at 100% CPU per core for lowest
+latency under heavy I/O workloads.
+If not set, defaults to true (interrupt mode).</p>
 </td>
 </tr>
 <tr>
