@@ -18,6 +18,9 @@ set -e
 
 FAILED=0
 ARCHIVE=0
+if ! scripts/test_shortcode_links.sh; then
+    FAILED=1
+fi
 
 # If the archive flag is set, we allow links to `/latest/` that won't exist
 # at the time of linting, but will exist when the archive is copied to the
@@ -187,6 +190,14 @@ for lang in $LANGS; do
 done
 
 if [ -d ./public ]; then
+    if ! python3 scripts/test_rss_links.py; then
+        FAILED=1
+    fi
+
+    if ! python3 scripts/check_rss_links.py public; then
+        FAILED=1
+    fi
+
     if [[ ${#SKIP_LANGS[@]} -ne 0 ]]; then
         printf -v find_exclude " -name %s -prune -o" "${SKIP_LANGS[@]}"; read -r -a find_exclude <<< "$find_exclude"
     fi

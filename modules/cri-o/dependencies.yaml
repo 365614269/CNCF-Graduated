@@ -30,7 +30,7 @@ dependencies:
         match: ReleaseMinorVersions
 
   - name: golangci-lint
-    version: v2.13.2
+    version: v2.15.0
     refPaths:
       - path: .github/workflows/verify.yml
         match: GOLANGCI_LINT_VERSION
@@ -64,12 +64,6 @@ dependencies:
         match: cri_tools_git_version
       - path: scripts/versions
         match: cri-tools
-
-  - name: buildah
-    version: v1.45.0
-    refPaths:
-      - path: scripts/versions
-        match: buildah
 
   - name: crun
     version: 1.29.1
