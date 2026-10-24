@@ -83,6 +83,8 @@ The path\(s\) to read. Multiple paths can be specified, separated by comma `','`
 
 `*` and `strftime` format can be included to add/remove the watch file dynamically. At the interval of `refresh_interval`, Fluentd refreshes the list of watch files.
 
+To discover new files sooner, you can also enable [`enable_dir_watcher`](#enable_dir_watcher).
+
 ```text
 path /path/to/%Y/%m/%d/*
 ```
@@ -194,6 +196,8 @@ follow_inodes true  # Without this parameter, file rotation causes log duplicati
 
 The interval to refresh the list of watch files. This is used when the path includes `*`.
 
+Periodic refreshes continue when [`enable_dir_watcher`](#enable_dir_watcher) is enabled. They remain the fallback for directories that are not currently watched and changes that directory watchers do not detect.
+
 ### `limit_recently_modified`
 
 | type | default | version |
@@ -281,6 +285,49 @@ The number of reading bytes per second to read with I/O operation.
 This value should be equal or greater than 8192.
 
 If you work with a big cluster with high volume of log, you can use this parameter to avoid network saturation and make it easier to calculate the max throughput per node. To restrict shipping log volumes per second, set a positive number.
+
+### `num_threads`
+
+| type | default | version |
+| :--- | :--- | :--- |
+| integer | 1 | 1.20.0 |
+
+Controls how `in_tail` parses log lines. The default, `1`, parses lines on the event loop. Set this to `2` or more to parse them on worker threads.
+
+This can reduce delays in processing other files while a large or fast-growing file is parsed. If all worker threads are busy, other files may still experience processing delays. This option does not guarantee an upper bound on latency, and it does not guarantee a higher overall throughput.
+
+```text
+<source>
+  @type tail
+  path /var/log/app/*.log
+  pos_file /var/log/fluentd/app.log.pos
+  tag app
+  num_threads 2
+  <parse>
+    @type json
+  </parse>
+</source>
+```
+
+Worker parsing is enabled only when all of the following conditions are met. Otherwise, `in_tail` logs `in_tail worker parsing is unavailable; using synchronous parsing` at startup and parses lines on the event loop.
+
+* The `<parse>` type is one of `none`, `regexp`, `json`, `csv`, `tsv`, `ltsv`, `msgpack`, `apache`, `apache2`, `apache_error`, `nginx` and `syslog`.
+* The parser is not a multiline parser.
+* `open_on_every_update` is `false`.
+* The internal hooks of `in_tail`, such as `receive_lines`, are not overridden.
+* The configured parser instance has not been replaced by a subclass.
+
+A plugin that inherits from `in_tail` keeps worker parsing as long as it leaves these hooks and the parser instance unchanged.
+
+With worker parsing, `in_tail` reads lines on the event loop and groups them into batches for parsing (see [`read_lines_limit`](#readlineslimit)). A worker thread parses each batch with its own parser instance. The events are emitted and the position file is updated on the event loop after the batch has been parsed. At most one batch per file is in flight at a time, so the order of the events within a file is preserved.
+
+The worker threads accept a limited amount of work. Up to `num_threads * 2` batches can be in flight at a time, counting the batches being parsed and the ones whose events are not emitted yet. Each batch is accounted for at three times the total byte size of its lines. Regular batches share a 64 MiB budget. One additional batch exceeding this budget can be accepted, subject to the same batch-count limit. When a batch is not accepted, its file waits until another batch completes. No lines are skipped.
+
+Lines that the parser cannot parse, such as a malformed JSON line, are handled in the same way as on the event loop (see [`emit_unmatched_lines`](#emitunmatchedlines)). If a worker thread raises an error while processing a batch, the batch is parsed again on the event loop.
+
+At shutdown, `in_tail` waits for the batches that are still in flight and applies the results that complete in time. The position of an unfinished batch is not advanced. Its lines can be read again on restart if the position is persisted with `pos_file` and the file remains available for tailing.
+
+While worker parsing is active, `in_monitor_agent` reports `worker_pending_batch_count`, `worker_pending_bytes` and `worker_parse_error_count` for the plugin.
 
 ### `max_line_size`
 
@@ -417,9 +464,55 @@ Early testing demonstrates that modern `Cool.io` and `in_tail` work properly wit
 | :--- | :--- | :--- |
 | bool | true | 1.0.1 |
 
-Enables the additional `inotify`-based watcher. Setting this parameter to `false` will disable the `inotify` events and use only timer watcher for file tailing.
+Enables stat watchers for individual files, using `inotify` where available. Setting this parameter to `false` uses only the timer watcher for file tailing; `enable_watch_timer` must remain `true`.
 
 This option is mainly for avoiding the stuck issue with `inotify`.
+
+This setting does not control directory watchers. If you disable it to avoid `inotify`, also leave [`enable_dir_watcher`](#enable_dir_watcher) disabled.
+
+### `enable_dir_watcher`
+
+| type | default | version |
+| :--- | :--- | :--- |
+| bool | false | 1.20.0 |
+
+Watches directories derived from `path` to discover new files without waiting for the next `refresh_interval`. Unlike file watchers, which detect changes to files already being tailed, directory watchers request a refresh of the file list when directories change.
+
+```text
+<source>
+  @type tail
+  path /var/log/myapp/*.log
+  pos_file /var/log/fluent/myapp.pos
+  tag myapp
+  enable_dir_watcher true
+  follow_inodes true
+  <parse>
+    @type none
+  </parse>
+</source>
+```
+
+Related directory changes are collected for one second before refreshing the file list. Further events do not extend that pending timer. This avoids a separate refresh for every event; it does not guarantee discovery within one second. Detection depends on the platform and file system, and some changes may be missed. Periodic refreshes remain enabled as a fallback.
+
+Directory watchers use `Cool.io` stat watchers backed by `libev`, with `inotify` on Linux where available and stat polling as a fallback. They are independent of `enable_stat_watcher` and may use `inotify` even when file stat watchers are disabled. That combination is supported and produces an informational configuration message. If you are avoiding `inotify` because of watch limits or file system issues, leave this option disabled too.
+
+Directory watching adds overhead even when no new files are created. On Linux, modifications to existing files in watched directories can cause internal event processing and metadata checks without triggering a file-list refresh. Each refresh also explores directory candidates in addition to the usual file discovery. Prefer narrowly scoped paths, especially with recursive `**` patterns.
+
+Faster discovery can also find rotated files matching `path` sooner. Use `follow_inodes true` to avoid duplicate collection after rename-based rotation. This does not prevent rereading a copytruncate archive, which has a different inode; keep such archives outside the matching paths or use `exclude_path`.
+
+### `dir_watcher_limit`
+
+| type | default | version |
+| :--- | :--- | :--- |
+| integer | 100 | 1.20.0 |
+
+The maximum number of directories watched at once when `enable_dir_watcher` is enabled. Must be greater than zero.
+
+If there are more candidate directories than this limit, `in_tail` rotates the watched subset at each periodic refresh. Files in unwatched directories are still discovered by periodic refreshes, but may not be found sooner through directory events. A warning is logged when the candidate count exceeds the limit; continued overflow is logged at debug level.
+
+This limit bounds active directory watchers, not directory exploration or the separate watchers for individual files. Raising it may increase OS watch usage. Lowering it does not avoid the cost of exploring a broad recursive path.
+
+For brace patterns enabled by `glob_policy always`, only the first 100 expanded alternatives per configured path are considered for directory watching, independently of this setting. A warning is logged when expansion is truncated. Other alternatives remain covered by periodic file discovery.
 
 ### `open_on_every_update`
 
@@ -597,6 +690,8 @@ This parameter does not fit the typical application log use cases, so check your
 ### `in_tail` is sometimes stopped when monitoring lots of files. How to avoid it?
 
 Try to set `enable_stat_watcher false` in `in_tail` setting. We got several reports that `in_tail` is stopped when `*` is included in `path`, and the problem is resolved by disabling the `inotify` events.
+
+If you have enabled `enable_dir_watcher`, disable it too when trying to avoid `inotify`: directory watchers can use it independently of `enable_stat_watcher`.
 
 ### Wildcard pattern in `path` does not work on Windows, why?
 

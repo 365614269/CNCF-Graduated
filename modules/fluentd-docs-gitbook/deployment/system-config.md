@@ -162,6 +162,21 @@ Specifies the file permission in the octal format.
 
 Specifies the directory permission in the octal format.
 
+### `umask`
+
+| type | default | version |
+| :--- | :--- | :--- |
+| string | nil | 1.20.0 |
+
+Specifies the umask in the octal format. 
+This is the configuration-file equivalent of the `--umask` command-line option. 
+If `--umask` is also given on the command line, the command-line value takes precedence.
+
+The `umask` affects the permission of files that Fluentd creates (such as buffer files).
+Whether it applies to worker-created files depends on the run mode:
+* `--no-supervisor` (standalone) or daemonized (`--daemon`): applied.
+* Supervisor in the foreground (without `--daemon`): not applied.
+
 ### `strict_config_value`
 
 | type | default | version |
@@ -190,13 +205,17 @@ it will be loaded without specifying `@include` directive.
 
 If you want to disable this auto-load feature, set `config_include_dir ""` explicitly.
 
-### `enable_jit` (experimental)
+### `enable_jit`
 
 | type | default | version |
 | :--- | :--- | :--- |
-| bool | false | 1.15.2 |
+| bool | true | 1.15.2 |
 
-Enable JIT for worker processes. Internally, this configuration enables Ruby's `--jit` command-line option.
+Enable Ruby's JIT \(YJIT\) for worker processes. Since v1.20.0, the default value is changed to `true`.
+
+JIT increases the memory usage of each worker process. Set `enable_jit false` to restore the previous behavior.
+
+Note that JIT is not available on Windows, and this parameter has no effect there.
 
 ### `enable_input_metrics`
 
