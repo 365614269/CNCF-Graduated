@@ -15,6 +15,27 @@ import (
 
 const maxCnameChainLength = 10
 
+type cnameVisitKey struct{}
+
+func cnameVisits(ctx context.Context) (context.Context, map[string]struct{}) {
+	if visited, ok := ctx.Value(cnameVisitKey{}).(map[string]struct{}); ok {
+		return ctx, visited
+	}
+	visited := make(map[string]struct{})
+	return context.WithValue(ctx, cnameVisitKey{}, visited), visited
+}
+
+// firstCNAMEVisit reports whether target has not already been chased while
+// answering the current client query.
+func firstCNAMEVisit(visited map[string]struct{}, target string) bool {
+	target = dns.CanonicalName(target)
+	if _, ok := visited[target]; ok {
+		return false
+	}
+	visited[target] = struct{}{}
+	return true
+}
+
 // A returns A records from Backend or an error.
 func A(ctx context.Context, b ServiceBackend, zone string, state request.Request, previousRecords []dns.RR, opt Options) (records []dns.RR, truncated bool, err error) {
 	services, err := checkForApex(ctx, b, zone, state, opt)
@@ -23,6 +44,7 @@ func A(ctx context.Context, b ServiceBackend, zone string, state request.Request
 	}
 
 	dup := make(map[string]struct{})
+	var cnames map[string]struct{}
 
 	for _, serv := range services {
 		what, ip := serv.HostType()
@@ -41,6 +63,12 @@ func A(ctx context.Context, b ServiceBackend, zone string, state request.Request
 				continue
 			}
 			if dnsutil.DuplicateCNAME(newRecord, previousRecords) {
+				continue
+			}
+			if cnames == nil {
+				ctx, cnames = cnameVisits(ctx)
+			}
+			if !firstCNAMEVisit(cnames, newRecord.Target) {
 				continue
 			}
 			if dns.IsSubDomain(zone, dns.Fqdn(serv.Host)) {
@@ -96,6 +124,7 @@ func AAAA(ctx context.Context, b ServiceBackend, zone string, state request.Requ
 	}
 
 	dup := make(map[string]struct{})
+	var cnames map[string]struct{}
 
 	for _, serv := range services {
 		what, ip := serv.HostType()
@@ -115,6 +144,12 @@ func AAAA(ctx context.Context, b ServiceBackend, zone string, state request.Requ
 				continue
 			}
 			if dnsutil.DuplicateCNAME(newRecord, previousRecords) {
+				continue
+			}
+			if cnames == nil {
+				ctx, cnames = cnameVisits(ctx)
+			}
+			if !firstCNAMEVisit(cnames, newRecord.Target) {
 				continue
 			}
 			if dns.IsSubDomain(zone, dns.Fqdn(serv.Host)) {
@@ -350,6 +385,7 @@ func TXT(ctx context.Context, b ServiceBackend, zone string, state request.Reque
 	}
 
 	dup := make(map[string]struct{})
+	var cnames map[string]struct{}
 
 	for _, serv := range services {
 		what, _ := serv.HostType()
@@ -368,6 +404,12 @@ func TXT(ctx context.Context, b ServiceBackend, zone string, state request.Reque
 				continue
 			}
 			if dnsutil.DuplicateCNAME(newRecord, previousRecords) {
+				continue
+			}
+			if cnames == nil {
+				ctx, cnames = cnameVisits(ctx)
+			}
+			if !firstCNAMEVisit(cnames, newRecord.Target) {
 				continue
 			}
 			if dns.IsSubDomain(zone, dns.Fqdn(serv.Host)) {
