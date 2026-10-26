@@ -695,8 +695,8 @@ func TestCNAMETargetsChasedOnce(t *testing.T) {
 				backendCalls[state.Name()]++
 				switch state.Name() {
 				case "a.example.org.":
-					var svcs []msg.Service
-					for i := 0; i < fanout; i++ {
+					svcs := make([]msg.Service, 0, 2*fanout)
+					for range fanout {
 						svcs = append(svcs, msg.Service{Host: "b.example.org", Key: "/skydns/org/example/a"})
 						svcs = append(svcs, msg.Service{Host: "ext.example.com", Key: "/skydns/org/example/a"})
 					}
