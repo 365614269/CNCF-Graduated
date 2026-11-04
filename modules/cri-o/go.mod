@@ -9,7 +9,7 @@ require (
 	github.com/checkpoint-restore/checkpointctl v1.6.0
 	github.com/checkpoint-restore/go-criu/v8 v8.4.0
 	github.com/containerd/cgroups v1.1.0
-	github.com/containerd/containerd v1.7.35
+	github.com/containerd/containerd v1.7.36
 	github.com/containerd/containerd/api v1.10.0
 	github.com/containerd/fifo v1.1.0
 	github.com/containerd/nri v0.12.2
@@ -30,7 +30,7 @@ require (
 	github.com/docker/distribution v2.8.3+incompatible
 	github.com/docker/go-units v0.5.0
 	github.com/fsnotify/fsnotify v1.10.1
-	github.com/go-chi/chi/v5 v5.3.2
+	github.com/go-chi/chi/v5 v5.4.0
 	github.com/go-logr/logr v1.4.4
 	github.com/godbus/dbus/v5 v5.2.2
 	github.com/google/go-cmp v0.7.0
@@ -136,7 +136,7 @@ require (
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.9.0 // indirect
 	github.com/go-git/go-git/v5 v5.19.2 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.5 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.6 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/analysis v0.25.5 // indirect
 	github.com/go-openapi/errors v0.22.8 // indirect
