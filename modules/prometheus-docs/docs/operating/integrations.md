@@ -64,7 +64,7 @@ data volumes.
   * [Kafka](https://github.com/Telefonica/prometheus-kafka-adapter): write
   * [Last9](https://last9.io/docs/integrations/observability/prometheus/): write
   * [M3DB](https://m3db.io/docs/integrations/prometheus/): read and write
-  * [Mezmo](https://docs.mezmo.com/telemetry-pipelines/prometheus-remote-write-pipeline-source): write
+  * [Mezmo](https://docs.mezmo.com/telemetry-pipelines/prometheus-remote-write-source): write
   * [New Relic](https://docs.newrelic.com/docs/set-or-remove-your-prometheus-remote-write-integration): write
   * [Oodle](https://docs.oodle.ai/integrations/metrics/prometheus/): write
   * [OpenObserve](https://openobserve.ai/docs/ingestion/metrics/prometheus/): write
@@ -143,6 +143,7 @@ you to integrate it with your existing systems or build on top of it.
 
   * [Alert analysis](https://github.com/m0nikasingh/am2ch): Stores alerts into a ClickHouse database and provides alert analysis dashboards
   * [karma](https://github.com/prymitive/karma): alert dashboard
+  * [LibreDB Studio](https://github.com/libredb/libredb-studio): web-based query IDE that runs PromQL over the HTTP API and browses metrics, targets, rule groups and scrape pools
   * [PushProx](https://github.com/RobustPerception/PushProx): Proxy to transverse NAT and similar network setups
   * [Promdump](https://github.com/ihcsim/promdump): kubectl plugin to dump and restore data blocks
   * [Promregator](https://github.com/promregator/promregator): discovery and scraping for Cloud Foundry applications

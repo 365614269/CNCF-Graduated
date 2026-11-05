@@ -653,6 +653,16 @@ WEAK_STUB(BootstrapExtensionEnableClusterLifecycle,
           envoy_dynamic_module_callback_bootstrap_extension_enable_cluster_lifecycle(nullptr))
 WEAK_STUB(BootstrapExtensionEnableListenerLifecycle,
           envoy_dynamic_module_callback_bootstrap_extension_enable_listener_lifecycle(nullptr))
+WEAK_STUB(BootstrapExtensionRunOnAllWorkers,
+          envoy_dynamic_module_callback_bootstrap_extension_run_on_all_workers(nullptr, 1))
+WEAK_STUB(BootstrapExtensionEnableClusterWriter,
+          envoy_dynamic_module_callback_bootstrap_extension_enable_cluster_writer(nullptr))
+WEAK_STUB(BootstrapExtensionClusterWriterAddOrUpdate,
+          envoy_dynamic_module_callback_bootstrap_extension_cluster_writer_add_or_update(
+              nullptr, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, nullptr))
+WEAK_STUB(BootstrapExtensionClusterWriterRemove,
+          envoy_dynamic_module_callback_bootstrap_extension_cluster_writer_remove(nullptr,
+                                                                                  {nullptr, 0}))
 
 WEAK_STUB(BootstrapExtensionRegisterAdminHandler,
           envoy_dynamic_module_callback_bootstrap_extension_register_admin_handler(
@@ -2495,6 +2505,8 @@ WEAK_STUB(RouteSpecifierLookupBuiltRoute,
           envoy_dynamic_module_callback_route_specifier_lookup_built_route(nullptr, 1))
 WEAK_STUB(RouteSpecifierConfigHasBuiltRouteCache,
           envoy_dynamic_module_callback_route_specifier_config_has_built_route_cache(nullptr))
+WEAK_STUB(RouteSpecifierSetVirtualCluster,
+          envoy_dynamic_module_callback_route_specifier_set_virtual_cluster(nullptr, {nullptr, 0}))
 
 } // namespace
 } // namespace DynamicModules
