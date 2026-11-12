@@ -85,6 +85,7 @@ data volumes.
 For notification mechanisms not natively supported by the Alertmanager, the
 [webhook receiver](/docs/alerting/configuration/#webhook_config) allows for integration.
 
+  * [Akmatori](https://akmatori.com/docs/integrations/alertmanager): investigates alerts with LLM agents and proposes remediation for human approval
   * [AlertINT](https://github.com/alertint/alertint-agent): correlates alerts into incidents and runs LLM triage before notifying
   * [alertmanager-webhook-logger](https://github.com/tomtom-international/alertmanager-webhook-logger): logs alerts
   * [Alertsnitch](https://gitlab.com/yakshaving.art/alertsnitch): saves alerts to a MySQL database
@@ -144,6 +145,7 @@ you to integrate it with your existing systems or build on top of it.
   * [Alert analysis](https://github.com/m0nikasingh/am2ch): Stores alerts into a ClickHouse database and provides alert analysis dashboards
   * [karma](https://github.com/prymitive/karma): alert dashboard
   * [LibreDB Studio](https://github.com/libredb/libredb-studio): web-based query IDE that runs PromQL over the HTTP API and browses metrics, targets, rule groups and scrape pools
+  * [Nightingale (n9e)](https://github.com/ccfos/nightingale): alerting engine that evaluates PromQL alert rules against Prometheus via its HTTP API, with web-based rule management and notification routing
   * [PushProx](https://github.com/RobustPerception/PushProx): Proxy to transverse NAT and similar network setups
   * [Promdump](https://github.com/ihcsim/promdump): kubectl plugin to dump and restore data blocks
   * [Promregator](https://github.com/promregator/promregator): discovery and scraping for Cloud Foundry applications
