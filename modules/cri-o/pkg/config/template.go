@@ -1410,7 +1410,6 @@ const templateStringCrioRuntimeRuntimesRuntimeHandler = `# The "crio.runtime.run
 # platform_runtime_paths = { "os/arch" = "/path/to/binary" }
 # no_sync_log = false
 # default_annotations = {}
-# stream_websockets = false
 # seccomp_profile = ""
 # container_create_timeout = 240
 # Where:
@@ -1473,7 +1472,12 @@ const templateStringCrioRuntimeRuntimesRuntimeHandler = `# The "crio.runtime.run
 # - default_annotations (optional, map): Default annotations if not overridden by the pod spec.
 # - stream_websockets (optional, bool): Let conmon-rs serve container exec, attach and port forward over SPDY
 #   and WebSocket instead of the CRI-O streaming server. Only valid for the 'pod' runtime type, needs
-#   conmon-rs v1.2.0 or later and gets disabled for older versions.
+#   conmon-rs v1.2.0 or later and gets disabled for older versions. If not set, it is enabled for the 'pod'
+#   runtime type if conmon-rs supports the streaming protocols of the kubelet, stream_enable_tls is false
+#   and neither exec_cpu_affinity nor infra_ctr_cpuset is set: conmon-rs serves the streams over plain HTTP
+#   on 127.0.0.1, does not use stream_address, stream_port, stream_enable_tls and the stream_tls_* options,
+#   and neither runs the exec sessions in the exec cgroup of exec_cpu_affinity nor pins them to
+#   infra_ctr_cpuset.
 # - seccomp_profile (optional, string): The absolute path of the seccomp.json profile which is used as the default
 #   seccomp profile for the runtime.
 #   If not specified or set to "", the runtime seccomp_profile will be used.
@@ -1527,7 +1531,8 @@ const templateStringCrioRuntimeRuntimesRuntimeHandler = `# The "crio.runtime.run
 {{ if $runtime_handler.AllowedAnnotations }}{{ $.Comment }}allowed_annotations = [
 {{ range $opt := $runtime_handler.AllowedAnnotations }}{{ $.Comment }}{{ printf "\t%q,\n" $opt }}{{ end }}{{ $.Comment }}]{{ end }}
 {{ $.Comment }}privileged_without_host_devices = {{ $runtime_handler.PrivilegedWithoutHostDevices }}
-{{ if $runtime_handler.PlatformRuntimePaths }}platform_runtime_paths = {
+{{ with $runtime_handler.StreamWebsockets }}{{ $.Comment }}stream_websockets = {{ . }}
+{{ end }}{{ if $runtime_handler.PlatformRuntimePaths }}platform_runtime_paths = {
 {{- $first := true }}{{- range $key, $value := $runtime_handler.PlatformRuntimePaths }}
 {{- if not $first }},{{ end }}{{- printf "%q = %q" $key $value }}{{- $first = false }}{{- end }}}
 {{ end }}
@@ -1547,7 +1552,7 @@ const templateStringCrioRuntimeWorkloads = `# The workloads table defines ways t
 # Note that the "cpulimit" field overrides the "cpuquota" value supplied in this configuration.
 # Each resource can have a default value specified, or be empty.
 # For a container to opt-into this workload, the pod should be configured with the annotation $activation_annotation (key only, value is ignored).
-# To customize per-container, an annotation of the form $annotation_prefix.$resource/$ctrName = "value" can be specified
+# To customize per-container, an annotation of the form $annotation_prefix/$ctrName = {"$resource": $value} can be specified
 # signifying for that resource type to override the default value.
 # If the annotation_prefix is not present, every container in the pod will be given the default values.
 # Example:
@@ -1556,17 +1561,17 @@ const templateStringCrioRuntimeWorkloads = `# The workloads table defines ways t
 # annotation_prefix = "io.crio.workload-type"
 # [crio.runtime.workloads.workload-type.resources]
 # cpuset = "0-1"
-# cpushares = "5"
-# cpuquota = "1000"
-# cpuperiod = "100000"
-# cpulimit = "35"
+# cpushares = 5
+# cpuquota = 1000
+# cpuperiod = 100000
+# cpulimit = 35
 # Where:
 # The workload name is workload-type.
-# To specify, the pod must have the "io.crio.workload" annotation (this is a precise string match).
+# To specify, the pod must have the "io.crio/workload" annotation (this is a precise string match).
 # This workload supports setting cpuset and cpu resources.
 # annotation_prefix is used to customize the different resources.
 # To configure the cpu shares a container gets in the example above, the pod would have to have the following annotation:
-# "io.crio.workload-type/$container_name = {"cpushares": "value"}"
+# "io.crio.workload-type/$container_name = {"cpushares": 5}"
 {{ range $workload_type, $workload_config := .Workloads  }}
 {{ $.Comment }}[crio.runtime.workloads.{{ $workload_type }}]
 {{ $.Comment }}activation_annotation = "{{ $workload_config.ActivationAnnotation }}"
