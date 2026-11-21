@@ -72,7 +72,11 @@ test_program(name = "bootstrap_cluster_writer_test")
 
 test_program(name = "bootstrap_config_names_test")
 
+test_program(name = "bootstrap_config_snapshot_test")
+
 test_program(name = "bootstrap_listener_lifecycle_test")
+
+test_program(name = "bootstrap_runtime_update_test")
 
 test_program(name = "bootstrap_writer_test")
 

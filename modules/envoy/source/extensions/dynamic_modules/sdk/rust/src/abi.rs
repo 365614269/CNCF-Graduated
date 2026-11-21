@@ -10058,6 +10058,31 @@ pub enum envoy_dynamic_module_type_bootstrap_active_resource_kind {
     TransportSocketMatch = 2,
     Secret = 3,
 }
+/** A configuration snapshot owned by the module. Release it with
+ envoy_dynamic_module_callback_bootstrap_extension_config_snapshot_delete before
+ envoy_dynamic_module_on_bootstrap_extension_config_destroy returns for its owning config.
+ It may move between threads, but must not be used concurrently.*/
+pub type envoy_dynamic_module_type_bootstrap_extension_config_snapshot_module_ptr = *mut ::std::os::raw::c_void;
+/** Receives JSON owned by Envoy and valid only during this invocation.
+
+ @param json is the encoded snapshot. Its pointer is non-null.
+ @param user_data is the opaque pointer supplied to the serialize callback and may be null.*/
+pub type envoy_dynamic_module_type_bootstrap_extension_config_snapshot_json_fn = ::std::option::Option<
+    unsafe extern "C" fn(
+        json: envoy_dynamic_module_type_envoy_buffer,
+        user_data: *mut ::std::os::raw::c_void,
+    ),
+>;
+#[repr(u32)]
+/// The result of envoy_dynamic_module_callback_bootstrap_extension_config_snapshot_new.
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum envoy_dynamic_module_type_bootstrap_config_snapshot_result {
+    Success = 0,
+    NotAllowed = 1,
+    InvalidRegex = 2,
+    Unavailable = 3,
+    CollectionFailed = 4,
+}
 /** The callback type invoked once per active resource name during enumeration.
 
  @param name is the name of the resource. The buffer is owned by Envoy and is valid only for the
@@ -11033,6 +11058,65 @@ unsafe extern "C" {
 }
 #[cfg_attr(envoy_dynamic_module_dll, link(name = "envoy", kind = "raw-dylib"))]
 unsafe extern "C" {
+    /** Collects and redacts selected providers synchronously on the main thread. Missing providers are
+ omitted, duplicates are collected once, and results are sorted by provider key. An empty
+ selection collects nothing. Endpoint dumps are not included. Cost grows with the selected
+ resources, so combine frequent notifications into one collection.
+
+ Collection is refused in cluster or listener lifecycle hooks, whatever triggered them, and in
+ other bootstrap hooks Envoy runs inside an xDS update or a resource's destruction. Providers can
+ contain partial changes under the previous version. Defer collection with the bootstrap config
+ scheduler. Callout failures during cluster removal are already reported from a posted callback.
+
+ Only protobuf fields annotated as sensitive are redacted. Metadata, opaque strings and module
+ configuration may retain sensitive data. No admin listener is needed, and admin allow_paths does
+ not restrict access.
+
+ @param config_envoy_ptr is the non-null pointer to the bootstrap extension configuration.
+ @param providers is an array of provider keys, borrowed for this call. May be null only when
+ providers_count is zero. Each key's pointer must be non-null when its length is nonzero.
+ @param providers_count is the number of entries in providers.
+ @param name_regex is a full-match RE2 resource name filter, ignored by providers without name
+ filtering. A null pointer or zero length disables filtering. The buffer is borrowed for this
+ call.
+ @param snapshot_out is a non-null output pointer. Receives the module-owned snapshot on success,
+ or null on failure. Release it with the snapshot delete callback before its config is destroyed.
+ @return the collection result. A call off the main thread also reports an Envoy bug.*/
+    pub fn envoy_dynamic_module_callback_bootstrap_extension_config_snapshot_new(
+        config_envoy_ptr: envoy_dynamic_module_type_bootstrap_extension_config_envoy_ptr,
+        providers: *const envoy_dynamic_module_type_module_buffer,
+        providers_count: usize,
+        name_regex: envoy_dynamic_module_type_module_buffer,
+        snapshot_out: *mut envoy_dynamic_module_type_bootstrap_extension_config_snapshot_module_ptr,
+    ) -> envoy_dynamic_module_type_bootstrap_config_snapshot_result;
+}
+#[cfg_attr(envoy_dynamic_module_dll, link(name = "envoy", kind = "raw-dylib"))]
+unsafe extern "C" {
+    /** Encodes the snapshot as envoy.admin.v3.ConfigDump JSON on any thread without consuming it.
+ Encoding can be expensive; use a module-owned thread to avoid blocking Envoy's main thread or
+ workers.
+
+ @param snapshot is a non-null snapshot handle. Must not be used concurrently.
+ @param json_fn is a non-null callback invoked synchronously once on success, and not on failure.
+ @param user_data is an opaque pointer passed to json_fn and may be null.
+ @return true on success, false if encoding fails, including for unknown or unlinked Any types.*/
+    pub fn envoy_dynamic_module_callback_bootstrap_extension_config_snapshot_serialize(
+        snapshot: envoy_dynamic_module_type_bootstrap_extension_config_snapshot_module_ptr,
+        json_fn: envoy_dynamic_module_type_bootstrap_extension_config_snapshot_json_fn,
+        user_data: *mut ::std::os::raw::c_void,
+    ) -> bool;
+}
+#[cfg_attr(envoy_dynamic_module_dll, link(name = "envoy", kind = "raw-dylib"))]
+unsafe extern "C" {
+    /** Deletes a snapshot on any thread.
+
+ @param snapshot is the snapshot to release, or null. Must not be in use by another call.*/
+    pub fn envoy_dynamic_module_callback_bootstrap_extension_config_snapshot_delete(
+        snapshot: envoy_dynamic_module_type_bootstrap_extension_config_snapshot_module_ptr,
+    );
+}
+#[cfg_attr(envoy_dynamic_module_dll, link(name = "envoy", kind = "raw-dylib"))]
+unsafe extern "C" {
     /** envoy_dynamic_module_callback_bootstrap_extension_enable_cluster_lifecycle is called by the
  module to opt in to receiving cluster lifecycle events
  (envoy_dynamic_module_on_bootstrap_extension_cluster_add_or_update and
@@ -11103,6 +11187,67 @@ unsafe extern "C" {
         name_fn: envoy_dynamic_module_type_bootstrap_active_resource_name_fn,
         user_data: *mut ::std::os::raw::c_void,
     );
+}
+#[cfg_attr(envoy_dynamic_module_dll, link(name = "envoy", kind = "raw-dylib"))]
+unsafe extern "C" {
+    /** envoy_dynamic_module_on_bootstrap_extension_runtime_bool_update is called when a watched runtime
+ key gets a new boolean value, or becomes unset after having one.*/
+    pub fn envoy_dynamic_module_on_bootstrap_extension_runtime_bool_update(
+        extension_envoy_ptr: envoy_dynamic_module_type_bootstrap_extension_envoy_ptr,
+        extension_module_ptr: envoy_dynamic_module_type_bootstrap_extension_module_ptr,
+        key: envoy_dynamic_module_type_envoy_buffer,
+        value: bool,
+        removed: bool,
+    );
+}
+#[cfg_attr(envoy_dynamic_module_dll, link(name = "envoy", kind = "raw-dylib"))]
+unsafe extern "C" {
+    /** envoy_dynamic_module_on_bootstrap_extension_runtime_int_update is called when a watched runtime
+ key gets a new non-negative integer value, or becomes unset after having one.*/
+    pub fn envoy_dynamic_module_on_bootstrap_extension_runtime_int_update(
+        extension_envoy_ptr: envoy_dynamic_module_type_bootstrap_extension_envoy_ptr,
+        extension_module_ptr: envoy_dynamic_module_type_bootstrap_extension_module_ptr,
+        key: envoy_dynamic_module_type_envoy_buffer,
+        value: u64,
+        removed: bool,
+    );
+}
+#[cfg_attr(envoy_dynamic_module_dll, link(name = "envoy", kind = "raw-dylib"))]
+unsafe extern "C" {
+    /** envoy_dynamic_module_on_bootstrap_extension_runtime_number_update is called when a watched
+ runtime key gets a new number that is not a non-negative integer, or becomes unset after having
+ one.*/
+    pub fn envoy_dynamic_module_on_bootstrap_extension_runtime_number_update(
+        extension_envoy_ptr: envoy_dynamic_module_type_bootstrap_extension_envoy_ptr,
+        extension_module_ptr: envoy_dynamic_module_type_bootstrap_extension_module_ptr,
+        key: envoy_dynamic_module_type_envoy_buffer,
+        value: f64,
+        removed: bool,
+    );
+}
+#[cfg_attr(envoy_dynamic_module_dll, link(name = "envoy", kind = "raw-dylib"))]
+unsafe extern "C" {
+    /** envoy_dynamic_module_callback_bootstrap_extension_enable_runtime_update is called by the module
+ to watch a runtime key, so that the runtime update hooks above are called on the bootstrap
+ extension when its value changes. Call it once for each key to watch. The key does not need to
+ have a value yet.
+
+ This can only be called during envoy_dynamic_module_on_bootstrap_extension_server_initialized.
+ RTDS may or may not have delivered its layers by then, so the module should read the current
+ value with the runtime getters such as envoy_dynamic_module_callback_get_runtime_bool when it
+ starts watching the key, and then rely on the hooks for the later changes.
+
+ @param extension_envoy_ptr is the pointer to the DynamicModuleBootstrapExtension object.
+ @param key is the runtime key to watch, for example "envoy.reloadable_features.some_flag". It is
+ only read during the call.
+ @return true if the module now watches the key. Returns false when the key is empty or already
+ watched, when the module implements none of the runtime update hooks, outside of
+ envoy_dynamic_module_on_bootstrap_extension_server_initialized, once the server began to shut
+ down, or when called off the main thread. A call off the main thread also reports an Envoy bug.*/
+    pub fn envoy_dynamic_module_callback_bootstrap_extension_enable_runtime_update(
+        extension_envoy_ptr: envoy_dynamic_module_type_bootstrap_extension_envoy_ptr,
+        key: envoy_dynamic_module_type_module_buffer,
+    ) -> bool;
 }
 #[cfg_attr(envoy_dynamic_module_dll, link(name = "envoy", kind = "raw-dylib"))]
 unsafe extern "C" {

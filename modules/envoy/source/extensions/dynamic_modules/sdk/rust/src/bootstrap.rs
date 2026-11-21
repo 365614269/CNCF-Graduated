@@ -1,4 +1,7 @@
-use crate::abi::envoy_dynamic_module_type_metrics_result;
+use crate::abi::{
+  envoy_dynamic_module_type_bootstrap_config_snapshot_result as ConfigSnapshotResult,
+  envoy_dynamic_module_type_metrics_result,
+};
 use crate::buffer::EnvoyBuffer;
 use crate::{
   abi,
@@ -20,6 +23,157 @@ use crate::{
 #[cfg(any(test, feature = "mock"))]
 use mockall::*;
 use std::panic::{catch_unwind, AssertUnwindSafe};
+use std::ptr::NonNull;
+
+/// A config dump provider to include in a snapshot.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ConfigSnapshotProvider<'a> {
+  /// The server's bootstrap configuration.
+  Bootstrap,
+  /// Cluster configurations.
+  Clusters,
+  /// Listener configurations.
+  Listeners,
+  /// Route configurations.
+  Routes,
+  /// Scoped route configurations.
+  RouteScopes,
+  /// Secret configurations.
+  Secrets,
+  /// HTTP filters configured through ECDS.
+  EcdsHttpFilters,
+  /// Upstream HTTP filters configured through ECDS.
+  EcdsUpstreamHttpFilters,
+  /// Network filters configured through ECDS.
+  EcdsNetworkFilters,
+  /// Upstream network filters configured through ECDS.
+  EcdsUpstreamNetworkFilters,
+  /// TCP listener filters configured through ECDS.
+  EcdsTcpListenerFilters,
+  /// UDP listener filters configured through ECDS.
+  EcdsUdpListenerFilters,
+  /// UDP session filters configured through ECDS.
+  EcdsUdpSessionFilters,
+  /// QUIC listener filters configured through ECDS.
+  EcdsQuicListenerFilters,
+  /// A provider registered by another extension.
+  Custom(&'a str),
+}
+
+impl ConfigSnapshotProvider<'_> {
+  fn as_str(&self) -> &str {
+    match self {
+      Self::Bootstrap => "bootstrap",
+      Self::Clusters => "clusters",
+      Self::Listeners => "listeners",
+      Self::Routes => "routes",
+      Self::RouteScopes => "route_scopes",
+      Self::Secrets => "secrets",
+      Self::EcdsHttpFilters => "ecds_filter_http",
+      Self::EcdsUpstreamHttpFilters => "ecds_filter_upstream_http",
+      Self::EcdsNetworkFilters => "ecds_filter_network",
+      Self::EcdsUpstreamNetworkFilters => "ecds_filter_upstream_network",
+      Self::EcdsTcpListenerFilters => "ecds_filter_tcp_listener",
+      Self::EcdsUdpListenerFilters => "ecds_filter_udp_listener",
+      Self::EcdsUdpSessionFilters => "ecds_filter_udp_session",
+      Self::EcdsQuicListenerFilters => "ecds_filter_quic_listener",
+      Self::Custom(name) => name,
+    }
+  }
+}
+
+/// A configuration snapshot that can move between threads.
+/// Drop it before its owning [`BootstrapExtensionConfig`] is destroyed. Join workers holding
+/// snapshots in the config's [`Drop`] implementation.
+#[cfg_attr(any(test, feature = "mock"), automock)]
+pub trait EnvoyBootstrapExtensionConfigSnapshot: Send {
+  /// Encodes the snapshot as ConfigDump JSON.
+  /// Encoding can be expensive; use a module-owned thread to avoid blocking Envoy's main thread or
+  /// workers.
+  /// Only protobuf fields annotated as sensitive are redacted. Metadata, opaque strings and module
+  /// configuration may still contain sensitive data. Encoding fails for unknown or unlinked Any
+  /// types.
+  fn into_json(self: Box<Self>) -> Result<Vec<u8>, ConfigSnapshotError>;
+}
+
+#[derive(Debug)]
+struct EnvoyBootstrapExtensionConfigSnapshotImpl {
+  raw: NonNull<std::ffi::c_void>,
+}
+
+// the ABI permits exclusive use and release on any thread
+unsafe impl Send for EnvoyBootstrapExtensionConfigSnapshotImpl {}
+
+impl EnvoyBootstrapExtensionConfigSnapshot for EnvoyBootstrapExtensionConfigSnapshotImpl {
+  fn into_json(self: Box<Self>) -> Result<Vec<u8>, ConfigSnapshotError> {
+    extern "C" fn receive_json(
+      json: abi::envoy_dynamic_module_type_envoy_buffer,
+      user_data: *mut std::ffi::c_void,
+    ) {
+      let output = unsafe { &mut *user_data.cast::<Vec<u8>>() };
+      let bytes =
+        unsafe { crate::ffi_helpers::slice_from_raw_or_empty(json.ptr.cast::<u8>(), json.length) };
+      output.extend_from_slice(bytes);
+    }
+
+    let mut output = Vec::new();
+    let success = unsafe {
+      abi::envoy_dynamic_module_callback_bootstrap_extension_config_snapshot_serialize(
+        self.raw.as_ptr(),
+        Some(receive_json),
+        std::ptr::from_mut(&mut output).cast(),
+      )
+    };
+    if success {
+      Ok(output)
+    } else {
+      Err(ConfigSnapshotError::EncodingFailed)
+    }
+  }
+}
+
+impl Drop for EnvoyBootstrapExtensionConfigSnapshotImpl {
+  fn drop(&mut self) {
+    unsafe {
+      abi::envoy_dynamic_module_callback_bootstrap_extension_config_snapshot_delete(
+        self.raw.as_ptr(),
+      )
+    }
+  }
+}
+
+/// A collection or encoding failure.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConfigSnapshotError {
+  /// Called off the main thread, before `on_server_initialized`, during shutdown, from a cluster
+  /// or listener lifecycle hook, whatever triggered it, from another bootstrap hook Envoy runs
+  /// inside an xDS update or a resource's destruction, or while another collection runs. A call
+  /// off the main thread also reports an Envoy bug.
+  NotAllowed,
+  /// The name filter is invalid or its RE2 program size exceeds
+  /// `re2.max_program_size.error_level`.
+  InvalidRegex,
+  /// Admin support is unavailable.
+  Unavailable,
+  /// Collection failed for another reason, such as a provider throwing or returning no message.
+  CollectionFailed,
+  /// The collected messages could not be encoded as JSON.
+  EncodingFailed,
+}
+
+impl std::fmt::Display for ConfigSnapshotError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.write_str(match self {
+      Self::NotAllowed => "config snapshot collection not allowed",
+      Self::InvalidRegex => "invalid config snapshot name regex",
+      Self::Unavailable => "config snapshot unavailable",
+      Self::CollectionFailed => "config snapshot collection failed",
+      Self::EncodingFailed => "config snapshot encoding failed",
+    })
+  }
+}
+
+impl std::error::Error for ConfigSnapshotError {}
 
 /// The kind of active resource to enumerate with
 /// [`EnvoyBootstrapExtensionConfig::active_resource_names`].
@@ -279,6 +433,25 @@ pub trait EnvoyBootstrapExtensionConfig {
   /// `--mode init_only`.
   fn enable_cluster_lifecycle(&self) -> bool;
 
+  /// Collects and redacts selected providers synchronously on the main thread after initialization
+  /// and before shutdown. Missing providers are omitted, duplicates are collected once, and results
+  /// are sorted by provider key. An empty selection collects nothing. Endpoint dumps are not
+  /// included. `name_regex` applies a full-match RE2 resource name filter where supported; `None`
+  /// or an empty expression selects all names. Cost grows with the selected resources, so combine
+  /// frequent notifications into one collection.
+  ///
+  /// Collection is refused in cluster or listener lifecycle hooks, whatever triggered them, and in
+  /// other bootstrap hooks Envoy runs inside an xDS update or a resource's destruction. Providers
+  /// can contain partial changes under the previous version. Defer collection with
+  /// [`Self::new_scheduler`]. Callout failures during cluster removal are already reported from a
+  /// posted callback.
+  /// No admin listener is needed and admin `allow_paths` does not restrict access.
+  fn get_config_snapshot<'a>(
+    &self,
+    providers: &[ConfigSnapshotProvider<'a>],
+    name_regex: Option<&'a str>,
+  ) -> Result<Box<dyn EnvoyBootstrapExtensionConfigSnapshot>, ConfigSnapshotError>;
+
   /// Enable listener lifecycle event notifications. When enabled, the module will receive
   /// [`BootstrapExtensionConfig::on_listener_add_or_update`] and
   /// [`BootstrapExtensionConfig::on_listener_removal`] callbacks when listeners are added, updated,
@@ -471,6 +644,32 @@ pub trait EnvoyBootstrapExtension {
   /// The callback receives the gauge name and its current value.
   /// Return `true` to continue iteration, `false` to stop.
   fn iterate_gauges(&self, callback: &mut dyn FnMut(&str, u64) -> bool);
+
+  /// Watch a runtime key. The extension then receives [`BootstrapExtension::on_runtime_update`]
+  /// when the value of the key changes in a newly loaded runtime snapshot, for example on an RTDS
+  /// update, a disk layer update or a request to the admin `/runtime_modify` endpoint. Call this
+  /// once for each key to watch. The key does not need to have a value yet, and its value when this
+  /// is called is not reported.
+  ///
+  /// This can only be called from [`BootstrapExtension::on_server_initialized`]. RTDS may or may
+  /// not have delivered its layers by then, so read the current value with the runtime getters
+  /// such as [`crate::get_runtime_bool`] when starting to watch the key.
+  ///
+  /// Returns `false` if the key is empty or already watched, outside of
+  /// [`BootstrapExtension::on_server_initialized`], or once the server began to shut down.
+  fn enable_runtime_update(&self, key: &str) -> bool;
+}
+
+/// The value of a watched runtime key, as given to [`BootstrapExtension::on_runtime_update`].
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum RuntimeValue {
+  /// A boolean, as read by [`crate::get_runtime_bool`].
+  Bool(bool),
+  /// A non-negative integer, as read exactly by [`crate::get_runtime_int`]. An integer is not
+  /// reported as [`RuntimeValue::Bool`], though [`crate::get_runtime_bool`] also reads it as one.
+  Int(u64),
+  /// Any other number, as read by [`crate::get_runtime_number`].
+  Number(f64),
 }
 
 /// BootstrapExtensionConfig is the module-side bootstrap extension configuration.
@@ -781,6 +980,27 @@ pub trait BootstrapExtension: Send + Sync {
   /// threads. To run code on every worker thread, call
   /// [`EnvoyBootstrapExtensionConfig::run_on_all_workers`] after the server is initialized.
   fn on_worker_thread_initialized(&mut self, _envoy_extension: &mut dyn EnvoyBootstrapExtension) {}
+
+  /// Called when the value of a runtime key watched via
+  /// [`EnvoyBootstrapExtension::enable_runtime_update`] changes. When several watched keys change
+  /// in the same runtime snapshot, this is called for each of them in lexicographic order of the
+  /// keys. The runtime getters such as [`crate::get_runtime_bool`] already return the new value on
+  /// the main thread when this is called.
+  ///
+  /// * `envoy_extension` can be used to interact with the underlying Envoy extension object.
+  /// * `key` is the watched runtime key whose value changed.
+  /// * `value` is the new value of the key, typed the way the runtime getters read it, or `None`
+  ///   when the key became unset. A value that is neither a boolean nor a number counts as unset.
+  ///   See [`RuntimeValue`]. When a runtime guard becomes unset, the guard returns to its value
+  ///   before any layer set it, normally its compiled default, while [`crate::get_runtime_bool`]
+  ///   returns the default given by the caller.
+  fn on_runtime_update(
+    &mut self,
+    _envoy_extension: &mut dyn EnvoyBootstrapExtension,
+    _key: &str,
+    _value: Option<RuntimeValue>,
+  ) {
+  }
 
   /// Called when Envoy begins draining.
   ///
@@ -1446,6 +1666,41 @@ impl EnvoyBootstrapExtensionConfig for EnvoyBootstrapExtensionConfigImpl {
     }
   }
 
+  fn get_config_snapshot(
+    &self,
+    providers: &[ConfigSnapshotProvider<'_>],
+    name_regex: Option<&str>,
+  ) -> Result<Box<dyn EnvoyBootstrapExtensionConfigSnapshot>, ConfigSnapshotError> {
+    let providers: smallvec::SmallVec<[_; 4]> = providers
+      .iter()
+      .map(|provider| str_to_module_buffer(provider.as_str()))
+      .collect();
+    let mut raw = std::ptr::null_mut();
+    let result = unsafe {
+      abi::envoy_dynamic_module_callback_bootstrap_extension_config_snapshot_new(
+        self.raw,
+        providers.as_ptr(),
+        providers.len(),
+        name_regex.map(str_to_module_buffer).unwrap_or(
+          abi::envoy_dynamic_module_type_module_buffer {
+            ptr: std::ptr::null(),
+            length: 0,
+          },
+        ),
+        &mut raw,
+      )
+    };
+    match result {
+      ConfigSnapshotResult::Success => {},
+      ConfigSnapshotResult::NotAllowed => return Err(ConfigSnapshotError::NotAllowed),
+      ConfigSnapshotResult::InvalidRegex => return Err(ConfigSnapshotError::InvalidRegex),
+      ConfigSnapshotResult::Unavailable => return Err(ConfigSnapshotError::Unavailable),
+      ConfigSnapshotResult::CollectionFailed => return Err(ConfigSnapshotError::CollectionFailed),
+    }
+    let raw = NonNull::new(raw).ok_or(ConfigSnapshotError::CollectionFailed)?;
+    Ok(Box::new(EnvoyBootstrapExtensionConfigSnapshotImpl { raw }))
+  }
+
   fn enable_listener_lifecycle(&self) -> bool {
     unsafe {
       abi::envoy_dynamic_module_callback_bootstrap_extension_enable_listener_lifecycle(self.raw)
@@ -1731,6 +1986,15 @@ impl EnvoyBootstrapExtension for EnvoyBootstrapExtensionImpl {
         Some(gauge_iterator_trampoline),
         &mut wrapper as *mut _ as *mut std::ffi::c_void,
       );
+    }
+  }
+
+  fn enable_runtime_update(&self, key: &str) -> bool {
+    unsafe {
+      abi::envoy_dynamic_module_callback_bootstrap_extension_enable_runtime_update(
+        self.raw,
+        str_to_module_buffer(key),
+      )
     }
   }
 }
@@ -2140,6 +2404,65 @@ ffi_export! {
   }
 }
 
+fn on_runtime_update_impl(
+  envoy_ptr: abi::envoy_dynamic_module_type_bootstrap_extension_envoy_ptr,
+  extension_ptr: abi::envoy_dynamic_module_type_bootstrap_extension_module_ptr,
+  key: abi::envoy_dynamic_module_type_envoy_buffer,
+  value: RuntimeValue,
+  removed: bool,
+) {
+  let extension = extension_ptr as *mut Box<dyn BootstrapExtension>;
+  let extension = unsafe { &mut *extension };
+  let key_str = unsafe { crate::ffi_helpers::str_lossy_from_raw(key.ptr as *const u8, key.length) };
+  extension.on_runtime_update(
+    &mut EnvoyBootstrapExtensionImpl::new(envoy_ptr),
+    key_str.as_ref(),
+    (!removed).then_some(value),
+  );
+}
+
+ffi_export! {
+  /// Event hook called by Envoy when a watched runtime key gets a new boolean value, or becomes
+  /// unset after having one.
+  fn envoy_dynamic_module_on_bootstrap_extension_runtime_bool_update(
+    envoy_ptr: abi::envoy_dynamic_module_type_bootstrap_extension_envoy_ptr,
+    extension_ptr: abi::envoy_dynamic_module_type_bootstrap_extension_module_ptr,
+    key: abi::envoy_dynamic_module_type_envoy_buffer,
+    value: bool,
+    removed: bool,
+  ) {
+    on_runtime_update_impl(envoy_ptr, extension_ptr, key, RuntimeValue::Bool(value), removed);
+  }
+}
+
+ffi_export! {
+  /// Event hook called by Envoy when a watched runtime key gets a new non-negative integer value,
+  /// or becomes unset after having one.
+  fn envoy_dynamic_module_on_bootstrap_extension_runtime_int_update(
+    envoy_ptr: abi::envoy_dynamic_module_type_bootstrap_extension_envoy_ptr,
+    extension_ptr: abi::envoy_dynamic_module_type_bootstrap_extension_module_ptr,
+    key: abi::envoy_dynamic_module_type_envoy_buffer,
+    value: u64,
+    removed: bool,
+  ) {
+    on_runtime_update_impl(envoy_ptr, extension_ptr, key, RuntimeValue::Int(value), removed);
+  }
+}
+
+ffi_export! {
+  /// Event hook called by Envoy when a watched runtime key gets any other new number, or becomes
+  /// unset after having one.
+  fn envoy_dynamic_module_on_bootstrap_extension_runtime_number_update(
+    envoy_ptr: abi::envoy_dynamic_module_type_bootstrap_extension_envoy_ptr,
+    extension_ptr: abi::envoy_dynamic_module_type_bootstrap_extension_module_ptr,
+    key: abi::envoy_dynamic_module_type_envoy_buffer,
+    value: f64,
+    removed: bool,
+  ) {
+    on_runtime_update_impl(envoy_ptr, extension_ptr, key, RuntimeValue::Number(value), removed);
+  }
+}
+
 ffi_export! {
   /// Event hook called by Envoy on every worker thread for an event posted by a bootstrap
   /// extension with `run_on_all_workers`.
@@ -2227,6 +2550,197 @@ ffi_export! {
       listener_name_str.as_ref(),
       status,
       error_details_str.as_ref(),
+    );
+  }
+}
+
+#[cfg(test)]
+mod snapshot_tests {
+  use super::*;
+  use crate::mod_test::config_snapshot_stubs::{TestHost, TestSnapshot};
+  use std::sync::atomic::{AtomicUsize, Ordering};
+  use std::sync::Arc;
+
+  fn snapshot(
+    json: Option<Vec<u8>>,
+    drops: Arc<AtomicUsize>,
+  ) -> Box<dyn EnvoyBootstrapExtensionConfigSnapshot> {
+    let raw = Box::into_raw(Box::new(TestSnapshot { json, drops })).cast();
+    Box::new(EnvoyBootstrapExtensionConfigSnapshotImpl {
+      raw: NonNull::new(raw).unwrap(),
+    })
+  }
+
+  #[test]
+  fn config_snapshot_can_move_to_worker_and_releases_after_encoding() {
+    let drops = Arc::new(AtomicUsize::new(0));
+    let owned = snapshot(Some(b"{\"configs\":[]}".to_vec()), Arc::clone(&drops));
+    let encoded = std::thread::spawn(move || owned.into_json())
+      .join()
+      .unwrap();
+    assert_eq!(encoded.unwrap(), b"{\"configs\":[]}");
+    assert_eq!(drops.load(Ordering::Relaxed), 1);
+  }
+
+  #[test]
+  fn config_snapshot_releases_on_encoding_failure_and_without_encoding() {
+    let drops = Arc::new(AtomicUsize::new(0));
+    assert_eq!(
+      snapshot(None, Arc::clone(&drops)).into_json(),
+      Err(ConfigSnapshotError::EncodingFailed)
+    );
+    drop(snapshot(Some(Vec::new()), Arc::clone(&drops)));
+    assert_eq!(drops.load(Ordering::Relaxed), 2);
+  }
+
+  #[test]
+  fn config_snapshot_selection_crosses_abi() {
+    let mut host = TestHost::default();
+    let envoy = EnvoyBootstrapExtensionConfigImpl::new(std::ptr::from_mut(&mut host).cast());
+    let cases = [
+      (ConfigSnapshotProvider::Bootstrap, "bootstrap"),
+      (ConfigSnapshotProvider::Clusters, "clusters"),
+      (ConfigSnapshotProvider::Listeners, "listeners"),
+      (ConfigSnapshotProvider::Routes, "routes"),
+      (ConfigSnapshotProvider::RouteScopes, "route_scopes"),
+      (ConfigSnapshotProvider::Secrets, "secrets"),
+      (ConfigSnapshotProvider::EcdsHttpFilters, "ecds_filter_http"),
+      (
+        ConfigSnapshotProvider::EcdsUpstreamHttpFilters,
+        "ecds_filter_upstream_http",
+      ),
+      (
+        ConfigSnapshotProvider::EcdsNetworkFilters,
+        "ecds_filter_network",
+      ),
+      (
+        ConfigSnapshotProvider::EcdsUpstreamNetworkFilters,
+        "ecds_filter_upstream_network",
+      ),
+      (
+        ConfigSnapshotProvider::EcdsTcpListenerFilters,
+        "ecds_filter_tcp_listener",
+      ),
+      (
+        ConfigSnapshotProvider::EcdsUdpListenerFilters,
+        "ecds_filter_udp_listener",
+      ),
+      (
+        ConfigSnapshotProvider::EcdsUdpSessionFilters,
+        "ecds_filter_udp_session",
+      ),
+      (
+        ConfigSnapshotProvider::EcdsQuicListenerFilters,
+        "ecds_filter_quic_listener",
+      ),
+      (
+        ConfigSnapshotProvider::Custom("extension-provider\0suffix"),
+        "extension-provider\0suffix",
+      ),
+    ];
+    let providers: Vec<_> = cases.iter().map(|(provider, _)| *provider).collect();
+    assert!(matches!(
+      envoy.get_config_snapshot(&providers, Some("cluster.*\0suffix")),
+      Err(ConfigSnapshotError::Unavailable)
+    ));
+    assert!(host
+      .providers
+      .iter()
+      .map(String::as_str)
+      .eq(cases.iter().map(|(_, name)| *name)));
+    assert_eq!(host.name_regex.as_deref(), Some("cluster.*\0suffix"));
+    assert!(matches!(
+      envoy.get_config_snapshot(&[], Some("")),
+      Err(ConfigSnapshotError::Unavailable)
+    ));
+    assert_eq!(host.name_regex.as_deref(), Some(""));
+    assert!(matches!(
+      envoy.get_config_snapshot(&[], None),
+      Err(ConfigSnapshotError::Unavailable)
+    ));
+    assert!(host.providers.is_empty());
+    assert!(host.name_regex.is_none());
+  }
+
+  #[test]
+  fn config_snapshot_collection_returns_an_encodable_handle() {
+    let drops = Arc::new(AtomicUsize::new(0));
+    let mut host = TestHost {
+      snapshot: Some(TestSnapshot {
+        json: Some(b"{\"configs\":[]}".to_vec()),
+        drops: Arc::clone(&drops),
+      }),
+      ..TestHost::default()
+    };
+    let envoy = EnvoyBootstrapExtensionConfigImpl::new(std::ptr::from_mut(&mut host).cast());
+    let snapshot = envoy
+      .get_config_snapshot(&[ConfigSnapshotProvider::Clusters], None)
+      .unwrap();
+    assert_eq!(snapshot.into_json().unwrap(), b"{\"configs\":[]}");
+    assert_eq!(drops.load(Ordering::Relaxed), 1);
+  }
+
+  #[test]
+  fn config_snapshot_collection_preserves_host_errors() {
+    for (result, error) in [
+      (
+        ConfigSnapshotResult::NotAllowed,
+        ConfigSnapshotError::NotAllowed,
+      ),
+      (
+        ConfigSnapshotResult::InvalidRegex,
+        ConfigSnapshotError::InvalidRegex,
+      ),
+      (
+        ConfigSnapshotResult::Unavailable,
+        ConfigSnapshotError::Unavailable,
+      ),
+      (
+        ConfigSnapshotResult::CollectionFailed,
+        ConfigSnapshotError::CollectionFailed,
+      ),
+    ] {
+      let mut host = TestHost {
+        result: Some(result),
+        ..TestHost::default()
+      };
+      let envoy = EnvoyBootstrapExtensionConfigImpl::new(std::ptr::from_mut(&mut host).cast());
+      assert!(matches!(envoy.get_config_snapshot(&[], None), Err(actual) if actual == error));
+    }
+  }
+
+  #[test]
+  fn config_snapshot_rejects_success_without_a_handle() {
+    let mut host = TestHost {
+      result: Some(ConfigSnapshotResult::Success),
+      ..TestHost::default()
+    };
+    let envoy = EnvoyBootstrapExtensionConfigImpl::new(std::ptr::from_mut(&mut host).cast());
+    assert!(matches!(
+      envoy.get_config_snapshot(&[], None),
+      Err(ConfigSnapshotError::CollectionFailed)
+    ));
+  }
+
+  #[test]
+  fn config_snapshot_can_be_mocked() {
+    let mut snapshot = MockEnvoyBootstrapExtensionConfigSnapshot::new();
+    snapshot
+      .expect_into_json()
+      .once()
+      .return_once(|| Ok(b"{}".to_vec()));
+    let mut envoy = MockEnvoyBootstrapExtensionConfig::new();
+    envoy
+      .expect_get_config_snapshot()
+      .once()
+      .return_once(move |_, _| Ok(Box::new(snapshot)));
+    assert_eq!(
+      envoy
+        .get_config_snapshot(&[], None)
+        .unwrap()
+        .into_json()
+        .unwrap(),
+      b"{}"
     );
   }
 }

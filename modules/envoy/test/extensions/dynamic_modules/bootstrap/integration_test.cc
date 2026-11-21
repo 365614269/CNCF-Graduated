@@ -1,3 +1,4 @@
+#include "envoy/admin/v3/config_dump.pb.h"
 #include "envoy/config/bootstrap/v3/bootstrap.pb.h"
 #include "envoy/config/cluster/v3/cluster.pb.h"
 #include "envoy/config/listener/v3/listener.pb.h"
@@ -315,6 +316,53 @@ TEST_P(DynamicModulesBootstrapIntegrationTest, ListenerLifecycleRust) {
       initializeWithBootstrapExtension(testDataDir("rust"), "bootstrap_listener_lifecycle_test"));
 }
 
+// This test verifies that a Rust bootstrap extension is told about every change of the runtime keys
+// it watches, including a runtime feature flag, with the new value, and is not told about the
+// values present when it started watching, about unchanged values or about unwatched keys.
+TEST_P(DynamicModulesBootstrapIntegrationTest, RuntimeUpdateRust) {
+  DISABLE_IF_ADMIN_DISABLED;
+  config_helper_.addRuntimeOverride("dynamic_modules_test.number", "1");
+  EXPECT_LOG_CONTAINS_ALL_OF(
+      Envoy::ExpectedLogMessages(
+          {{"info", "Runtime update enabled for dynamic_modules_test.number: true"},
+           {"info", "Runtime update enabled for dynamic_modules_test.ratio: true"},
+           {"info",
+            "Runtime update enabled for envoy.reloadable_features.test_feature_true: true"}}),
+      initializeWithBootstrapExtension(testDataDir("rust"), "bootstrap_runtime_update_test"));
+
+  auto runtime_modify = [this](absl::string_view query) {
+    BufferingStreamDecoderPtr response = IntegrationUtil::makeSingleRequest(
+        lookupPort("admin"), "POST", absl::StrCat("/runtime_modify?", query), "",
+        Http::CodecType::HTTP1, version_);
+    ASSERT_TRUE(response->complete());
+    EXPECT_EQ("200", response->headers().getStatusValue());
+  };
+
+  EXPECT_LOG_CONTAINS_ALL_OF(
+      Envoy::ExpectedLogMessages(
+          {{"info", "Runtime update: dynamic_modules_test.number=Int(42), getter agrees: true"},
+           {"info", "Runtime update: dynamic_modules_test.ratio=Number(0.25), getter agrees: true"},
+           {"info", "Runtime update: envoy.reloadable_features.test_feature_true=Bool(false), "
+                    "getter agrees: true"}}),
+      runtime_modify(
+          "dynamic_modules_test.number=42&dynamic_modules_test.ratio=0.25&envoy."
+          "reloadable_features.test_feature_true=false&dynamic_modules_test.unwatched=1"));
+
+  EXPECT_LOG_NOT_CONTAINS(
+      "info", "Runtime update:",
+      runtime_modify("dynamic_modules_test.number=42&dynamic_modules_test.unwatched=2"));
+
+  // Removing the admin override of a key falls back to the lower layer, and removing the only
+  // value of a key reports a removal.
+  EXPECT_LOG_CONTAINS_ALL_OF(
+      Envoy::ExpectedLogMessages(
+          {{"info", "Runtime update: dynamic_modules_test.number=Int(1), getter agrees: true"},
+           {"info", "Runtime update: dynamic_modules_test.ratio removed"},
+           {"info", "Runtime update: envoy.reloadable_features.test_feature_true removed"}}),
+      runtime_modify("dynamic_modules_test.number=&dynamic_modules_test.ratio=&envoy.reloadable_"
+                     "features.test_feature_true="));
+}
+
 // This test verifies that a bootstrap extension can register a function in the process-wide
 // function registry and an HTTP filter in the same module can resolve and call it during request
 // processing. The bootstrap extension asynchronously initializes a routing table and registers a
@@ -438,6 +486,59 @@ typed_config:
     // No x-routed-to header should be present.
     EXPECT_TRUE(upstream_request_->headers().get(Http::LowerCaseString("x-routed-to")).empty());
   }
+}
+
+TEST_P(DynamicModulesBootstrapIntegrationTest, ConfigSnapshotRust) {
+  DISABLE_IF_ADMIN_DISABLED;
+  config_helper_.addConfigModifier([](envoy::config::bootstrap::v3::Bootstrap& bootstrap) {
+    bootstrap.mutable_admin()->add_allow_paths()->set_prefix("/snapshot");
+    auto* cluster = bootstrap.mutable_static_resources()->add_clusters();
+    cluster->set_name("snapshot_extra");
+    cluster->set_type(envoy::config::cluster::v3::Cluster::STATIC);
+    cluster->mutable_connect_timeout()->set_seconds(1);
+  });
+  initializeWithBootstrapExtension(testDataDir("rust"), "bootstrap_config_snapshot_test");
+  auto denied = IntegrationUtil::makeSingleRequest(lookupPort("admin"), "GET", "/config_dump", "",
+                                                   Http::CodecType::HTTP1, version_);
+  EXPECT_EQ("403", denied->headers().getStatusValue());
+
+  auto collect = [this](absl::string_view path) {
+    auto response = IntegrationUtil::makeSingleRequest(
+        lookupPort("admin"), "GET", std::string(path), "", Http::CodecType::HTTP1, version_);
+    EXPECT_EQ("200", response->headers().getStatusValue());
+    envoy::admin::v3::ConfigDump dump;
+    TestUtility::loadFromJson(response->body(), dump);
+    return dump;
+  };
+  auto snapshot = collect("/snapshot");
+  ASSERT_EQ(2, snapshot.configs_size());
+  envoy::admin::v3::ClustersConfigDump clusters;
+  ASSERT_TRUE(snapshot.configs(0).UnpackTo(&clusters));
+  ASSERT_EQ(2, clusters.static_clusters_size());
+  std::vector<std::string> cluster_names;
+  for (const auto& entry : clusters.static_clusters()) {
+    envoy::config::cluster::v3::Cluster cluster;
+    ASSERT_TRUE(entry.cluster().UnpackTo(&cluster));
+    cluster_names.push_back(cluster.name());
+  }
+  EXPECT_THAT(cluster_names, testing::UnorderedElementsAre("cluster_0", "snapshot_extra"));
+  envoy::admin::v3::ListenersConfigDump listeners;
+  ASSERT_TRUE(snapshot.configs(1).UnpackTo(&listeners));
+  ASSERT_EQ(1, listeners.dynamic_listeners_size());
+  envoy::config::listener::v3::Listener listener;
+  ASSERT_TRUE(listeners.dynamic_listeners(0).active_state().listener().UnpackTo(&listener));
+  EXPECT_EQ("http", listener.name());
+  EXPECT_FALSE(listener.filter_chains().empty());
+
+  snapshot = collect("/snapshot?filtered");
+  ASSERT_EQ(2, snapshot.configs_size());
+  ASSERT_TRUE(snapshot.configs(0).UnpackTo(&clusters));
+  ASSERT_EQ(1, clusters.static_clusters_size());
+  envoy::config::cluster::v3::Cluster cluster;
+  ASSERT_TRUE(clusters.static_clusters(0).cluster().UnpackTo(&cluster));
+  EXPECT_EQ("cluster_0", cluster.name());
+  ASSERT_TRUE(snapshot.configs(1).UnpackTo(&listeners));
+  EXPECT_EQ(0, listeners.dynamic_listeners_size());
 }
 
 // Verifies a Rust bootstrap extension can enumerate active resource names by kind via

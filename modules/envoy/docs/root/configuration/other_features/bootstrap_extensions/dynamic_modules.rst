@@ -11,6 +11,7 @@ This can be used to implement:
 * Server initialization logic when Envoy starts.
 * Code that runs on every worker thread.
 * Clusters and listeners that the module adds, updates and removes.
+* Reactions to runtime value changes.
 * Singleton patterns for configuration loading from external services.
 * Global state management across filters.
 * Background tasks that run on the main thread.
@@ -71,6 +72,42 @@ The workers start only after Envoy finishes initializing, so a module must not w
 hook before it calls ``envoy_dynamic_module_callback_bootstrap_extension_config_signal_init_complete``.
 That call can start the workers and wait until they ran the events posted before it, so a module
 must not hold a lock across it that its worker event hook takes.
+
+.. _config_bootstrap_extensions_dynamic_modules_runtime_update:
+
+Runtime Updates
+---------------
+
+A bootstrap extension watches a :ref:`runtime <config_runtime>` key by passing it to
+``envoy_dynamic_module_callback_bootstrap_extension_enable_runtime_update``, once for each key to
+watch. Envoy then calls a runtime update hook on that extension on the main thread whenever the
+value of a watched key changes. The hook is chosen by the type of the value, the way the runtime
+getters read it:
+
+* ``envoy_dynamic_module_on_bootstrap_extension_runtime_int_update`` for a non-negative integer,
+  as read by ``envoy_dynamic_module_callback_get_runtime_int``.
+* ``envoy_dynamic_module_on_bootstrap_extension_runtime_number_update`` for any other number, as
+  read by ``envoy_dynamic_module_callback_get_runtime_number``.
+* ``envoy_dynamic_module_on_bootstrap_extension_runtime_bool_update`` for a boolean, as read by
+  ``envoy_dynamic_module_callback_get_runtime_bool``.
+
+A value of any other type, such as a string, counts as unset. When a key becomes unset, Envoy calls
+the hook of its previous type with the previous value and ``removed`` set. Envoy compares each
+newly loaded runtime snapshot with the previous values of the watched keys, so an RTDS update, a
+disk layer update or a request to the admin ``/runtime_modify`` endpoint reports only the watched
+keys whose type or value it changed, in lexicographic order. The value of a key when the extension
+starts watching it is not reported. When a hook runs, the runtime getters already return the new
+value on the main thread. When a runtime guard such as ``envoy.reloadable_features.some_flag`` is
+removed, the guard returns to its value before any layer set it, normally its compiled default,
+while ``envoy_dynamic_module_callback_get_runtime_bool`` returns the default given by the caller.
+
+The extension can only watch keys during
+``envoy_dynamic_module_on_bootstrap_extension_server_initialized``. RTDS may or may not have
+delivered its layers by then, so the extension should read the current value with the runtime
+getters when it starts watching a key, and then rely on the hooks for the later changes. No update
+is reported once the server began to shut down. In the Rust SDK, the three hooks call
+``on_runtime_update`` of ``BootstrapExtension`` with a ``RuntimeValue``, or with ``None`` when the
+key became unset.
 
 .. _config_bootstrap_extensions_dynamic_modules_cluster_writer:
 
@@ -177,6 +214,47 @@ prefix, tagged with ``config_name`` set to the extension name, or ``default`` if
   ownership_lost, Counter, Listeners that another component replaced or removed
   listeners_owned, Gauge, Listeners that the module owns
   updates_pending, Gauge, Writes that are queued or warming or that wait for the workers to start
+
+.. _config_bootstrap_extensions_dynamic_modules_config_snapshots:
+
+Configuration Snapshots
+-----------------------
+
+Bootstrap modules can collect selected configuration providers with
+``envoy_dynamic_module_callback_bootstrap_extension_config_snapshot_new``. The Rust SDK exposes
+this as ``get_config_snapshot``.
+
+Provider keys include ``bootstrap``, ``clusters``, ``listeners``,
+``routes``, ``route_scopes``, ``secrets`` and the registered ``ecds_filter_*`` providers. Missing keys
+are omitted, duplicates are collected once, and an empty selection collects nothing. Providers
+appear in key order, as in :ref:`/config_dump <operations_admin_interface_config_dump>`.
+Endpoint dumps are not included. An optional full-match RE2 regular expression filters resource names
+for providers that support it. A missing or empty expression disables filtering.
+
+Collection and sensitive-field redaction run synchronously on the main thread after server
+initialization and before shutdown begins. Their cost grows with the selected resources. Combine
+frequent notifications into one collection.
+
+Collection is refused in cluster or listener lifecycle hooks, whatever triggered them, and in
+other bootstrap hooks Envoy runs inside an xDS update or a resource's destruction. Providers can
+contain partially applied changes with an old version. Defer collection with the bootstrap config
+scheduler. Callout failures during cluster removal are already reported from a posted callback.
+
+Creation returns a result distinguishing a refused call, an invalid or oversized name expression,
+unavailable admin support, and a provider failure. Calls are refused off the main thread, before
+initialization, after shutdown begins, inside those hooks, or while another collection runs.
+
+JSON encoding can also be expensive. Use a module-owned thread to avoid blocking Envoy's main thread
+or workers. Encoding and deletion can run on any thread. Release each snapshot before its owning
+bootstrap configuration's destroy hook returns. Modules must stop and join workers holding snapshots
+during configuration teardown. A snapshot must not be used concurrently.
+
+Redaction covers only protobuf fields annotated as sensitive, as with ``/config_dump``. Metadata,
+opaque strings and module configuration can still contain sensitive data. JSON encoding can fail
+when an ``Any`` contains an unknown or unlinked protobuf type.
+
+This API needs admin support compiled in, but does not need an admin listener and is not restricted
+by admin ``allow_paths``.
 
 Use Cases
 ---------
