@@ -418,7 +418,7 @@ github.com/intel/goresctrl/pkg/kubernetes
 github.com/intel/goresctrl/pkg/path
 github.com/intel/goresctrl/pkg/rdt
 github.com/intel/goresctrl/pkg/utils
-# github.com/klauspost/compress v1.20.3
+# github.com/klauspost/compress v1.20.4
 ## explicit; go 1.25
 github.com/klauspost/compress
 github.com/klauspost/compress/flate
@@ -719,7 +719,7 @@ golang.org/x/crypto/cryptobyte
 golang.org/x/crypto/cryptobyte/asn1
 golang.org/x/crypto/hkdf
 golang.org/x/crypto/sha3
-# golang.org/x/mod v0.42.0
+# golang.org/x/mod v0.43.0
 ## explicit; go 1.26.0
 golang.org/x/mod/semver
 # golang.org/x/net v0.62.0
@@ -1029,7 +1029,7 @@ sigs.k8s.io/structured-merge-diff/v7/value
 # sigs.k8s.io/yaml v1.6.0
 ## explicit; go 1.22
 sigs.k8s.io/yaml
-# tags.cncf.io/container-device-interface v1.1.1
+# tags.cncf.io/container-device-interface v1.1.2
 ## explicit; go 1.23
 tags.cncf.io/container-device-interface/internal/ociedit
 tags.cncf.io/container-device-interface/internal/validation

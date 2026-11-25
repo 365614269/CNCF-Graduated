@@ -45,7 +45,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.1
 	github.com/intel/goresctrl v0.13.0
-	github.com/klauspost/compress v1.20.3
+	github.com/klauspost/compress v1.20.4
 	github.com/mdlayher/vsock v1.4.0
 	github.com/moby/locker v1.0.1 //gosocialcheck:trusted
 	github.com/moby/sys/mountinfo v0.7.2 //gosocialcheck:trusted
@@ -77,7 +77,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.47.0
 	go.opentelemetry.io/otel/sdk v1.47.0
 	go.opentelemetry.io/otel/trace v1.47.0
-	golang.org/x/mod v0.42.0 //gosocialcheck:trusted
+	golang.org/x/mod v0.43.0 //gosocialcheck:trusted
 	golang.org/x/sync v0.25.0 //gosocialcheck:trusted
 	golang.org/x/sys v0.50.0 //gosocialcheck:trusted
 	golang.org/x/time v0.16.0 //gosocialcheck:trusted
@@ -91,7 +91,7 @@ require (
 	k8s.io/cri-streaming v0.38.0-beta.0
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/streaming v0.38.0-beta.0
-	tags.cncf.io/container-device-interface v1.1.1
+	tags.cncf.io/container-device-interface v1.1.2
 )
 
 require (

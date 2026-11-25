@@ -8,8 +8,8 @@ schema = 3
     version = "v0.123.0"
     hash = "sha256-OjuvlqYrGvoUiXO/5ALbMxHvXRlrhDjLby1BN/nuhAw="
   [mod."cloud.google.com/go/auth"]
-    version = "v0.24.1-0.20261001053825-dbc26066f70a"
-    hash = "sha256-pRhLkVobgMUr7ZLoL9e7dyE7QdAbJuyOpIgGsi0Kab0="
+    version = "v0.24.1"
+    hash = "sha256-kL53gv5Tq8mUUPZh1XfoShkup9ACOnEQhxtr0PMnx2g="
   [mod."cloud.google.com/go/auth/oauth2adapt"]
     version = "v0.3.0"
     hash = "sha256-wCGutEF5sCKrrGALupeQL8QYyjgSPu+KtVmZ6+/I8PQ="
@@ -20,11 +20,11 @@ schema = 3
     version = "v1.14.0"
     hash = "sha256-hwxPmKkVbkemYhUrEArP/CLftjLI+VQUjx5MkdaJXtA="
   [mod."cloud.google.com/go/monitoring"]
-    version = "v1.29.0"
-    hash = "sha256-Hn/YZtZle8ObXy8yft4pgiNslqScuCdVnK8ztPnyEqw="
+    version = "v1.30.0"
+    hash = "sha256-AOxUKDkE75OQV1Jp43Nh8mgAu/SzvNKjzt1+R7Nb/HM="
   [mod."cloud.google.com/go/storage"]
-    version = "v1.68.0"
-    hash = "sha256-ohfDuIG0/R/wn8iWOznrhMSvrQO3qtWAhXHUqHdPMIU="
+    version = "v1.70.0"
+    hash = "sha256-U1gIDjsDJXWxM3b/y/QX+6QwNaXzhiZMLSVPavILzdY="
   [mod."dario.cat/mergo"]
     version = "v1.0.2"
     hash = "sha256-p6jdiHlLEfZES8vJnDywG4aVzIe16p0CU6iglglIweA="
@@ -965,10 +965,10 @@ schema = 3
     version = "v0.0.0-20261012220534-4341edf3f941"
     hash = "sha256-wQ9vIu89aXy9/x6M15m9gY4euMKo99GIX64M6vmRjhM="
   [mod."google.golang.org/genproto/googleapis/api"]
-    version = "v0.0.0-20261110000943-09e21b237f2c"
-    hash = "sha256-U2Hb54rCMaqBwu1vrS/uuky3Xt00DNuUXywpCWN5bhg="
+    version = "v0.0.0-20261123191846-1e707ab9fbc2"
+    hash = "sha256-fqFusMV5vIoM/R+DH7F8Nrs4L7xEUio06C7vJFc3A64="
   [mod."google.golang.org/genproto/googleapis/rpc"]
-    version = "v0.0.0-20261104224025-d1e00e9f33ab"
+    version = "v0.0.0-20261118221215-c8830f628b3f"
     hash = "sha256-qBJJ3Go2HqyEE+jp6FMafhXbMBbA/PIXvbdROnLPAYA="
   [mod."google.golang.org/grpc"]
     version = "v1.85.0"
@@ -1028,8 +1028,8 @@ schema = 3
     version = "v0.35.4"
     hash = "sha256-qQ+d6Be34puAk4cYSltBU5Dz4azZ4dzYXGAw/HYsj/c="
   [mod."k8s.io/utils"]
-    version = "v0.0.0-20260707023825-cf1189d6abe3"
-    hash = "sha256-DBYXOtMHB8jsC8CcjH+iLEkzgYQwAOYtIlTsqQtpHMw="
+    version = "v0.0.0-20261023123148-ca04ba58ecab"
+    hash = "sha256-qIrvwpCcBNxhw0VNpuU+HvlKg0bBHSZJWgeQBj4Swhw="
   [mod."modernc.org/libc"]
     version = "v1.73.4"
     hash = "sha256-YN3m9MDZ2GRZznT5ErWZJdap+E5xOwOyKlZ/ixyGT+0="
