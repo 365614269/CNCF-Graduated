@@ -1,6 +1,7 @@
 package run
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509/pkix"
 	"io"
@@ -17,13 +18,17 @@ import (
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	"github.com/spiffe/spire/pkg/common/log"
+	"github.com/spiffe/spire/pkg/common/plugindecode"
 	"github.com/spiffe/spire/pkg/common/telemetry"
 	"github.com/spiffe/spire/pkg/common/tlspolicy"
 	"github.com/spiffe/spire/pkg/server"
 	bundleClient "github.com/spiffe/spire/pkg/server/bundle/client"
 	"github.com/spiffe/spire/pkg/server/credtemplate"
+	"github.com/spiffe/spire/pkg/server/datastore/sqlcommon"
 	"github.com/spiffe/spire/pkg/server/endpoints/bundle"
 	"github.com/spiffe/spire/pkg/server/plugin/keymanager"
+	upstreamdisk "github.com/spiffe/spire/pkg/server/plugin/upstreamauthority/disk"
+	"github.com/spiffe/spire/test/configtest"
 	"github.com/spiffe/spire/test/spiretest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -82,7 +87,7 @@ func TestParseConfigGood(t *testing.T) {
 			Name:       "plugin_name_server",
 			Path:       "./pluginServerCmd",
 			Checksum:   "pluginServerChecksum",
-			DataSource: catalog.FixedData(data),
+			DataSource: catalog.FixedData{Data: data, Format: catalog.ConfigFormatHCL},
 			Disabled:   false,
 		},
 		{
@@ -90,7 +95,7 @@ func TestParseConfigGood(t *testing.T) {
 			Name:       "plugin_disabled",
 			Path:       "./pluginServerCmd",
 			Checksum:   "pluginServerChecksum",
-			DataSource: catalog.FixedData(data),
+			DataSource: catalog.FixedData{Data: data, Format: catalog.ConfigFormatHCL},
 			Disabled:   true,
 		},
 		{
@@ -98,7 +103,7 @@ func TestParseConfigGood(t *testing.T) {
 			Name:       "plugin_enabled",
 			Path:       "./pluginServerCmd",
 			Checksum:   "pluginServerChecksum",
-			DataSource: catalog.FileData("plugin.conf"),
+			DataSource: catalog.FileData{Path: "plugin.conf", Format: catalog.ConfigFormatHCL},
 			Disabled:   false,
 		},
 	}
@@ -106,6 +111,221 @@ func TestParseConfigGood(t *testing.T) {
 	pluginConfigs, err := catalog.PluginConfigsFromHCLNode(c.Plugins)
 	require.NoError(t, err)
 	require.Equal(t, expectedPluginConfigs, pluginConfigs)
+}
+
+func TestParseFile_YAML(t *testing.T) {
+	for _, name := range []string{"server_good_posix", "server_yaml_parity"} {
+		t.Run(name, func(t *testing.T) {
+			hclConf, err := ParseFile("../../../../test/fixture/config/"+name+".conf", false)
+			require.NoError(t, err)
+			yamlConf, err := ParseFile("../../../../test/fixture/config/"+name+".yaml", false)
+			require.NoError(t, err)
+			require.NotNil(t, yamlConf.PluginsRaw)
+			require.Empty(t, yamlConf.YAMLUnknownKeys)
+
+			setYAMLProfilesFromHCL(t, hclConf)
+			hclConf.ConfigFormat = catalog.ConfigFormatYAML
+			hclConf.Server.Experimental.EnableYAMLConfig = true
+			configtest.RequireYAMLParity(t, hclConf, yamlConf, hclConf.Plugins, yamlConf.PluginsRaw, decodeServerPluginData)
+		})
+	}
+}
+
+// setYAMLProfilesFromHCL decodes the HCL bundle endpoint profiles into the
+// fields that YAML configurations use, so both can be compared.
+func setYAMLProfilesFromHCL(t *testing.T, c *Config) {
+	federation := c.Server.Federation
+	if federation == nil {
+		return
+	}
+	if be := federation.BundleEndpoint; be != nil && be.Profile != nil {
+		text, err := parseBundleEndpointProfileASTNode(be.Profile)
+		require.NoError(t, err)
+		be.ProfileConfig = new(bundleEndpointConfigProfile)
+		require.NoError(t, hcl.Decode(be.ProfileConfig, text))
+	}
+	for td, fw := range federation.FederatesWith {
+		if fw.BundleEndpointProfile == nil {
+			continue
+		}
+		text, err := parseBundleEndpointProfileASTNode(fw.BundleEndpointProfile)
+		require.NoError(t, err)
+		fw.BundleEndpointProfileConfig = new(bundleEndpointProfileConfig)
+		require.NoError(t, hcl.Decode(fw.BundleEndpointProfileConfig, text))
+		federation.FederatesWith[td] = fw
+	}
+}
+
+func decodeServerPluginData(t *testing.T, pluginType, pluginName, data string, format catalog.ConfigFormat) any {
+	switch pluginType + "/" + pluginName {
+	case "DataStore/sql":
+		config, err := sqlcommon.BuildConfig(data, format)
+		require.NoError(t, err)
+		config.DatabaseTypeNode, config.DatabaseTypeYAML = nil, nil
+		return config
+	case "UpstreamAuthority/disk":
+		config := new(upstreamdisk.Configuration)
+		require.NoError(t, plugindecode.DecodeConfig(data, format, config))
+		return config
+	}
+	return nil
+}
+
+func TestNewServerConfig_YAMLProfiles(t *testing.T) {
+	certPath, err := filepath.Abs("../../../../conf/server/dummy_upstream_ca.crt")
+	require.NoError(t, err)
+	keyPath, err := filepath.Abs("../../../../conf/server/dummy_upstream_ca.key")
+	require.NoError(t, err)
+
+	parse := func(t *testing.T, federation string) *Config {
+		path := filepath.Join(t.TempDir(), "server.yaml")
+		config := `server:
+  bind_address: 127.0.0.1
+  bind_port: 8081
+  trust_domain: example.org
+  log_level: INFO
+  data_dir: ` + t.TempDir() + `
+  experimental:
+    enable_yaml_config: true
+  federation:
+` + federation + `
+plugins:
+  KeyManager:
+    memory:
+      plugin_data: {}
+`
+		require.NoError(t, os.WriteFile(path, []byte(config), 0o600))
+		c, err := ParseFile(path, false)
+		require.NoError(t, err)
+		require.Empty(t, c.YAMLUnknownKeys)
+		return c
+	}
+
+	t.Run("valid", func(t *testing.T) {
+		c := parse(t, `    bundle_endpoint:
+      address: 0.0.0.0
+      port: 8443
+      profile:
+        https_web:
+          serving_cert_file:
+            cert_file_path: `+certPath+`
+            key_file_path: `+keyPath+`
+            file_sync_interval: 1h
+    federates_with:
+      domain1.test:
+        bundle_endpoint_url: https://1.2.3.4:8443
+        bundle_endpoint_profile:
+          https_spiffe:
+            endpoint_spiffe_id: spiffe://domain1.test/beserver
+      domain2.test:
+        bundle_endpoint_url: https://example.org:8443
+        bundle_endpoint_profile:
+          https_web: {}`)
+		sc, err := NewServerConfig(c, nil, false)
+		require.NoError(t, err)
+		require.NotNil(t, sc.Federation.BundleEndpoint.DiskCertManager)
+		require.Equal(t, bundleClient.HTTPSSPIFFEProfile{EndpointSPIFFEID: spiffeid.RequireFromString("spiffe://domain1.test/beserver")},
+			sc.Federation.FederatesWith[spiffeid.RequireTrustDomainFromString("domain1.test")].EndpointProfile)
+		require.Equal(t, bundleClient.HTTPSWebProfile{},
+			sc.Federation.FederatesWith[spiffeid.RequireTrustDomainFromString("domain2.test")].EndpointProfile)
+	})
+
+	for _, tt := range []struct {
+		name, federation, err string
+	}{
+		{
+			name: "two bundle endpoint profiles",
+			federation: `    bundle_endpoint:
+      profile:
+        https_spiffe: {}
+        https_web: {}`,
+			err: "exactly one bundle endpoint profile is expected",
+		},
+		{
+			name: "two federates_with profiles",
+			federation: `    federates_with:
+      domain1.test:
+        bundle_endpoint_url: https://1.2.3.4:8443
+        bundle_endpoint_profile:
+          https_spiffe:
+            endpoint_spiffe_id: spiffe://domain1.test/beserver
+          https_web: {}`,
+			err: "exactly one bundle endpoint profile is expected",
+		},
+		{
+			// A profile key without a value is not considered set.
+			name: "profile without value",
+			federation: `    federates_with:
+      domain1.test:
+        bundle_endpoint_url: https://1.2.3.4:8443
+        bundle_endpoint_profile:
+          https_web:`,
+			err: "no bundle endpoint profile defined",
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := NewServerConfig(parse(t, tt.federation), nil, false)
+			require.ErrorContains(t, err, tt.err)
+		})
+	}
+}
+
+func TestParseFile_YAMLUnknownKeys(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.yaml")
+	require.NoError(t, os.WriteFile(path, []byte("server:\n  trust_domain: example.org\n  trustDomain: example.org\n"), 0o600))
+	c, err := ParseFile(path, false)
+	require.NoError(t, err)
+	require.Equal(t, "example.org", c.Server.TrustDomain)
+	require.Equal(t, []string{"trustDomain (line 3)"}, c.YAMLUnknownKeys)
+
+	log, hook := test.NewNullLogger()
+	require.EqualError(t, checkForUnknownConfig(c, log), "unknown configuration detected")
+	require.Equal(t, "trustDomain (line 3)", hook.LastEntry().Data["keys"])
+}
+
+func TestParseFile_YAMLErrors(t *testing.T) {
+	for _, tt := range []struct {
+		name, config, err string
+	}{
+		{"wrong type", "server:\n  bind_port: notanumber\n", "cannot unmarshal"},
+		{"multiple documents", "server: {}\n---\nserver: {}\n", "multiple YAML documents are not supported"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "config.yaml")
+			require.NoError(t, os.WriteFile(path, []byte(tt.config), 0o600))
+			_, err := ParseFile(path, false)
+			require.ErrorContains(t, err, tt.err)
+		})
+	}
+}
+
+func TestParseFile_YAMLExpandEnv(t *testing.T) {
+	t.Setenv("TEST_YAML_TRUST_DOMAIN", "example.org")
+	path := filepath.Join(t.TempDir(), "config.yaml")
+	require.NoError(t, os.WriteFile(path, []byte("server:\n  trust_domain: $TEST_YAML_TRUST_DOMAIN\n"), 0o600))
+	c, err := ParseFile(path, true)
+	require.NoError(t, err)
+	require.Equal(t, "example.org", c.Server.TrustDomain)
+}
+
+func TestValidateConfig_YAMLRequiresExperimentalFlag(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.yaml")
+	config := "server:\n  bind_address: 127.0.0.1\n  bind_port: 8081\n  trust_domain: example.org\n  data_dir: /tmp\nplugins:\n  KeyManager:\n    memory: {}\n"
+	require.NoError(t, os.WriteFile(path, []byte(config), 0o600))
+	c, err := ParseFile(path, false)
+	require.NoError(t, err)
+	require.EqualError(t, validateConfig(c), "YAML configuration is experimental: set experimental.enable_yaml_config to true to use it")
+
+	c.Server.Experimental.EnableYAMLConfig = true
+	require.NoError(t, validateConfig(c))
+}
+
+func TestValidateConfig_YAMLWithoutPlugins(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.yaml")
+	require.NoError(t, os.WriteFile(path, []byte("server:\n  bind_address: 127.0.0.1\n  bind_port: 8081\n  trust_domain: example.org\n  data_dir: /tmp\n  experimental:\n    enable_yaml_config: true\n"), 0o600))
+	c, err := ParseFile(path, false)
+	require.NoError(t, err)
+	require.EqualError(t, validateConfig(c), "plugins section must be configured")
 }
 
 func TestMergeInput(t *testing.T) {
@@ -933,6 +1153,18 @@ func TestNewServerConfig(t *testing.T) {
 				require.Equal(t, 8443, c.Federation.BundleEndpoint.Address.Port)
 				require.Equal(t, 10*time.Minute, c.Federation.BundleEndpoint.RefreshHint)
 
+				require.Nil(t, c.Federation.BundleEndpoint.ACME)
+				require.NotNil(t, c.Federation.BundleEndpoint.DiskCertManager)
+			},
+		},
+		{
+			msg: "bundle endpoint has web profile with certs on disk and no file sync interval",
+			input: func(c *Config) {
+				c.Server.Federation = &federationConfig{
+					BundleEndpoint: bundleEndpointProfileHTTPSWebServingCertFileNoSyncIntervalTest(t),
+				}
+			},
+			test: func(t *testing.T, c *server.Config) {
 				require.Nil(t, c.Federation.BundleEndpoint.ACME)
 				require.NotNil(t, c.Federation.BundleEndpoint.DiskCertManager)
 			},
@@ -2510,6 +2742,48 @@ func TestAgentTTL(t *testing.T) {
 	}
 }
 
+func TestBundleEndpointServingCertFileSyncInterval(t *testing.T) {
+	for _, tt := range []struct {
+		name     string
+		config   *bundleEndpointConfig
+		expected string
+	}{
+		{
+			name:     "file_sync_interval is used when set",
+			config:   bundleEndpointProfileHTTPSWebServingCertFileTest(t),
+			expected: "5m0s",
+		},
+		{
+			name:     "file_sync_interval defaults to 1h when not set",
+			config:   bundleEndpointProfileHTTPSWebServingCertFileNoSyncIntervalTest(t),
+			expected: "1h0m0s",
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			log, hook := test.NewNullLogger()
+			federationConfig := &server.FederationConfig{BundleEndpoint: &bundle.EndpointConfig{}}
+			require.NoError(t, setBundleEndpointConfigProfile(tt.config, t.TempDir(), log, federationConfig))
+			certManager := federationConfig.BundleEndpoint.DiskCertManager
+			require.NotNil(t, certManager)
+
+			// The cert manager does not expose its sync interval, but it logs
+			// the interval when it starts watching the files. Start it with a
+			// canceled context so that it returns right away.
+			ctx, cancel := context.WithCancel(context.Background())
+			cancel()
+			certManager.WatchFileChanges(ctx)
+
+			spiretest.AssertLogsContainEntries(t, hook.AllEntries(), []spiretest.LogEntry{
+				{
+					Level:   logrus.InfoLevel,
+					Message: "Started watching certificate files",
+					Data:    logrus.Fields{"interval": tt.expected},
+				},
+			})
+		})
+	}
+}
+
 func bundleEndpointProfileACMEAndProfileTest(t *testing.T) *bundleEndpointConfig {
 	configString := `address = "0.0.0.0"
         port = 8443
@@ -2539,6 +2813,22 @@ func bundleEndpointProfileHTTPSWebServingCertFileTest(t *testing.T) *bundleEndpo
         		cert_file_path = "../../../../test/fixture/certs/svid.pem"
         		key_file_path = "../../../../test/fixture/certs/svid_key.pem"
         		file_sync_interval = "5m"
+        	}
+        }`
+	config := new(bundleEndpointConfig)
+	require.NoError(t, hcl.Decode(config, configString))
+
+	return config
+}
+
+func bundleEndpointProfileHTTPSWebServingCertFileNoSyncIntervalTest(t *testing.T) *bundleEndpointConfig {
+	configString := `address = "0.0.0.0"
+        port = 8443
+        refresh_hint = "10m"
+        profile "https_web" {
+        	serving_cert_file {
+        		cert_file_path = "../../../../test/fixture/certs/svid.pem"
+        		key_file_path = "../../../../test/fixture/certs/svid_key.pem"
         	}
         }`
 	config := new(bundleEndpointConfig)
