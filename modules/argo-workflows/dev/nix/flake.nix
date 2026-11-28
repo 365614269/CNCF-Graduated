@@ -38,9 +38,9 @@
             # renovate: datasource=go depName=k8s.io/code-generator
             codeGenerator = "0.35.4";
             # renovate: datasource=go depName=google.golang.org/protobuf
-            protocGenGo = "1.36.6";
+            protocGenGo = "1.36.12";
             # renovate: datasource=go depName=google.golang.org/grpc/cmd/protoc-gen-go-grpc
-            protocGenGoGrpc = "1.5.1";
+            protocGenGoGrpc = "1.6.2";
             # renovate: datasource=go depName=github.com/grpc-ecosystem/grpc-gateway/v2
             grpcGateway = "2.34.0";
             kubeOpenapi = "0.0.0-20220124234850-424119656bbf";
@@ -249,11 +249,11 @@
                 owner = "protocolbuffers";
                 repo = "protobuf-go";
                 rev = "v${version}";
-                sha256 = "sha256-6Wx1XoHZS1RM0hpgVE85U7huVS4IK+AroTE2zpZR4VI=";
+                sha256 = "sha256-1jaQXOwy5x2Yqzkkb5l/kbOhFVUgZ0N1yemDhgq32VE=";
               };
               subPackages = [ "cmd/protoc-gen-go" ];
               doCheck = false;
-              vendorHash = "sha256-nGI/Bd6eMEoY0sBwWEtyhFowHVvwLKjbT4yfzFz6Z3E=";
+              vendorHash = "sha256-EAkrbx9pTBhZ0y0ub14PnMINrk1M6yEgnGapzpgXqBU=";
             };
             protoc-gen-go-grpc = pkgs.buildGoModule rec {
               pname = "protoc-gen-go-grpc";
@@ -263,11 +263,11 @@
                 owner = "grpc";
                 repo = "grpc-go";
                 rev = "cmd/protoc-gen-go-grpc/v${version}";
-                sha256 = "sha256-PAUM0chkZCb4hGDQtCgHF3omPm0jP1sSDolx4EuOwXo=";
+                sha256 = "sha256-I1sPfKhpCb/GNznKgEE2BZ11vAwJIc6HYf78/nIDRy4=";
               };
               modRoot = "cmd/protoc-gen-go-grpc";
               doCheck = false;
-              vendorHash = "sha256-yn6jo6Ku/bnbSX8FL0B/Uu3Knn59r1arjhsVUkZ0m9g=";
+              vendorHash = "sha256-lBOgdAE2FT5ZQxfG/ugqxtH5RB3946VJYjm+VUT1AEI=";
             };
             grpc-ecosystem = pkgs.buildGoModule rec {
               pname = "grpc-ecosystem";
@@ -277,11 +277,11 @@
                 owner = "grpc-ecosystem";
                 repo = "grpc-gateway";
                 rev = "v${version}";
-                sha256 = "sha256-LoSfWF+bJ6p+XVdqauIcgESfse+F57aoADi3mYUf3lo=";
+                sha256 = "sha256-ell+E75F5KC5OAwuP/tjdeyIouLLAGmcXqeWsJG/HC0=";
               };
               subPackages = [ "protoc-gen-grpc-gateway" "protoc-gen-openapiv2" ];
               doCheck = false;
-              vendorHash = "sha256-e0CajogxQoHPanjek6nWebV2yHFja0QHHD57SNlLQDI=";
+              vendorHash = "sha256-0EiubUU7p0HsHWnTLITzpBVB8D1JQSwCe3LmXp52/4A=";
             };
 
             go-swagger = pkgs.go-swagger.overrideAttrs (old: rec {
